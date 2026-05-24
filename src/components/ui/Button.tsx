@@ -138,3 +138,88 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button";
 export default Button;
+
+// ── File Overview ──────────────────────────────────────────────────────────────
+//
+// Button.tsx
+// A fully-featured, theme-aware button component built on Framer Motion.
+// Supports multiple visual variants, three sizes, icon slots, a loading state,
+// and full-width layout — all styled from ThemeContext with no external CSS.
+//
+// ── What it renders ───────────────────────────────────────────────────────────
+//
+// A <motion.button> pill that animates subtly on hover and tap.
+// Layout is inline-flex with three optional slots: [leftIcon] [label] [rightIcon].
+// All colors, typography, radius, shadows, and transitions come from the theme.
+//
+// ── Props ─────────────────────────────────────────────────────────────────────
+//
+//  variant    — controls the color scheme (default: "primary"):
+//                 primary   | secondary | outline | ghost | danger
+//  size       — controls padding, font size, and icon size (default: "md"):
+//                 sm | md | lg
+//  loading    — shows a spinning Loader2 icon in place of leftIcon and locks
+//               the button into a disabled state until the operation resolves
+//  leftIcon   — optional node rendered before the label (hidden while loading)
+//  rightIcon  — optional node rendered after  the label (always hidden while loading)
+//  fullWidth  — stretches the button to 100% of its container width
+//  disabled   — standard HTML disabled; merged with `loading` into `isDisabled`
+//  style      — caller inline-style overrides applied last (highest specificity)
+//  ...rest    — all native <button> HTML attributes are forwarded to the element
+//
+// ── Disabled / loading state ─────────────────────────────────────────────────
+//
+//  isDisabled = disabled || loading
+//  When true:
+//    • cursor becomes "not-allowed"
+//    • opacity drops to 0.55
+//    • Framer Motion hover/tap animations are suppressed (empty objects passed)
+//    • the native `disabled` attribute is set, blocking all click events
+//
+// ── Variant → style mapping ───────────────────────────────────────────────────
+//
+//  primary   — accentPrimary bg,   textOnAccent fg,  subtle shadow
+//  secondary — accentSecondary bg, textOnAccent fg,  subtle shadow
+//  outline   — transparent bg,     accentPrimary fg, accentPrimary border
+//  ghost     — transparent bg,     textPrimary fg,   transparent border
+//  danger    — error color bg,     white fg,         subtle shadow
+//
+//  variantStyle() is a switch function (not a static map) so it can be
+//  extended with dynamic theme logic per variant in the future.
+//
+// ── Size tokens ───────────────────────────────────────────────────────────────
+//
+//  Spacing and font size are applied via Tailwind utility classes (sizeStyles map).
+//  Icon size is derived separately inside the JSX:
+//    sm → 14 px  |  md → 16 px  |  lg → 18 px
+//
+// ── Animation (Framer Motion) ─────────────────────────────────────────────────
+//
+//  whileHover — scale: 1.02, opacity: 0.92  (gives a gentle "lift" feel)
+//  whileTap   — scale: 0.97                 (gives tactile "press" feedback)
+//  transition — 150 ms, applied to both     (fast enough to feel snappy)
+//  Both are set to empty objects when isDisabled to prevent any animation.
+//
+// ── Style priority (low → high) ──────────────────────────────────────────────
+//
+//  Base inline styles
+//    ↓
+//  variantStyle() (spread on top)
+//    ↓
+//  caller `style` prop (spread last — wins everything)
+//    ↓
+//  sizeStyles Tailwind classes + rest.className (for spacing / font size)
+//
+// ── forwardRef ────────────────────────────────────────────────────────────────
+//
+//  The component is wrapped in forwardRef so parent components and form
+//  libraries can attach a ref directly to the underlying <button> DOM node
+//  (e.g. for focus management, imperative clicks, or integration with
+//  React Hook Form's register()).
+//
+// ── Dependencies ─────────────────────────────────────────────────────────────
+//
+//  framer-motion — motion.button for declarative micro-animations
+//  lucide-react  — Loader2 icon for the loading spinner (animate-spin via Tailwind)
+//  useTheme()    — pulls colors, typography, radius, shadows, transitions
+//                  from ThemeContext; no CSS classes needed for theming
