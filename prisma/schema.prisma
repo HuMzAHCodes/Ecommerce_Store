@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
-//  Prisma Schema — Blüm E-Commerce Store
-//  Database: PostgreSQL
-//  Run: npx prisma migrate dev --name init
+//  Prisma 5 Schema — Blüm E-Commerce Store
+//  Database : MySQL (MySQL Workbench)
+//  Run      : npx prisma migrate dev --name init
 // ─────────────────────────────────────────────────────────────
 
 generator client {
@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -39,7 +39,7 @@ enum Role {
   ADMIN
 }
 
-// ── Products ──────────────────────────────────────────────────
+// ── Categories & Products ─────────────────────────────────────
 
 model Category {
   id          String   @id @default(cuid())
@@ -58,12 +58,12 @@ model Product {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
-  description String
+  description String   @db.Text
   price       Float
   salePrice   Float?
   stock       Int      @default(0)
-  images      String[]
-  tags        String[]
+  images      String   @db.Text
+  tags        String   @db.Text
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -195,7 +195,8 @@ model Address {
   createdAt DateTime @default(now())
 
   userId String
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   orders Order[]
 
   @@map("addresses")
@@ -207,7 +208,7 @@ model Review {
   id        String   @id @default(cuid())
   rating    Int
   title     String?
-  body      String
+  body      String   @db.Text
   createdAt DateTime @default(now())
 
   userId String
