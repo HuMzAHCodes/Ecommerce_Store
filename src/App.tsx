@@ -1,122 +1,166 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import PageLayout from "./components/layout/PageLayout";
 
-function App() {
-  const [count, setCount] = useState(0)
+// ── Pages (lazy loaded for performance) ───────────────────────
+import { lazy, Suspense } from "react";
+import { useTheme } from "./theme/ThemeContext";
+
+const Home         = lazy(() => import("./pages/Home"));
+const Shop         = lazy(() => import("./pages/Shop"));
+const ProductPage  = lazy(() => import("./pages/ProductPage"));
+const Cart         = lazy(() => import("./pages/Cart"));
+const Checkout     = lazy(() => import("./pages/Checkout"));
+const Login        = lazy(() => import("./pages/Login"));
+const Register     = lazy(() => import("./pages/Register"));
+const Profile      = lazy(() => import("./pages/Profile"));
+const Orders       = lazy(() => import("./pages/Orders"));
+const Wishlist     = lazy(() => import("./pages/Wishlist"));
+const About        = lazy(() => import("./pages/About"));
+const NotFound     = lazy(() => import("./pages/NotFound"));
+
+// ── Query Client ──────────────────────────────────────────────
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime:        1000 * 60 * 5, // 5 min
+      retry:            1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// ── Page Loader ───────────────────────────────────────────────
+const PageLoader = () => {
+  const theme = useTheme();
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+      <div style={{
+        width: 36, height: 36, borderRadius: "50%",
+        border: `3px solid ${theme.colors.borderLight}`,
+        borderTopColor: theme.colors.accentPrimary,
+        animation: "spin 0.8s linear infinite",
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+};
+
+// ── App ───────────────────────────────────────────────────────
+const App = () => {
+  // TODO: replace with real values from AuthContext + CartContext
+  const cartCount     = 0;
+  const wishlistCount = 0;
+  const isLoggedIn    = false;
+  const userName      = undefined;
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <PageLayout
+          cartCount={cartCount}
+          wishlistCount={wishlistCount}
+          isLoggedIn={isLoggedIn}
+          userName={userName}
         >
-          Count is {count}
-        </button>
-      </section>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/"              element={<Home />}        />
+              <Route path="/shop"          element={<Shop />}        />
+              <Route path="/shop/:slug"    element={<ProductPage />} />
+              <Route path="/cart"          element={<Cart />}        />
+              <Route path="/checkout"      element={<Checkout />}    />
+              <Route path="/login"         element={<Login />}       />
+              <Route path="/register"      element={<Register />}    />
+              <Route path="/profile"       element={<Profile />}     />
+              <Route path="/orders"        element={<Orders />}      />
+              <Route path="/wishlist"      element={<Wishlist />}    />
+              <Route path="/about"         element={<About />}       />
+              <Route path="*"              element={<NotFound />}    />
+            </Routes>
+          </Suspense>
+        </PageLayout>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
-      <div className="ticks"></div>
+export default App;
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+// ── File Overview ──────────────────────────────────────────────────────────────
+//
+// App.tsx
+// The application root. Wires together the provider stack, client-side router,
+// global layout shell, and all page routes. This is the single file that owns
+// the full app composition — every other component is a descendant of what
+// is set up here.
+//
+// ── Provider stack (outer → inner) ───────────────────────────────────────────
+//
+//  QueryClientProvider   — makes React Query's cache available to the entire tree
+//  BrowserRouter         — enables client-side routing via the HTML5 History API
+//  PageLayout            — renders Navbar + animated <main> + Footer around pages
+//  Suspense              — catches lazy-loaded page chunks while they load,
+//                          showing <PageLoader /> as the fallback
+//
+// ── Lazy loading ──────────────────────────────────────────────────────────────
+//
+//  Every page component is wrapped in React.lazy() with a dynamic import.
+//  This means each page is split into its own JS bundle chunk and only
+//  downloaded when the user first navigates to that route — keeping the
+//  initial bundle small and TTI (time to interactive) fast.
+//  All lazy components are children of a single <Suspense> boundary so
+//  any in-flight page load shows the same <PageLoader /> spinner.
+//
+// ── Route table ───────────────────────────────────────────────────────────────
+//
+//  /                  → Home          (landing / hero page)
+//  /shop              → Shop          (product listing, supports ?filter= queries)
+//  /shop/:slug        → ProductPage   (individual product detail, :slug is the ID/handle)
+//  /cart              → Cart          (shopping bag)
+//  /checkout          → Checkout      (order flow; hideFooter would be set here)
+//  /login             → Login         (authentication)
+//  /register          → Register      (new account creation)
+//  /profile           → Profile       (account settings)
+//  /orders            → Orders        (order history)
+//  /wishlist          → Wishlist      (saved items)
+//  /about             → About         (brand / company info)
+//  *                  → NotFound      (catch-all 404 page)
+//
+// ── QueryClient configuration ─────────────────────────────────────────────────
+//
+//  Defined at module level (outside the component) so it is created exactly
+//  once for the lifetime of the app and never re-instantiated on re-renders.
+//
+//  staleTime: 5 minutes   — cached query data is considered fresh for 5 min;
+//                           no background refetch within that window
+//  retry: 1               — failed requests are retried once before throwing
+//  refetchOnWindowFocus: false — prevents automatic refetches when the user
+//                           switches tabs/windows back to the app
+//
+// ── PageLoader ────────────────────────────────────────────────────────────────
+//
+//  A centered spinner shown while a lazy page chunk is downloading.
+//  Rendered at minHeight: 60vh so it appears in the vertical middle of the
+//  content area (below the Navbar, above the Footer) without causing layout
+//  shift. The spinner is a pure CSS animation — a bordered circle with one
+//  colored arc rotating via a keyframes rule injected inline with <style>.
+//  Uses theme.colors so the spinner matches the active theme automatically.
+//
+// ── Auth & cart state (TODO) ──────────────────────────────────────────────────
+//
+//  cartCount, wishlistCount, isLoggedIn, and userName are currently hardcoded
+//  as placeholder values (0 / false / undefined) inside <App>. The inline
+//  TODO comment marks these as the integration point for real context values:
+//    cartCount / wishlistCount  ← CartContext (e.g. derived from cart items array)
+//    isLoggedIn / userName      ← AuthContext (e.g. from a session or JWT hook)
+//  Once those contexts exist, these four lines are the only change needed
+//  in App.tsx to make the Navbar reflect live state.
+//
+// ── Dependencies ─────────────────────────────────────────────────────────────
+//
+//  react-router-dom        — BrowserRouter, Routes, Route for client-side routing
+//  @tanstack/react-query   — QueryClient + QueryClientProvider for server state
+//  PageLayout              — global shell (Navbar + main + Footer)
+//  useTheme()              — consumed only by PageLoader for spinner colors
+//  React.lazy + Suspense   — code-split page loading with fallback UI
