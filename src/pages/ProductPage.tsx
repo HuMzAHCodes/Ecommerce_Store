@@ -1,37 +1,398 @@
-const ProductPage = () => (
-  <div style={{ padding: "4rem 1.5rem", textAlign: "center", fontFamily: "sans-serif" }}>
-    <h2>ProductPage — coming soon</h2>
-  </div>
-);
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { Heart, ShoppingBag, Star, ChevronRight, Minus, Plus, RotateCcw, Truck, Shield } from "lucide-react";
+import { useTheme } from "../theme/ThemeContext";
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
+import { useToast } from "../components/ui/Toast";
+
+// ── Mock data (replace with React Query API call later) ───────
+
+const MOCK_PRODUCTS: Record<string, {
+  id: string; name: string; price: number; salePrice?: number | null;
+  category: string; badge?: string | null; slug: string;
+  description: string; benefits: string[]; howToUse: string;
+  images: { bg: string; label: string }[];
+  reviews: { id: string; name: string; rating: number; date: string; body: string }[];
+  sizes: string[];
+}> = {
+  "radiance-serum": {
+    id:"1", name:"Radiance Serum", price:68, salePrice:null, category:"Skincare", badge:"Best Seller", slug:"radiance-serum",
+    description:"A lightweight, fast-absorbing serum packed with Vitamin C and hyaluronic acid that visibly brightens, evens skin tone, and delivers lasting hydration. Formulated without parabens, sulfates, or artificial fragrances.",
+    benefits:["Visibly brightens in 2 weeks","Evens skin tone","24hr hydration","Dermatologist tested","Fragrance-free"],
+    howToUse:"Apply 3–4 drops to cleansed skin morning and evening. Gently pat into face and neck. Follow with moisturiser. Use SPF in the morning.",
+    images:[{ bg:"#F5DDD0", label:"Front" },{ bg:"#EDD0C0", label:"Side" },{ bg:"#F0E8E0", label:"Detail" }],
+    reviews:[
+      { id:"r1", name:"Amara K.", rating:5, date:"May 2025", body:"Genuinely the best serum I've ever used. My skin is glowing after just two weeks." },
+      { id:"r2", name:"Priya M.", rating:5, date:"Apr 2025", body:"Lightweight, absorbs fast, and my dark spots have faded noticeably." },
+      { id:"r3", name:"Sophie L.", rating:4, date:"Mar 2025", body:"Love this. Wish the bottle was bigger for the price." },
+    ],
+    sizes:["15ml", "30ml", "50ml"],
+  },
+};
+
+// Fallback for any slug not in mock
+const DEFAULT = Object.values(MOCK_PRODUCTS)[0];
+
+const fadeUp: Variants = {
+  hidden:  { opacity:0, y:20 },
+  visible: { opacity:1, y:0, transition:{ duration:0.45, ease:"easeInOut" } },
+};
+
+// ── Component ─────────────────────────────────────────────────
+
+const ProductPage = () => {
+  const { slug }  = useParams<{ slug: string }>();
+  const theme     = useTheme();
+  const { colors, typography, radius, shadows, transitions } = theme;
+  const { addItem, isInCart, openDrawer } = useCart();
+  const { toggle, isWishlisted }          = useWishlist();
+  const toast = useToast();
+
+  const product = (slug && MOCK_PRODUCTS[slug]) ? MOCK_PRODUCTS[slug] : DEFAULT;
+
+  const [activeImg,  setActiveImg]  = useState(0);
+  const [qty,        setQty]        = useState(1);
+  const [activeSize, setActiveSize] = useState(product.sizes[1]);
+  const [activeTab,  setActiveTab]  = useState<"details"|"how-to"|"reviews">("details");
+
+  const handleAddToCart = () => {
+    for (let i = 0; i < qty; i++) {
+      addItem({ id: product.id, name: product.name, price: product.price, salePrice: product.salePrice, image: product.images[0].bg, slug: product.slug });
+    }
+    openDrawer();
+    toast.success(`${product.name} added to cart!`);
+  };
+
+  const avgRating = product.reviews.reduce((s,r) => s + r.rating, 0) / product.reviews.length;
+
+  return (
+    <div style={{ background: colors.bgPrimary, minHeight:"100vh" }}>
+
+      {/* ── Breadcrumb ───────────────────────────────────── */}
+      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding:"0.875rem 1.5rem" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", gap:6, fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>
+          <Link to="/"    style={{ color: colors.textMuted, textDecoration:"none" }}>Home</Link>
+          <ChevronRight size={12} />
+          <Link to="/shop" style={{ color: colors.textMuted, textDecoration:"none" }}>Shop</Link>
+          <ChevronRight size={12} />
+          <span style={{ color: colors.textPrimary }}>{product.name}</span>
+        </div>
+      </div>
+
+      {/* ── Main content ──────────────────────────────────── */}
+      <div style={{ maxWidth:1280, margin:"0 auto", padding:"3rem 1.5rem", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4rem", alignItems:"start" }}>
+
+        {/* Left — Images */}
+        <motion.div initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.5 }}>
+          {/* Main image */}
+          <AnimatePresence mode="wait">
+            <motion.div key={activeImg}
+              initial={{ opacity:0, scale:0.97 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.97 }}
+              transition={{ duration:0.3 }}
+              style={{ height:460, borderRadius: radius?.xl, background: product.images[activeImg].bg, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"1rem", boxShadow: shadows?.lg, position:"relative" }}>
+              <span style={{ fontSize:"6rem" }}>✨</span>
+              {product.badge && (
+                <span style={{ position:"absolute", top:16, left:16, background: product.badge==="Sale" ? colors.accentPrimary : product.badge==="New" ? colors.accentSecondary : colors.textPrimary, color:"#fff", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", padding:"4px 12px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
+                  {product.badge}
+                </span>
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Thumbnails */}
+          <div style={{ display:"flex", gap:"0.75rem" }}>
+            {product.images.map((img, i) => (
+              <button key={i} onClick={() => setActiveImg(i)}
+                style={{ flex:1, height:88, borderRadius: radius?.lg, background: img.bg, border:`2px solid ${activeImg===i ? colors.accentPrimary : colors.borderLight}`, cursor:"pointer", transition:`border-color ${transitions?.fast}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ fontSize:"1.5rem" }}>✨</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Right — Info */}
+        <motion.div variants={{ visible:{ transition:{ staggerChildren:0.08 } } }} initial="hidden" animate="visible">
+
+          <motion.div variants={fadeUp}>
+            <Link to={`/shop?category=${product.category}`}
+              style={{ fontFamily: typography.fontBody, fontSize: typography.xs, fontWeight: typography.weightMedium, color: colors.accentPrimary, textDecoration:"none", letterSpacing:"0.08em", textTransform:"uppercase" }}>
+              {product.category}
+            </Link>
+          </motion.div>
+
+          <motion.h1 variants={fadeUp} style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic", margin:"0.5rem 0 0.75rem" }}>
+            {product.name}
+          </motion.h1>
+
+          {/* Rating */}
+          <motion.div variants={fadeUp} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"1.25rem" }}>
+            <div style={{ display:"flex", gap:2 }}>
+              {[1,2,3,4,5].map((s) => (
+                <Star key={s} size={15} fill={s <= Math.round(avgRating) ? colors.accentPrimary : "none"} color={colors.accentPrimary} />
+              ))}
+            </div>
+            <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>
+              {avgRating.toFixed(1)} ({product.reviews.length} reviews)
+            </span>
+          </motion.div>
+
+          {/* Price */}
+          <motion.div variants={fadeUp} style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"1.75rem" }}>
+            <span style={{ fontFamily: typography.fontDisplay, fontSize: typography["3xl"], color: product.salePrice ? colors.accentPrimary : colors.textPrimary }}>
+              ${product.salePrice ?? product.price}
+            </span>
+            {product.salePrice && (
+              <span style={{ fontFamily: typography.fontBody, fontSize: typography.xl, color: colors.textMuted, textDecoration:"line-through" }}>${product.price}</span>
+            )}
+          </motion.div>
+
+          {/* Size */}
+          <motion.div variants={fadeUp} style={{ marginBottom:"1.5rem" }}>
+            <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom:"0.625rem" }}>
+              Size — <span style={{ color: colors.accentPrimary }}>{activeSize}</span>
+            </p>
+            <div style={{ display:"flex", gap:"0.5rem" }}>
+              {product.sizes.map((s) => (
+                <button key={s} onClick={() => setActiveSize(s)}
+                  style={{ padding:"0.5rem 1.125rem", borderRadius: radius?.full, border:`1.5px solid ${activeSize===s ? colors.accentPrimary : colors.borderLight}`, background: activeSize===s ? colors.accentLight : "transparent", color: activeSize===s ? colors.accentPrimary : colors.textSecondary, fontFamily: typography.fontBody, fontSize: typography.sm, cursor:"pointer", transition:`all ${transitions?.fast}` }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Qty + Add to cart */}
+          <motion.div variants={fadeUp} style={{ display:"flex", gap:"0.875rem", alignItems:"center", marginBottom:"1rem" }}>
+            {/* Qty stepper */}
+            <div style={{ display:"flex", alignItems:"center", gap:0, border:`1px solid ${colors.borderLight}`, borderRadius: radius?.full, overflow:"hidden" }}>
+              <button onClick={() => setQty(q => Math.max(1, q-1))}
+                style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}>
+                <Minus size={14} />
+              </button>
+              <span style={{ width:36, textAlign:"center", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>
+                {qty}
+              </span>
+              <button onClick={() => setQty(q => q+1)}
+                style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}>
+                <Plus size={14} />
+              </button>
+            </div>
+
+            {/* Add to cart */}
+            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }} onClick={handleAddToCart}
+              style={{ flex:1, height:42, borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, display:"flex", alignItems:"center", justifyContent:"center", gap:8, boxShadow: shadows?.md }}>
+              <ShoppingBag size={18} /> {isInCart(product.id) ? "Add More" : "Add to Cart"}
+            </motion.button>
+
+            {/* Wishlist */}
+            <motion.button whileTap={{ scale:0.88 }} onClick={() => { toggle({ id:product.id, name:product.name, price:product.price, salePrice:product.salePrice, image:product.images[0].bg, slug:product.slug }); toast.info(isWishlisted(product.id) ? "Removed from wishlist" : "Saved to wishlist!"); }}
+              style={{ width:42, height:42, borderRadius: radius?.full, border:`1.5px solid ${isWishlisted(product.id) ? colors.accentPrimary : colors.borderLight}`, background: isWishlisted(product.id) ? colors.accentLight : "transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <Heart size={18} fill={isWishlisted(product.id) ? colors.accentPrimary : "none"} color={isWishlisted(product.id) ? colors.accentPrimary : colors.textMuted} />
+            </motion.button>
+          </motion.div>
+
+          {/* Perks */}
+          <motion.div variants={fadeUp} style={{ display:"flex", flexDirection:"column", gap:"0.5rem", padding:"1.25rem", background: colors.bgSecondary, borderRadius: radius?.lg, marginBottom:"1.75rem" }}>
+            {[{ icon:<Truck size={15}/>,     text:"Free shipping on orders over $50" },
+              { icon:<RotateCcw size={15}/>, text:"30-day easy returns" },
+              { icon:<Shield size={15}/>,    text:"Clean, dermatologist-tested formula" }]
+              .map((p,i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
+                  <span style={{ color: colors.accentPrimary }}>{p.icon}</span> {p.text}
+                </div>
+            ))}
+          </motion.div>
+
+          {/* Tabs */}
+          <motion.div variants={fadeUp}>
+            <div style={{ display:"flex", borderBottom:`1px solid ${colors.borderLight}`, marginBottom:"1.25rem" }}>
+              {(["details","how-to","reviews"] as const).map((tab) => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  style={{ padding:"0.625rem 1.25rem", border:"none", background:"transparent", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: activeTab===tab ? typography.weightMedium : typography.weightRegular, color: activeTab===tab ? colors.accentPrimary : colors.textMuted, borderBottom: `2px solid ${activeTab===tab ? colors.accentPrimary : "transparent"}`, marginBottom:-1, transition:`all ${transitions?.fast}` }}>
+                  {tab === "how-to" ? "How to Use" : tab.charAt(0).toUpperCase()+tab.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <AnimatePresence mode="wait">
+              {activeTab === "details" && (
+                <motion.div key="details" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }}>
+                  <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.7, marginBottom:"1rem" }}>{product.description}</p>
+                  <ul style={{ display:"flex", flexDirection:"column", gap:"0.375rem" }}>
+                    {product.benefits.map((b) => (
+                      <li key={b} style={{ display:"flex", alignItems:"center", gap:8, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
+                        <span style={{ color: colors.accentPrimary, fontSize:"0.7rem" }}>●</span> {b}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+              {activeTab === "how-to" && (
+                <motion.div key="how-to" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }}>
+                  <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.8 }}>{product.howToUse}</p>
+                </motion.div>
+              )}
+              {activeTab === "reviews" && (
+                <motion.div key="reviews" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }} style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+                  {product.reviews.map((r) => (
+                    <div key={r.id} style={{ padding:"1rem", background: colors.bgSecondary, borderRadius: radius?.lg, border:`1px solid ${colors.borderLight}` }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.375rem" }}>
+                        <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{r.name}</span>
+                        <span style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{r.date}</span>
+                      </div>
+                      <div style={{ display:"flex", gap:2, marginBottom:"0.5rem" }}>
+                        {[1,2,3,4,5].map((s) => <Star key={s} size={12} fill={s<=r.rating ? colors.accentPrimary : "none"} color={colors.accentPrimary} />)}
+                      </div>
+                      <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.6, margin:0 }}>{r.body}</p>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
 export default ProductPage;
 
-// ── File Overview ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────
+// FILE OVERVIEW: ProductPage.tsx
+// ──────────────────────────────────────────────────────────────────────────────
 //
-// ProductPage.tsx
-// Temporary placeholder for the individual product detail page. Renders a
-// centered "coming soon" heading with minimal inline styling.
-// No logic, no props, no theme dependency.
+// PURPOSE
+// -------
+// The individual product detail page. When a user clicks a product anywhere
+// in the app they are routed to /shop/:slug, which renders this component.
+// It displays the full product — images, pricing, size picker, quantity
+// stepper, add-to-cart, wishlist, perks, and a tabbed content section for
+// description, usage instructions, and reviews.
 //
-// This file exists solely to satisfy the lazy import in App.tsx:
-//   const ProductPage = lazy(() => import("./pages/ProductPage"))
-// Without it, navigating to /shop/:slug would throw a module-not-found error.
 //
-// ── Route context ─────────────────────────────────────────────────────────────
+// DATA
+// ----
+// MOCK_PRODUCTS
+//    A Record keyed by product slug. Each entry is a richer version of the
+//    Shop page's Product type — it adds description, benefits, howToUse,
+//    a multi-image array, a reviews array, and a sizes array. Currently only
+//    "radiance-serum" is defined. When the backend is ready this entire
+//    object should be replaced with a React Query useQuery call to
+//    GET /api/products/:slug.
 //
-// This page is mounted at /shop/:slug where :slug is the product's URL handle
-// or ID. The real implementation will need to call useParams() to extract
-// the slug and use it to fetch the correct product.
+// DEFAULT
+//    A fallback set to the first entry in MOCK_PRODUCTS. If the URL slug
+//    does not match any key in MOCK_PRODUCTS (e.g. a product not yet mocked),
+//    the component renders the default product rather than crashing or showing
+//    an empty page. This should be replaced with a proper 404 redirect once
+//    real data is in place.
 //
-// ── What to build here ────────────────────────────────────────────────────────
+// fadeUp (Variants)
+//    The same staggered entrance variant used in Shop.tsx — each section of
+//    the right-hand info column animates in from below with a fade. Typed
+//    explicitly as Variants to catch type errors at the definition site.
 //
-// This stub should eventually be replaced with the full ProductPage, which
-// will likely include:
-//   • useParams() to read :slug from the URL
-//   • React Query fetch for product data by slug
-//   • Image gallery / carousel
-//   • Product title, price, description, and badge (Sale / New)
-//   • Variant selector (size, color, scent, etc.)
-//   • Quantity picker + Add to Cart button
-//   • Wishlist toggle
-//   • Related / recommended products section
-//   • Breadcrumb navigation (Home → Shop → Product name)
+//
+// STATE
+// -----
+// activeImg  — index of the currently displayed product image. Clicking a
+//              thumbnail updates this, which swaps the main image with an
+//              AnimatePresence cross-fade.
+// qty        — the quantity the user wants to add to cart. Controlled by the
+//              Minus / Plus stepper. Minimum value is clamped to 1.
+// activeSize — the currently selected size option. Defaults to the middle
+//              size (index 1) so the most common size is pre-selected.
+// activeTab  — which tab is showing in the bottom info section:
+//              "details", "how-to", or "reviews". Each tab panel animates
+//              in and out via AnimatePresence.
+//
+//
+// SLUG RESOLUTION
+// ---------------
+// useParams extracts the :slug segment from the URL. The component then
+// looks up MOCK_PRODUCTS[slug]. If found it uses that product; if not found
+// (slug is undefined or not in the map) it falls back to DEFAULT. This means
+// every link from the Shop page that uses a valid slug will land on the right
+// product, and any unrecognised slug still renders a valid page.
+//
+//
+// HANDLERS
+// --------
+// handleAddToCart()
+//    Loops `qty` times calling addItem, so adding 3 units results in 3
+//    separate cart entries (or qty increments on the same item, depending
+//    on how CartContext handles duplicates). After adding, it opens the
+//    cart drawer and fires a success toast.
+//
+// Wishlist toggle (inline)
+//    Called directly in the wishlist button's onClick. Calls toggle() from
+//    WishlistContext and fires an info toast. The toast message reads
+//    isWishlisted *before* toggle fires, so "Removed" vs "Saved" is
+//    correct for the action that just happened — same pattern as Shop.tsx.
+//
+// avgRating
+//    Computed inline by reducing the reviews array. Used to render the
+//    filled/empty star icons and the numeric rating display.
+//
+//
+// LAYOUT
+// ------
+// A two-column CSS grid (1fr 1fr) with a 4rem gap. The left column holds
+// the image gallery; the right column holds all product information.
+// The left column slides in from the left (x: -20) on mount. The right
+// column uses a stagger parent variant so each child section (category
+// link, title, rating, price, size picker, etc.) cascades in with an 80ms
+// delay between each one, creating a smooth sequential entrance.
+//
+// The image gallery has two parts: a large main image area (460px tall)
+// that cross-fades between images using AnimatePresence keyed on activeImg,
+// and a row of thumbnail buttons below it that highlight the active image
+// with an accent-coloured border.
+//
+// The tab section at the bottom uses AnimatePresence mode="wait" so the
+// outgoing tab panel fades out completely before the incoming one fades in,
+// preventing two panels from being visible at the same time.
+//
+//
+// CONTEXTS USED
+// -------------
+// useTheme()     — all visual tokens (colours, typography, radius, shadows,
+//                  transitions) so the page is fully theme-aware.
+// useCart()      — addItem to add the product, isInCart to change the button
+//                  label to "Add More" when the product is already in the
+//                  cart, openDrawer to reveal the cart sidebar after adding.
+// useWishlist()  — toggle to add/remove, isWishlisted to reflect the saved
+//                  state on the heart button (filled vs outline, accent
+//                  background vs transparent).
+// useToast()     — success toast after adding to cart, info toast after
+//                  toggling the wishlist.
+//
+//
+// BUG FIX — Variants type and ease value
+// ----------------------------------------
+// Same issue as Shop.tsx. The original fadeUp used ease: [0.4, 0, 0.2, 1]
+// which is a raw number array. Newer Framer Motion versions only accept
+// named easing strings for the ease property inside Variants. Fixed by:
+// 1. Replacing [0.4, 0, 0.2, 1] with "easeInOut".
+// 2. Adding the Variants type annotation to fadeUp.
+// 3. Importing Variants as a type from framer-motion.
+//
+//
+// KEY INSIGHT
+// -----------
+// The most subtle design decision in this file is the two-layer animation
+// architecture on the right column. The parent motion.div has no visual
+// animation of its own — it only carries a variants object with a
+// staggerChildren transition. Each child section (category, title, rating,
+// etc.) then carries the fadeUp variant. This separation means the stagger
+// orchestration lives in the parent and the actual motion lives in the
+// children, which is the correct Framer Motion pattern for cascading
+// entrance animations. If the staggerChildren were put on the children
+// themselves, or if the parent also tried to animate, the timing would
+// conflict and the cascade would break. The parent is purely a conductor;
+// the children do all the visible work.
+//
+// ──────────────────────────────────────────────────────────────────────────────
