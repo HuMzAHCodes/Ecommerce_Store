@@ -1,166 +1,185 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import PageLayout from "./components/layout/PageLayout";
-
-// ── Pages (lazy loaded for performance) ───────────────────────
 import { lazy, Suspense } from "react";
+import { CartProvider, useCart }         from "./context/CartContext";
+import { AuthProvider, useAuth }         from "./context/AuthContext";
+import { WishlistProvider, useWishlist } from "./context/WishlistContext";
+import PageLayout from "./components/layout/PageLayout";
 import { useTheme } from "./theme/ThemeContext";
 
-const Home         = lazy(() => import("./pages/Home"));
-const Shop         = lazy(() => import("./pages/Shop"));
-const ProductPage  = lazy(() => import("./pages/ProductPage"));
-const Cart         = lazy(() => import("./pages/Cart"));
-const Checkout     = lazy(() => import("./pages/Checkout"));
-const Login        = lazy(() => import("./pages/Login"));
-const Register     = lazy(() => import("./pages/Register"));
-const Profile      = lazy(() => import("./pages/profile"));
-const Orders       = lazy(() => import("./pages/Orders"));
-const Wishlist     = lazy(() => import("./pages/Wishlist"));
-const About        = lazy(() => import("./pages/About"));
-const NotFound     = lazy(() => import("./pages/NotFound"));
+// ── Pages (lazy loaded) ───────────────────────────────────────
+const Home        = lazy(() => import("./pages/Home"));
+const Shop        = lazy(() => import("./pages/Shop"));
+const ProductPage = lazy(() => import("./pages/ProductPage"));
+const Cart        = lazy(() => import("./pages/Cart"));
+const Checkout    = lazy(() => import("./pages/Checkout"));
+const Login       = lazy(() => import("./pages/Login"));
+const Register    = lazy(() => import("./pages/Register"));
+const Profile     = lazy(() => import("./pages/profile"));
+const Orders      = lazy(() => import("./pages/Orders"));
+const Wishlist    = lazy(() => import("./pages/Wishlist"));
+const About       = lazy(() => import("./pages/About"));
+const NotFound    = lazy(() => import("./pages/NotFound"));
 
 // ── Query Client ──────────────────────────────────────────────
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime:        1000 * 60 * 5, // 5 min
-      retry:            1,
-      refetchOnWindowFocus: false,
-    },
+    queries: { staleTime: 1000 * 60 * 5, retry: 1, refetchOnWindowFocus: false },
   },
 });
 
-// ── Page Loader ───────────────────────────────────────────────
+// ── Spinner ───────────────────────────────────────────────────
 const PageLoader = () => {
   const theme = useTheme();
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-      <div style={{
-        width: 36, height: 36, borderRadius: "50%",
-        border: `3px solid ${theme.colors.borderLight}`,
-        borderTopColor: theme.colors.accentPrimary,
-        animation: "spin 0.8s linear infinite",
-      }} />
+      <div style={{ width: 36, height: 36, borderRadius: "50%", border: `3px solid ${theme.colors.borderLight}`, borderTopColor: theme.colors.accentPrimary, animation: "spin 0.8s linear infinite" }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };
 
-// ── App ───────────────────────────────────────────────────────
-const App = () => {
-  // TODO: replace with real values from AuthContext + CartContext
-  const cartCount     = 0;
-  const wishlistCount = 0;
-  const isLoggedIn    = false;
-  const userName      = undefined;
+// ── Inner App — reads from contexts ──────────────────────────
+const AppInner = () => {
+  const { totalItems }    = useCart();
+  const { totalItems: wishlistCount } = useWishlist();
+  const { isLoggedIn, user } = useAuth();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <PageLayout
-          cartCount={cartCount}
-          wishlistCount={wishlistCount}
-          isLoggedIn={isLoggedIn}
-          userName={userName}
-        >
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/"              element={<Home />}        />
-              <Route path="/shop"          element={<Shop />}        />
-              <Route path="/shop/:slug"    element={<ProductPage />} />
-              <Route path="/cart"          element={<Cart />}        />
-              <Route path="/checkout"      element={<Checkout />}    />
-              <Route path="/login"         element={<Login />}       />
-              <Route path="/register"      element={<Register />}    />
-              <Route path="/profile"       element={<Profile />}     />
-              <Route path="/orders"        element={<Orders />}      />
-              <Route path="/wishlist"      element={<Wishlist />}    />
-              <Route path="/about"         element={<About />}       />
-              <Route path="*"              element={<NotFound />}    />
-            </Routes>
-          </Suspense>
-        </PageLayout>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <PageLayout
+      cartCount={totalItems}
+      wishlistCount={wishlistCount}
+      isLoggedIn={isLoggedIn}
+      userName={user?.name}
+    >
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/"           element={<Home />}        />
+          <Route path="/shop"       element={<Shop />}        />
+          <Route path="/shop/:slug" element={<ProductPage />} />
+          <Route path="/cart"       element={<Cart />}        />
+          <Route path="/checkout"   element={<Checkout />}    />
+          <Route path="/login"      element={<Login />}       />
+          <Route path="/register"   element={<Register />}    />
+          <Route path="/profile"    element={<Profile />}     />
+          <Route path="/orders"     element={<Orders />}      />
+          <Route path="/wishlist"   element={<Wishlist />}    />
+          <Route path="/about"      element={<About />}       />
+          <Route path="*"           element={<NotFound />}    />
+        </Routes>
+      </Suspense>
+    </PageLayout>
   );
 };
 
+// ── Root App — provides all contexts ─────────────────────────
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <AppInner />
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </QueryClientProvider>
+);
+
 export default App;
 
-// ── File Overview ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────
+// FILE OVERVIEW: App.tsx
+// ──────────────────────────────────────────────────────────────────────────────
 //
-// App.tsx
-// The application root. Wires together the provider stack, client-side router,
-// global layout shell, and all page routes. This is the single file that owns
-// the full app composition — every other component is a descendant of what
-// is set up here.
+// PURPOSE
+// -------
+// This is the root of the entire React application. It is responsible for
+// three things: wrapping the app in every global provider it needs, defining
+// all client-side routes, and lazy-loading each page so the initial bundle
+// stays small.
 //
-// ── Provider stack (outer → inner) ───────────────────────────────────────────
 //
-//  QueryClientProvider   — makes React Query's cache available to the entire tree
-//  BrowserRouter         — enables client-side routing via the HTML5 History API
-//  PageLayout            — renders Navbar + animated <main> + Footer around pages
-//  Suspense              — catches lazy-loaded page chunks while they load,
-//                          showing <PageLoader /> as the fallback
+// KEY BUILDING BLOCKS
+// -------------------
 //
-// ── Lazy loading ──────────────────────────────────────────────────────────────
+// 1. Lazy-loaded pages
+//    Every page component is imported with React.lazy(). This means the
+//    JavaScript for each page is only downloaded when the user actually
+//    navigates to that route — not on the initial load. The trade-off is
+//    that a page takes a brief moment to load the first time it is visited,
+//    which is handled by the <Suspense> fallback below.
 //
-//  Every page component is wrapped in React.lazy() with a dynamic import.
-//  This means each page is split into its own JS bundle chunk and only
-//  downloaded when the user first navigates to that route — keeping the
-//  initial bundle small and TTI (time to interactive) fast.
-//  All lazy components are children of a single <Suspense> boundary so
-//  any in-flight page load shows the same <PageLoader /> spinner.
+// 2. QueryClient
+//    A single QueryClient instance is created outside any component so it is
+//    never recreated on re-renders. Its default options are:
+//    - staleTime: 5 minutes  — cached server data is considered fresh for 5
+//                              minutes, preventing redundant network requests
+//                              when the user navigates between pages quickly.
+//    - retry: 1              — a failed request is retried once before React
+//                              Query gives up and reports an error.
+//    - refetchOnWindowFocus: false — data is NOT re-fetched automatically when
+//                              the user switches browser tabs and comes back,
+//                              avoiding surprise loading states.
 //
-// ── Route table ───────────────────────────────────────────────────────────────
+// 3. PageLoader (spinner)
+//    A centred spinning circle shown by <Suspense> while a lazy page chunk is
+//    being downloaded. It reads accent and border colours from ThemeContext so
+//    the spinner always matches the active theme, even before the page renders.
 //
-//  /                  → Home          (landing / hero page)
-//  /shop              → Shop          (product listing, supports ?filter= queries)
-//  /shop/:slug        → ProductPage   (individual product detail, :slug is the ID/handle)
-//  /cart              → Cart          (shopping bag)
-//  /checkout          → Checkout      (order flow; hideFooter would be set here)
-//  /login             → Login         (authentication)
-//  /register          → Register      (new account creation)
-//  /profile           → Profile       (account settings)
-//  /orders            → Orders        (order history)
-//  /wishlist          → Wishlist      (saved items)
-//  /about             → About         (brand / company info)
-//  *                  → NotFound      (catch-all 404 page)
+// 4. AppInner
+//    A separate inner component whose only job is to read from the three
+//    context hooks (useCart, useWishlist, useAuth) and pass the derived values
+//    down to PageLayout. It must be a child of all three providers — that is
+//    why it is split out from the root <App> component. If these hooks were
+//    called directly inside <App>, they would run before their providers mount
+//    and throw an error.
+//    It also owns the <Routes> tree, mapping every URL path to its page:
+//    - "/"            → Home
+//    - "/shop"        → Shop (product listing)
+//    - "/shop/:slug"  → ProductPage (single product, slug is the URL identifier)
+//    - "/cart"        → Cart
+//    - "/checkout"    → Checkout
+//    - "/login"       → Login
+//    - "/register"    → Register
+//    - "/profile"     → Profile
+//    - "/orders"      → Orders
+//    - "/wishlist"    → Wishlist
+//    - "/about"       → About
+//    - "*"            → NotFound (catches any unrecognised URL)
 //
-// ── QueryClient configuration ─────────────────────────────────────────────────
+// 5. App (root component)
+//    The outermost component. It stacks all providers in the correct order
+//    from outermost to innermost:
 //
-//  Defined at module level (outside the component) so it is created exactly
-//  once for the lifetime of the app and never re-instantiated on re-renders.
+//    QueryClientProvider   — makes React Query available everywhere
+//      BrowserRouter       — enables client-side routing via the History API
+//        AuthProvider      — global auth state (user, token, login, logout)
+//          CartProvider    — global cart state (items, totals, add/remove)
+//            WishlistProvider — global wishlist state (saved products)
+//              AppInner    — reads contexts, renders layout + routes
 //
-//  staleTime: 5 minutes   — cached query data is considered fresh for 5 min;
-//                           no background refetch within that window
-//  retry: 1               — failed requests are retried once before throwing
-//  refetchOnWindowFocus: false — prevents automatic refetches when the user
-//                           switches tabs/windows back to the app
+//    Provider order matters: inner providers can depend on outer ones, but
+//    not the reverse. For example, CartProvider or WishlistProvider could
+//    theoretically use auth state in the future, which is why AuthProvider
+//    wraps them both.
 //
-// ── PageLoader ────────────────────────────────────────────────────────────────
 //
-//  A centered spinner shown while a lazy page chunk is downloading.
-//  Rendered at minHeight: 60vh so it appears in the vertical middle of the
-//  content area (below the Navbar, above the Footer) without causing layout
-//  shift. The spinner is a pure CSS animation — a bordered circle with one
-//  colored arc rotating via a keyframes rule injected inline with <style>.
-//  Uses theme.colors so the spinner matches the active theme automatically.
+// WHY AppInner IS SEPARATE FROM App
+// -----------------------------------
+// React Context hooks (useCart, useWishlist, useAuth) can only be called
+// inside a component that is already a descendant of the matching Provider.
+// If <App> called useCart() directly, it would crash because <CartProvider>
+// hadn't mounted yet. Splitting into <App> (providers) + <AppInner>
+// (consumers) is the standard pattern to solve this cleanly.
 //
-// ── Auth & cart state (TODO) ──────────────────────────────────────────────────
 //
-//  cartCount, wishlistCount, isLoggedIn, and userName are currently hardcoded
-//  as placeholder values (0 / false / undefined) inside <App>. The inline
-//  TODO comment marks these as the integration point for real context values:
-//    cartCount / wishlistCount  ← CartContext (e.g. derived from cart items array)
-//    isLoggedIn / userName      ← AuthContext (e.g. from a session or JWT hook)
-//  Once those contexts exist, these four lines are the only change needed
-//  in App.tsx to make the Navbar reflect live state.
+// ADDING A NEW PAGE
+// -----------------
+// 1. Create the page component under src/pages/.
+// 2. Add a lazy() import at the top of this file.
+// 3. Add a <Route path="/your-path" element={<YourPage />} /> inside <Routes>.
+// No other file needs to change for basic routing.
 //
-// ── Dependencies ─────────────────────────────────────────────────────────────
-//
-//  react-router-dom        — BrowserRouter, Routes, Route for client-side routing
-//  @tanstack/react-query   — QueryClient + QueryClientProvider for server state
-//  PageLayout              — global shell (Navbar + main + Footer)
-//  useTheme()              — consumed only by PageLoader for spinner colors
-//  React.lazy + Suspense   — code-split page loading with fallback UI
+// ──────────────────────────────────────────────────────────────────────────────
