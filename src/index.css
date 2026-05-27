@@ -1,4 +1,4 @@
-/* *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
 
@@ -49,7 +49,7 @@ input::placeholder { color: var(--color-text-muted); }
 .fade-up { animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .skeleton { background: var(--color-bg-tertiary); border-radius: var(--radius-md); animation: skeleton-pulse 1.5s ease-in-out infinite; }
 .stagger-1 { animation-delay: 0.05s; } .stagger-2 { animation-delay: 0.10s; }
-.stagger-3 { animation-delay: 0.15s; } .stagger-4 { animation-delay: 0.20s; } */
+.stagger-3 { animation-delay: 0.15s; } .stagger-4 { animation-delay: 0.20s; } 
 
 
 
@@ -57,7 +57,17 @@ input::placeholder { color: var(--color-text-muted); }
 
 
 
-/* ── Reset ──────────────────────────────────────────────────── */
+
+
+
+
+
+
+
+
+
+ 
+/* ── Reset ──────────────────────────────────────────────────── 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
@@ -76,13 +86,13 @@ body {
   transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
-/* ── Typography ──────────────────────────────────────────────── */
+// ── Typography ──────────────────────────────────────────────── 
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   color: var(--color-text-primary);
   line-height: 1.2;
-  /* Playfair Display technique: tight tracking on large headings */
+  // Playfair Display technique: tight tracking on large headings 
   letter-spacing: -0.02em;
 }
 
@@ -93,7 +103,7 @@ h4 { font-size: 1.25rem; font-weight: 600; }
 h5 { font-size: 1.125rem; font-weight: 500; }
 h6 { font-size: 1rem; font-weight: 500; }
 
-/* Display italic technique — used on hero / section headings */
+// Display italic technique — used on hero / section headings 
 .display-italic {
   font-family: var(--font-display);
   font-style: italic;
@@ -101,7 +111,7 @@ h6 { font-size: 1rem; font-weight: 500; }
   letter-spacing: -0.01em;
 }
 
-/* Label technique — DM Sans uppercase + tracked = premium UI labels */
+// Label technique — DM Sans uppercase + tracked = premium UI labels 
 .label-tracked {
   font-family: var(--font-body);
   font-size: 0.72rem;
@@ -119,32 +129,32 @@ a {
 }
 a:hover { color: var(--color-accent-primary); }
 
-/* ── Selection ───────────────────────────────────────────────── */
+//── Selection ───────────────────────────────────────────────── 
 ::selection {
   background-color: var(--color-accent-primary);
   color: var(--color-text-on-accent);
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────── */
+// ── Scrollbar ───────────────────────────────────────────────── 
 ::-webkit-scrollbar        { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track  { background: var(--color-bg-secondary); }
 ::-webkit-scrollbar-thumb  { background: var(--color-border-medium); border-radius: var(--radius-full); }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-primary); }
 
-/* ── Focus ───────────────────────────────────────────────────── */
+// ── Focus ───────────────────────────────────────────────────── 
 :focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
-/* ── Images ──────────────────────────────────────────────────── */
+// ── Images ──────────────────────────────────────────────────── 
 img, video { max-width: 100%; display: block; }
 
-/* ── Buttons ─────────────────────────────────────────────────── */
+// ── Buttons ─────────────────────────────────────────────────── //
 button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
 
-/* ── Inputs ──────────────────────────────────────────────────── */
+// ── Inputs ──────────────────────────────────────────────────── /
 input, textarea, select {
   font-family: var(--font-body);
   font-size: 1rem;
@@ -163,15 +173,15 @@ input:focus, textarea:focus, select:focus {
 }
 input::placeholder, textarea::placeholder { color: var(--color-text-muted); }
 
-/* Select options inherit dark bg */
+// Select options inherit dark bg /
 option { background: var(--color-bg-secondary); color: var(--color-text-primary); }
 
-/* ── Layout utilities ────────────────────────────────────────── */
+// ── Layout utilities ────────────────────────────────────────── /
 .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
 .section    { padding: 5rem 0; }
 .section-sm { padding: 3rem 0; }
 
-/* ── Animations ──────────────────────────────────────────────── */
+// ── Animations ──────────────────────────────────────────────── /
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -196,14 +206,14 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
   animation: skeleton-pulse 1.6s ease-in-out infinite;
 }
 
-/* Stagger delays */
+//Stagger delays /
 .stagger-1 { animation-delay: 0.05s; }
 .stagger-2 { animation-delay: 0.10s; }
 .stagger-3 { animation-delay: 0.15s; }
 .stagger-4 { animation-delay: 0.20s; }
 .stagger-5 { animation-delay: 0.25s; }
 
-/* ── Underline hover ─────────────────────────────────────────── */
+// ── Underline hover ─────────────────────────────────────────── /
 .underline-hover { position: relative; }
 .underline-hover::after {
   content: "";
@@ -215,8 +225,8 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
 }
 .underline-hover:hover::after { width: 100%; }
 
-/* ── Page transition ─────────────────────────────────────────── */
+//── Page transition ─────────────────────────────────────────── /
 .page-wrapper {
   min-height: 100vh;
   background-color: var(--color-bg-primary);
-}
+} */
