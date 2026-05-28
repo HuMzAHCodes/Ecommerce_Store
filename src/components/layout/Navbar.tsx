@@ -47,6 +47,16 @@ const NAV_LINKS: NavLink[] = [
   { label: "About", href: "/about" },
 ];
 
+/** Convert #RRGGBB theme colors to rgba for translucent nav on scroll */
+const hexToRgba = (hex: string, alpha: number): string => {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 // ── Component ─────────────────────────────────────────────────
 
 const Navbar = ({
@@ -91,7 +101,12 @@ const Navbar = ({
   const isActive = (href: string) =>
     location.pathname === href || location.pathname.startsWith(href + "/");
 
-  // ── Shared icon button style ───────────────────────────────
+  // ── Shared hover tokens — warm off-white, pairs with butter nav (#FFEFB3) ──
+  const navHoverBg     = "#FFFEF8";
+  const navActiveBg    = "#FFFFFF";
+  const hoverBg        = navHoverBg;
+  const hoverColor     = colors.accentPrimary;
+
   const iconBtn: React.CSSProperties = {
     position:       "relative",
     display:        "flex",
@@ -104,7 +119,45 @@ const Navbar = ({
     border:         "none",
     cursor:         "pointer",
     color:          colors.navText,
-    transition:     `background ${transitions?.fast}, color ${transitions?.fast}`,
+    transition:     `background ${transitions?.fast}, color ${transitions?.fast}, transform ${transitions?.fast}`,
+  };
+
+  const iconHover = {
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+      const el = e.currentTarget;
+      el.style.background = hoverBg;
+      el.style.color      = hoverColor;
+      el.style.transform  = "translateY(-1px)";
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+      const el = e.currentTarget;
+      el.style.background = "transparent";
+      el.style.color      = colors.navText;
+      el.style.transform  = "translateY(0)";
+    },
+  };
+
+  const navLinkHover = (href: string) => ({
+    onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.currentTarget.style.background = hoverBg;
+      e.currentTarget.style.color      = hoverColor;
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
+      const active = isActive(href);
+      e.currentTarget.style.background = active ? navActiveBg : "transparent";
+      e.currentTarget.style.color      = active ? hoverColor : colors.navText;
+    },
+  });
+
+  const menuItemHover = {
+    onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.currentTarget.style.background = hoverBg;
+      e.currentTarget.style.color      = hoverColor;
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.currentTarget.style.background = "transparent";
+      e.currentTarget.style.color      = colors.textSecondary;
+    },
   };
 
   return (
@@ -115,13 +168,15 @@ const Navbar = ({
         animate={{ y: 0,   opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         style={{
-          position:   "sticky",
-          top:        0,
-          zIndex:     100,
-          background: colors.navBg,
-          borderBottom: `1px solid ${scrolled ? colors.borderMedium : colors.navBorder}`,
-          boxShadow:  scrolled ? shadows?.sm : "none",
-          transition: `box-shadow ${transitions?.normal}, border-color ${transitions?.normal}`,
+          position:              "sticky",
+          top:                   0,
+          zIndex:                100,
+          background:            scrolled ? hexToRgba(colors.navBg, 0.38) : colors.navBg,
+          backdropFilter:        scrolled ? "blur(10px) saturate(1.1)" : "none",
+          WebkitBackdropFilter:  scrolled ? "blur(10px) saturate(1.1)" : "none",
+          borderBottom:          `1px solid ${scrolled ? colors.borderMedium : colors.navBorder}`,
+          boxShadow:             scrolled ? shadows?.sm : "none",
+          transition:            `background ${transitions?.normal}, box-shadow ${transitions?.normal}, border-color ${transitions?.normal}, backdrop-filter ${transitions?.normal}`,
         }}
       >
         <div
@@ -140,13 +195,26 @@ const Navbar = ({
           <Link
             to="/"
             style={{
-              fontFamily:    typography.fontDisplay,
-              fontSize:      typography["2xl"],
-              fontWeight:    typography.weightMedium,
-              color:         colors.textPrimary,
+              fontFamily:     typography.fontDisplay,
+              fontSize:       typography["2xl"],
+              fontWeight:     typography.weightMedium,
+              color:          colors.textPrimary,
               textDecoration: "none",
-              letterSpacing: "0.06em",
-              flexShrink:    0,
+              letterSpacing:  "0.06em",
+              flexShrink:     0,
+              padding:        "0.35rem 0.6rem",
+              borderRadius:   radius?.md,
+              transition:     `color ${transitions?.fast}, transform ${transitions?.fast}, background ${transitions?.fast}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color      = hoverColor;
+              e.currentTarget.style.background = hoverBg;
+              e.currentTarget.style.transform  = "scale(1.03)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color      = colors.textPrimary;
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.transform  = "scale(1)";
             }}
           >
             BLÜM
@@ -172,6 +240,7 @@ const Navbar = ({
               >
                 <Link
                   to={link.href}
+                  {...navLinkHover(link.href)}
                   style={{
                     display:     "inline-flex",
                     alignItems:  "center",
@@ -187,7 +256,7 @@ const Navbar = ({
                       ? colors.accentPrimary
                       : colors.navText,
                     background:  isActive(link.href)
-                      ? colors.accentLight
+                      ? navActiveBg
                       : "transparent",
                     textDecoration: "none",
                     transition:  `all ${transitions?.fast}`,
@@ -232,6 +301,7 @@ const Navbar = ({
                         <Link
                           key={child.label}
                           to={child.href}
+                          {...menuItemHover}
                           style={{
                             display:      "block",
                             padding:      "0.5rem 0.875rem",
@@ -241,14 +311,6 @@ const Navbar = ({
                             color:        colors.textSecondary,
                             textDecoration: "none",
                             transition:   `all ${transitions?.fast}`,
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLAnchorElement).style.background = colors.bgSecondary;
-                            (e.currentTarget as HTMLAnchorElement).style.color = colors.textPrimary;
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-                            (e.currentTarget as HTMLAnchorElement).style.color = colors.textSecondary;
                           }}
                         >
                           {child.label}
@@ -268,6 +330,7 @@ const Navbar = ({
             <motion.button
               whileTap={{ scale: 0.92 }}
               style={iconBtn}
+              {...iconHover}
               onClick={() => setSearchOpen((p) => !p)}
               aria-label="Search"
             >
@@ -275,19 +338,23 @@ const Navbar = ({
             </motion.button>
 
             {/* Wishlist */}
-            <Link to="/wishlist" style={{ ...iconBtn, textDecoration: "none" }}>
+            <Link to="/wishlist" style={{ ...iconBtn, textDecoration: "none" }} {...iconHover}>
               <Heart size={19} />
               {wishlistCount > 0 && <CountBadge count={wishlistCount} color={colors.accentSecondary} />}
             </Link>
 
             {/* Cart */}
-            <Link to="/cart" style={{ ...iconBtn, textDecoration: "none" }}>
+            <Link to="/cart" style={{ ...iconBtn, textDecoration: "none" }} {...iconHover}>
               <ShoppingBag size={19} />
               {cartCount > 0 && <CountBadge count={cartCount} color={colors.accentPrimary} />}
             </Link>
 
             {/* User */}
-            <Link to={isLoggedIn ? "/profile" : "/login"} style={{ ...iconBtn, textDecoration: "none" }}>
+            <Link
+              to={isLoggedIn ? "/profile" : "/login"}
+              style={{ ...iconBtn, textDecoration: "none" }}
+              {...iconHover}
+            >
               {isLoggedIn && userName ? (
                 <div
                   style={{
@@ -316,6 +383,7 @@ const Navbar = ({
               whileTap={{ scale: 0.92 }}
               style={{ ...iconBtn, display: "none" }}
               className="show-mobile"
+              {...iconHover}
               onClick={() => setMobileOpen((p) => !p)}
               aria-label="Menu"
             >
@@ -335,7 +403,7 @@ const Navbar = ({
               style={{
                 overflow:     "hidden",
                 borderTop:    `1px solid ${colors.borderLight}`,
-                background:   colors.bgSecondary,
+                background:   scrolled ? hexToRgba(colors.navBg, 0.38) : colors.bgSecondary,
               }}
             >
               <form
@@ -370,12 +438,13 @@ const Navbar = ({
                   type="button"
                   onClick={() => setSearchOpen(false)}
                   style={{
-                    background: "none",
-                    border:     "none",
-                    cursor:     "pointer",
-                    color:      colors.textMuted,
-                    display:    "flex",
+                    ...iconBtn,
+                    width:  34,
+                    height: 34,
+                    color:  colors.textMuted,
                   }}
+                  {...iconHover}
+                  aria-label="Close search"
                 >
                   <X size={17} />
                 </button>
@@ -422,10 +491,32 @@ const Navbar = ({
             >
               {/* Close */}
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2rem" }}>
-                <span style={{ fontFamily: typography.fontDisplay, fontSize: typography.xl, color: colors.textPrimary }}>
+                <span
+                  style={{
+                    fontFamily:   typography.fontDisplay,
+                    fontSize:     typography.xl,
+                    color:        colors.textPrimary,
+                    padding:      "0.35rem 0.5rem",
+                    borderRadius: radius?.md,
+                    transition:   `color ${transitions?.fast}, background ${transitions?.fast}`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color      = hoverColor;
+                    e.currentTarget.style.background = hoverBg;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color      = colors.textPrimary;
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
                   BLÜM
                 </span>
-                <button onClick={() => setMobileOpen(false)} style={{ ...iconBtn, background: colors.bgSecondary }}>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  style={{ ...iconBtn, color: colors.textPrimary }}
+                  {...iconHover}
+                  aria-label="Close menu"
+                >
                   <X size={18} />
                 </button>
               </div>
@@ -436,6 +527,7 @@ const Navbar = ({
                   <div key={link.label}>
                     <Link
                       to={link.href}
+                      {...navLinkHover(link.href)}
                       style={{
                         display:      "block",
                         padding:      "0.75rem 1rem",
@@ -444,8 +536,9 @@ const Navbar = ({
                         fontSize:     typography.base,
                         fontWeight:   typography.weightMedium,
                         color:        isActive(link.href) ? colors.accentPrimary : colors.textPrimary,
-                        background:   isActive(link.href) ? colors.accentLight : "transparent",
+                        background:   isActive(link.href) ? navActiveBg : "transparent",
                         textDecoration: "none",
+                        transition:   `all ${transitions?.fast}`,
                       }}
                     >
                       {link.label}
@@ -454,6 +547,7 @@ const Navbar = ({
                       <Link
                         key={child.label}
                         to={child.href}
+                        {...menuItemHover}
                         style={{
                           display:      "block",
                           padding:      "0.5rem 1rem 0.5rem 2rem",
@@ -462,6 +556,7 @@ const Navbar = ({
                           fontSize:     typography.sm,
                           color:        colors.textSecondary,
                           textDecoration: "none",
+                          transition:   `all ${transitions?.fast}`,
                         }}
                       >
                         {child.label}
@@ -486,6 +581,17 @@ const Navbar = ({
                     color:        colors.textPrimary,
                     textDecoration: "none",
                     background:   colors.bgSecondary,
+                    transition:   `all ${transitions?.fast}`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = hoverBg;
+                    e.currentTarget.style.color      = hoverColor;
+                    e.currentTarget.style.transform  = "translateX(4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = colors.bgSecondary;
+                    e.currentTarget.style.color      = colors.textPrimary;
+                    e.currentTarget.style.transform  = "translateX(0)";
                   }}
                 >
                   <User size={17} />
