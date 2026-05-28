@@ -101,11 +101,12 @@ const Navbar = ({
   const isActive = (href: string) =>
     location.pathname === href || location.pathname.startsWith(href + "/");
 
-  // ── Shared hover tokens — warm off-white, pairs with butter nav (#FFEFB3) ──
-  const navHoverBg     = "#FFFEF8";
-  const navActiveBg    = "#FFFFFF";
-  const hoverBg        = navHoverBg;
-  const hoverColor     = colors.accentPrimary;
+  // ── Shared hover tokens — butter + emerald luxury palette ──
+const navHoverBg  = "rgba(1, 62, 55, 0.08)";
+const navActiveBg = "rgba(1, 62, 55, 0.12)";
+
+const hoverBg    = navHoverBg;
+const hoverColor = "#013e37";
 
   const iconBtn: React.CSSProperties = {
     position:       "relative",
@@ -118,7 +119,7 @@ const Navbar = ({
     background:     "transparent",
     border:         "none",
     cursor:         "pointer",
-    color:          colors.navText,
+   color: "#111111",
     transition:     `background ${transitions?.fast}, color ${transitions?.fast}, transform ${transitions?.fast}`,
   };
 
@@ -132,7 +133,7 @@ const Navbar = ({
     onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
       const el = e.currentTarget;
       el.style.background = "transparent";
-      el.style.color      = colors.navText;
+      el.style.color = "#111111";
       el.style.transform  = "translateY(0)";
     },
   };
@@ -171,9 +172,9 @@ const Navbar = ({
           position:              "sticky",
           top:                   0,
           zIndex:                100,
-          background:            scrolled ? hexToRgba(colors.navBg, 0.38) : colors.navBg,
-          backdropFilter:        scrolled ? "blur(10px) saturate(1.1)" : "none",
-          WebkitBackdropFilter:  scrolled ? "blur(10px) saturate(1.1)" : "none",
+          background:            scrolled ? hexToRgba(colors.navBg, 0.20) : colors.navBg,
+          backdropFilter:         scrolled ? "blur(18px) saturate(1.4)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(18px) saturate(1.4)" : "none",
           borderBottom:          `1px solid ${scrolled ? colors.borderMedium : colors.navBorder}`,
           boxShadow:             scrolled ? shadows?.sm : "none",
           transition:            `background ${transitions?.normal}, box-shadow ${transitions?.normal}, border-color ${transitions?.normal}, backdrop-filter ${transitions?.normal}`,
