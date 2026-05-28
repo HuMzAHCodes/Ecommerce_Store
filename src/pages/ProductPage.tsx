@@ -21,7 +21,7 @@ const MOCK_PRODUCTS: Record<string, {
     description:"A lightweight, fast-absorbing serum packed with Vitamin C and hyaluronic acid that visibly brightens, evens skin tone, and delivers lasting hydration. Formulated without parabens, sulfates, or artificial fragrances.",
     benefits:["Visibly brightens in 2 weeks","Evens skin tone","24hr hydration","Dermatologist tested","Fragrance-free"],
     howToUse:"Apply 3–4 drops to cleansed skin morning and evening. Gently pat into face and neck. Follow with moisturiser. Use SPF in the morning.",
-    images:[{bg:"#F5DDD0",label:"Front"},{bg:"#EDD0C0",label:"Side"},{bg:"#F0E8E0",label:"Detail"}],
+    images:[{bg:"#FFEFB3",label:"Front"},{bg:"#FFF5D0",label:"Side"},{bg:"#C5E8E3",label:"Detail"}],
     reviews:[
       {id:"r1",name:"Amara K.",rating:5,date:"May 2025",body:"Genuinely the best serum I've ever used. My skin is glowing after just two weeks."},
       {id:"r2",name:"Priya M.",rating:5,date:"Apr 2025",body:"Lightweight, absorbs fast, and my dark spots have faded noticeably."},

@@ -193,17 +193,40 @@ export const themes: Record<ThemeName, Theme> = {
   // ── Other themes kept for easy switching ─────────────────────
 
   blushAndSlate: {
-    name: "Blush & Slate",
+    name: "Butter & Green",
     colors: {
-      bgPrimary: "#FDF6F0", bgSecondary: "#F9EDE3", bgTertiary: "#F3E3D5",
-      bgCard: "#FFFFFF", bgOverlay: "rgba(61,74,92,0.45)",
-      accentPrimary: "#C97B63", accentSecondary: "#8EAFC2", accentHover: "#B56A52", accentLight: "#F5DDD0",
-      textPrimary: "#3D4A5C", textSecondary: "#6B7A8D", textMuted: "#9AAABB",
-      textOnAccent: "#FFFFFF", textOnDark: "#FDF6F0",
-      borderLight: "#ECDDD3", borderMedium: "#D9C8BC", borderFocus: "#C97B63",
-      success: "#5A9E7A", successBg: "#EBF5F0", error: "#C95A5A", errorBg: "#F5EBEB",
-      warning: "#C9A05A", warningBg: "#F5F0EB",
-      navBg: "#FDF6F0", navBorder: "#ECDDD3", navText: "#3D4A5C", navTextHover: "#C97B63",
+      // Backgrounds — butter family (#FFEFB3 base)
+      bgPrimary:     "#FFFDF5",
+      bgSecondary:   "#FFF9E8",
+      bgTertiary:    "#FFEFB3",
+      bgCard:        "#FFFFFF",
+      bgOverlay:     "rgba(1, 62, 55, 0.50)",
+
+      // Accent — green family (#013E37 base)
+      accentPrimary:   "#013E37",
+      accentSecondary: "#3A7A71",
+      accentHover:     "#012A26",
+      accentLight:     "rgba(255, 239, 179, 0.55)",
+
+      // Text — green family
+      textPrimary:   "#013E37",
+      textSecondary: "#2A5C54",
+      textMuted:     "#5C8780",
+      textOnAccent:  "#FFEFB3",
+      textOnDark:    "#FFEFB3",
+
+      // Borders — lighter butter shades
+      borderLight:   "#F5E8A8",
+      borderMedium:  "#E8D98A",
+      borderFocus:   "#013E37",
+
+      // States — lighter greens & golden butter
+      success: "#02756A", successBg: "#E6F4F2",
+      error:   "#8B4540", errorBg:   "#FFF5E8",
+      warning: "#C9A84C", warningBg: "#FFF9E0",
+
+      // Nav — butter bar, green type (reel-inspired)
+      navBg: "#FFEFB3", navBorder: "#E8D98A", navText: "#013E37", navTextHover: "#012A26",
     },
     typography: {
       fontDisplay: "'Playfair Display', Georgia, serif",
@@ -214,7 +237,12 @@ export const themes: Record<ThemeName, Theme> = {
       weightLight:300,weightRegular:400,weightMedium:500,weightBold:600,
     },
     spacing:sharedSpacing,radius:sharedRadius,
-    shadows:{ sm:"0 1px 3px rgba(61,74,92,0.08)",md:"0 4px 12px rgba(61,74,92,0.10)",lg:"0 12px 32px rgba(61,74,92,0.12)",xl:"0 24px 48px rgba(61,74,92,0.16)" },
+    shadows:{
+      sm:"0 1px 3px rgba(1,62,55,0.08), 0 1px 2px rgba(1,62,55,0.05)",
+      md:"0 4px 12px rgba(1,62,55,0.10), 0 2px 4px rgba(1,62,55,0.06)",
+      lg:"0 12px 32px rgba(1,62,55,0.12), 0 4px 8px rgba(1,62,55,0.08)",
+      xl:"0 24px 48px rgba(1,62,55,0.16), 0 8px 16px rgba(1,62,55,0.10)",
+    },
     transitions:sharedTransitions,animation:sharedAnimation,
   },
 

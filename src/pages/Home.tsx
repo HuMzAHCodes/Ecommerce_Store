@@ -15,12 +15,12 @@ const CATEGORIES = [
 ];
 
 const FEATURED = [
-  { id: "1", name: "Radiance Serum",      price: 68,  salePrice: null, badge: "Best Seller", bg: "#F5DDD0" },
-  { id: "2", name: "Glow Face Mist",      price: 42,  salePrice: 35,  badge: "Sale",        bg: "#D0E8F5" },
-  { id: "3", name: "Velvet Body Butter",  price: 55,  salePrice: null, badge: "New",         bg: "#D5EDD5" },
-  { id: "4", name: "Rose Toner",          price: 38,  salePrice: null, badge: null,          bg: "#F5D0E8" },
-  { id: "5", name: "Cloud Cream SPF 30",  price: 72,  salePrice: null, badge: "New",         bg: "#EDE0F5" },
-  { id: "6", name: "Lip Treatment Set",   price: 34,  salePrice: 28,  badge: "Sale",        bg: "#F5EDD0" },
+  { id: "1", name: "Radiance Serum",      price: 68,  salePrice: null, badge: "Best Seller", bg: "#FFEFB3" },
+  { id: "2", name: "Glow Face Mist",      price: 42,  salePrice: 35,  badge: "Sale",        bg: "#C5E8E3" },
+  { id: "3", name: "Velvet Body Butter",  price: 55,  salePrice: null, badge: "New",         bg: "#FFF5D0" },
+  { id: "4", name: "Rose Toner",          price: 38,  salePrice: null, badge: null,          bg: "#A8D9D2" },
+  { id: "5", name: "Cloud Cream SPF 30",  price: 72,  salePrice: null, badge: "New",         bg: "#FFF9E8" },
+  { id: "6", name: "Lip Treatment Set",   price: 34,  salePrice: 28,  badge: "Sale",        bg: "#E6F4F2" },
 ];
 
 const PERKS = [
@@ -127,7 +127,7 @@ const Home = () => {
             {/* Social proof */}
             <motion.div variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginTop: "2.5rem" }}>
               <div style={{ display: "flex" }}>
-                {["#F5DDD0","#D0E8F5","#D5EDD5","#EDE0F5"].map((bg, i) => (
+                {["#FFEFB3","#C5E8E3","#FFF5D0","#A8D9D2"].map((bg, i) => (
                   <div key={i} style={{ width: 34, height: 34, borderRadius: "50%", background: bg, border: `2px solid ${colors.bgPrimary}`, marginLeft: i > 0 ? -10 : 0 }} />
                 ))}
               </div>

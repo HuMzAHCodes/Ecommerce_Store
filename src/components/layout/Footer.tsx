@@ -67,6 +67,14 @@ const Footer = () => {
   const [email,     setEmail]     = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  // Footer palette — green main, butter accent
+  const green       = colors.accentPrimary;
+  const greenDark   = colors.accentHover;
+  const butter      = colors.textOnAccent;
+  const butterSoft  = "rgba(255, 239, 179, 0.82)";
+  const butterMuted = "rgba(255, 239, 179, 0.58)";
+  const borderButter = "rgba(255, 239, 179, 0.22)";
+
   const handleNewsletter = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
@@ -78,7 +86,7 @@ const Footer = () => {
   const linkStyle: React.CSSProperties = {
     fontFamily:     typography.fontBody,
     fontSize:       typography.sm,
-    color:          colors.textSecondary,
+    color:          butterSoft,
     textDecoration: "none",
     display:        "inline-block",
     transition:     `color ${transitions?.fast}`,
@@ -86,7 +94,7 @@ const Footer = () => {
   };
 
   return (
-    <footer style={{ background: colors.bgSecondary, borderTop: `1px solid ${colors.borderLight}`, marginTop: "auto" }}>
+    <footer style={{ background: green, borderTop: `1px solid ${borderButter}`, marginTop: "auto" }}>
 
       {/* ── Main grid ────────────────────────────────────── */}
       <div
@@ -100,10 +108,10 @@ const Footer = () => {
       >
         {/* Brand */}
         <div>
-          <Link to="/" style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], fontWeight: typography.weightMedium, color: colors.textPrimary, textDecoration: "none", letterSpacing: "0.06em", display: "block", marginBottom: "1rem" }}>
+          <Link to="/" style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], fontWeight: typography.weightMedium, color: butter, textDecoration: "none", letterSpacing: "0.06em", display: "block", marginBottom: "1rem" }}>
             BLÜM
           </Link>
-          <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted, lineHeight: 1.7, marginBottom: "1.5rem", maxWidth: 220 }}>
+          <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: butterMuted, lineHeight: 1.7, marginBottom: "1.5rem", maxWidth: 220 }}>
             Simple. Clean. Beautiful. Crafted with care for the ones who care about what they put on their skin.
           </p>
 
@@ -118,9 +126,9 @@ const Footer = () => {
                 aria-label={label}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: radius?.full, background: colors.bgTertiary, color: colors.textSecondary, transition: `background ${transitions?.fast}, color ${transitions?.fast}` }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = colors.accentPrimary; (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = colors.bgTertiary;    (e.currentTarget as HTMLAnchorElement).style.color = colors.textSecondary; }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: radius?.full, background: greenDark, color: butterSoft, transition: `background ${transitions?.fast}, color ${transitions?.fast}` }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = butter; (e.currentTarget as HTMLAnchorElement).style.color = green; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = greenDark; (e.currentTarget as HTMLAnchorElement).style.color = butterSoft; }}
               >
                 <Icon />
               </motion.a>
@@ -131,15 +139,15 @@ const Footer = () => {
         {/* Link columns */}
         {Object.entries(LINKS).map(([heading, links]) => (
           <div key={heading}>
-            <h4 style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightBold, color: colors.textPrimary, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
+            <h4 style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightBold, color: butter, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
               {heading}
             </h4>
             <nav style={{ display: "flex", flexDirection: "column" }}>
               {links.map((l) => (
                 <Link
                   key={l.label} to={l.href} style={linkStyle}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = colors.accentPrimary;  }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = colors.textSecondary; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = butter;  }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = butterSoft; }}
                 >
                   {l.label}
                 </Link>
@@ -150,15 +158,15 @@ const Footer = () => {
 
         {/* Newsletter */}
         <div>
-          <h4 style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightBold, color: colors.textPrimary, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
+          <h4 style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightBold, color: butter, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
             Stay in the loop
           </h4>
-          <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted, marginBottom: "1rem", lineHeight: 1.6 }}>
+          <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: butterMuted, marginBottom: "1rem", lineHeight: 1.6 }}>
             New drops, restocks, and offers — straight to your inbox.
           </p>
 
           {submitted ? (
-            <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} style={{ color: colors.success, fontSize: typography.sm, fontFamily: typography.fontBody }}>
+            <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} style={{ color: butter, fontSize: typography.sm, fontFamily: typography.fontBody }}>
               ✓ You're subscribed!
             </motion.p>
           ) : (
@@ -166,11 +174,11 @@ const Footer = () => {
               <input
                 type="email" required placeholder="your@email.com"
                 value={email} onChange={(e) => setEmail(e.target.value)}
-                style={{ width: "100%", padding: "0.6rem 0.875rem", borderRadius: radius?.md, border: `1px solid ${colors.borderLight}`, background: colors.bgCard, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, outline: "none" }}
+                style={{ width: "100%", padding: "0.6rem 0.875rem", borderRadius: radius?.md, border: `1px solid ${borderButter}`, background: greenDark, fontFamily: typography.fontBody, fontSize: typography.sm, color: butter, outline: "none" }}
               />
               <motion.button
                 type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", padding: "0.6rem 1rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, border: "none", cursor: "pointer" }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", padding: "0.6rem 1rem", borderRadius: radius?.full, background: butter, color: green, fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, border: "none", cursor: "pointer" }}
               >
                 Subscribe <ArrowRight size={15} />
               </motion.button>
@@ -180,16 +188,16 @@ const Footer = () => {
       </div>
 
       {/* ── Bottom bar ───────────────────────────────────── */}
-      <div style={{ borderTop: `1px solid ${colors.borderLight}`, padding: "1.25rem 1.5rem", maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
-        <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, margin: 0 }}>
+      <div style={{ borderTop: `1px solid ${borderButter}`, padding: "1.25rem 1.5rem", maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
+        <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: butterMuted, margin: 0 }}>
           © {new Date().getFullYear()} Blüm. All rights reserved.
         </p>
         <div style={{ display: "flex", gap: "1.25rem" }}>
           {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((t) => (
             <Link key={t} to="#"
-              style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, textDecoration: "none" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = colors.accentPrimary; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = colors.textMuted; }}
+              style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: butterMuted, textDecoration: "none" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = butter; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = butterMuted; }}
             >
               {t}
             </Link>
