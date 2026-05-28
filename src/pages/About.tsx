@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Leaf, Heart, Sparkles, Shield } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
+import { useIsMobile } from "../hooks/useMediaQuery";
 
 const VALUES = [
   { icon:<Leaf size={24}/>,     title:"Clean Ingredients",  desc:"Every product is formulated without parabens, sulfates, artificial fragrances, or harmful chemicals." },
@@ -27,13 +28,14 @@ const fadeUp = {
 
 const About = () => {
   const theme = useTheme();
+  const isMobile = useIsMobile();
   const { colors, typography, radius, shadows } = theme;
 
   return (
     <div style={{ background: colors.bgPrimary }}>
 
       {/* Hero */}
-      <section style={{ background: `linear-gradient(135deg, ${colors.accentLight} 0%, ${colors.bgSecondary} 100%)`, padding:"6rem 1.5rem", textAlign:"center" }}>
+      <section style={{ background: `linear-gradient(135deg, ${colors.accentLight} 0%, ${colors.bgSecondary} 100%)`, padding: isMobile ? "4rem 1.25rem" : "6rem 1.5rem", textAlign:"center" }}>
         <motion.div initial="hidden" animate="visible" variants={{ visible:{ transition:{ staggerChildren:0.1 } } }}>
           <motion.p variants={fadeUp} style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.accentPrimary, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:"1rem" }}>
             Our Story
@@ -48,9 +50,9 @@ const About = () => {
       </section>
 
       {/* Mission */}
-      <section style={{ maxWidth:1280, margin:"0 auto", padding:"5rem 1.5rem", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4rem", alignItems:"center" }}>
+      <section style={{ maxWidth:1280, margin:"0 auto", padding: isMobile ? "3rem 1.25rem" : "5rem 1.5rem", display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems:"center" }}>
         <motion.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
-          <div style={{ height:400, borderRadius: radius?.xl, background: `linear-gradient(145deg, ${colors.accentLight}, ${colors.bgSecondary})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"8rem", boxShadow: shadows?.lg }}>
+          <div style={{ height: isMobile ? 260 : 400, borderRadius: radius?.xl, background: `linear-gradient(145deg, ${colors.accentLight}, ${colors.bgSecondary})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"8rem", boxShadow: shadows?.lg }}>
             🌿
           </div>
         </motion.div>
@@ -94,9 +96,9 @@ const About = () => {
       </section>
 
       {/* CTA */}
-      <section style={{ maxWidth:1280, margin:"0 auto", padding:"5rem 1.5rem", textAlign:"center" }}>
+      <section style={{ maxWidth:1280, margin:"0 auto", padding: isMobile ? "3.5rem 1.25rem" : "5rem 1.5rem", textAlign:"center" }}>
         <motion.div initial={{ opacity:0, scale:0.97 }} whileInView={{ opacity:1, scale:1 }} viewport={{ once:true }} transition={{ duration:0.5 }}
-          style={{ background: `linear-gradient(135deg, ${colors.accentLight}, ${colors.bgSecondary})`, borderRadius: radius?.xl, padding:"4rem 2rem", border:`1px solid ${colors.borderLight}` }}>
+          style={{ background: `linear-gradient(135deg, ${colors.accentLight}, ${colors.bgSecondary})`, borderRadius: radius?.xl, padding: isMobile ? "2.5rem 1.5rem" : "4rem 2rem", border:`1px solid ${colors.borderLight}` }}>
           <h2 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic", marginBottom:"1rem" }}>Ready to start your glow?</h2>
           <p style={{ fontFamily: typography.fontBody, color: colors.textSecondary, marginBottom:"2rem", maxWidth:400, margin:"0 auto 2rem" }}>Discover clean skincare that actually works. Free shipping on orders over $50.</p>
           <Link to="/shop">

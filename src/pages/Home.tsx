@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles, Truck, RotateCcw, Shield } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
+import { useIsMobile } from "../hooks/useMediaQuery";
 
 // ── Data ──────────────────────────────────────────────────────
 
@@ -51,6 +52,7 @@ const stagger: Variants = {
 
 const Home = () => {
   const theme = useTheme();
+  const isMobile = useIsMobile();
   const { colors, typography, radius, shadows, transitions } = theme;
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +80,7 @@ const Home = () => {
           <div style={{ position: "absolute", bottom: "5%", left: "5%", width: 320, height: 320, borderRadius: "50%", background: colors.accentSecondary + "33", filter: "blur(70px)", opacity: 0.4 }} />
         </motion.div>
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: "6rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", width: "100%" }}>
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: isMobile ? "3rem 1.25rem" : "6rem 1.5rem", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems: "center", width: "100%" }}>
 
           {/* Left — Copy */}
           <motion.div variants={stagger} initial="hidden" animate="visible">
@@ -292,7 +294,7 @@ const Home = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
-          style={{ background: `linear-gradient(135deg, ${colors.accentLight} 0%, ${colors.bgSecondary} 60%, ${colors.accentSecondary}22 100%)`, borderRadius: radius?.xl, padding: "4rem 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "2rem", border: `1px solid ${colors.borderLight}` }}
+          style={{ background: `linear-gradient(135deg, ${colors.accentLight} 0%, ${colors.bgSecondary} 60%, ${colors.accentSecondary}22 100%)`, borderRadius: radius?.xl, padding: isMobile ? "2.5rem 1.5rem" : "4rem 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "2rem", border: `1px solid ${colors.borderLight}` }}
         >
           <div>
             <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.accentPrimary, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.75rem" }}>

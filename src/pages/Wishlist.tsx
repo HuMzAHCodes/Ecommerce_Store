@@ -5,9 +5,11 @@ import { useTheme } from "../theme/ThemeContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../components/ui/Toast";
+import { useIsMobile } from "../hooks/useMediaQuery";
 
 const Wishlist = () => {
   const theme = useTheme();
+  const isMobile = useIsMobile();
   const { colors, typography, radius, shadows, transitions } = theme;
   const { items, removeItem } = useWishlist();
   const { addItem, isInCart, openDrawer } = useCart();
@@ -21,14 +23,14 @@ const Wishlist = () => {
 
   return (
     <div style={{ background: colors.bgPrimary, minHeight:"100vh" }}>
-      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding:"2.5rem 1.5rem 2rem" }}>
+      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding: isMobile ? "1.75rem 1.25rem 1.5rem" : "2.5rem 1.5rem 2rem" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
           <h1 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic" }}>Wishlist</h1>
           <p style={{ fontFamily: typography.fontBody, color: colors.textMuted, fontSize: typography.sm, marginTop:4 }}>{items.length} saved items</p>
         </div>
       </div>
 
-      <div style={{ maxWidth:1280, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
+      <div style={{ maxWidth:1280, margin:"0 auto", padding: isMobile ? "1.25rem" : "2.5rem 1.5rem" }}>
         {items.length === 0 ? (
           <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} style={{ textAlign:"center", padding:"5rem 0" }}>
             <Heart size={60} color={colors.borderMedium} style={{ margin:"0 auto 1rem" }} />
@@ -42,29 +44,29 @@ const Wishlist = () => {
             </Link>
           </motion.div>
         ) : (
-          <motion.div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(220px, 1fr))", gap:"1.25rem" }} initial="hidden" animate="visible" variants={{ visible:{ transition:{ staggerChildren:0.07 } } }}>
+          <motion.div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fill, minmax(220px, 1fr))", gap: isMobile ? "0.75rem" : "1.25rem" }} initial="hidden" animate="visible" variants={{ visible:{ transition:{ staggerChildren:0.07 } } }}>
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div key={item.id} initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.9 }} transition={{ duration:0.25 }} layout>
                   <motion.div whileHover={{ y:-4 }} transition={{ duration:0.2 }}
                     style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow:"hidden", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
-                    <div style={{ height:180, background: item.image, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem", position:"relative" }}>
+                    <div style={{ height: isMobile ? 130 : 180, background: item.image, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem", position:"relative" }}>
                       ✨
                       <button onClick={() => { removeItem(item.id); toast.info("Removed from wishlist"); }}
                         style={{ position:"absolute", top:8, right:8, width:28, height:28, borderRadius: radius?.full, background: colors.bgCard, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: shadows?.sm }}>
                         <X size={13} color={colors.textMuted} />
                       </button>
                     </div>
-                    <div style={{ padding:"1rem" }}>
-                      <Link to={`/shop/${item.slug}`} style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, textDecoration:"none", display:"block", marginBottom:"0.375rem" }}>
+                    <div style={{ padding: isMobile ? "0.75rem" : "1rem" }}>
+                      <Link to={`/shop/${item.slug}`} style={{ fontFamily: typography.fontBody, fontSize: isMobile ? typography.xs : typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, textDecoration:"none", display:"block", marginBottom:"0.375rem" }}>
                         {item.name}
                       </Link>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                        <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightBold, color: item.salePrice ? colors.accentPrimary : colors.textPrimary }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap: isMobile ? "4px" : "0px" }}>
+                        <span style={{ fontFamily: typography.fontBody, fontSize: isMobile ? typography.xs : typography.sm, fontWeight: typography.weightBold, color: item.salePrice ? colors.accentPrimary : colors.textPrimary }}>
                           ${item.salePrice ?? item.price}
                         </span>
                         <motion.button whileTap={{ scale:0.9 }} onClick={() => handleAddToCart(item)}
-                          style={{ display:"flex", alignItems:"center", gap:5, padding:"0.4rem 0.875rem", borderRadius: radius?.full, background: isInCart(item.id) ? colors.accentPrimary : colors.bgSecondary, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.xs, fontWeight: typography.weightMedium, color: isInCart(item.id) ? "#fff" : colors.textSecondary, transition:`all ${transitions?.fast}` }}>
+                          style={{ display:"flex", alignItems:"center", gap:5, padding: isMobile ? "0.35rem 0.6rem" : "0.4rem 0.875rem", borderRadius: radius?.full, background: isInCart(item.id) ? colors.accentPrimary : colors.bgSecondary, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: isMobile ? "0.68rem" : typography.xs, fontWeight: typography.weightMedium, color: isInCart(item.id) ? "#fff" : colors.textSecondary, transition:`all ${transitions?.fast}` }}>
                           <ShoppingBag size={13} /> {isInCart(item.id) ? "In Cart" : "Add"}
                         </motion.button>
                       </div>

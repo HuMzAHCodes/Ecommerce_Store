@@ -1,175 +1,207 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Lock, Package, Heart, LogOut, ChevronRight, Camera } from "lucide-react";
+import { User, Lock, Package, Heart, LogOut, ChevronRight, Camera, ChevronDown } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ui/Toast";
+import { useIsMobile } from "../hooks/useMediaQuery";
 
 const TABS = [
-  { id:"account",  label:"Account",      icon:<User size={16}/>    },
-  { id:"orders",   label:"Orders",       icon:<Package size={16}/> },
-  { id:"wishlist", label:"Wishlist",     icon:<Heart size={16}/>   },
-  { id:"security", label:"Security",     icon:<Lock size={16}/>    },
+  { id:"account",  label:"Account",  icon:<User size={15}/>    },
+  { id:"orders",   label:"Orders",   icon:<Package size={15}/> },
+  { id:"wishlist", label:"Wishlist", icon:<Heart size={15}/>   },
+  { id:"security", label:"Security", icon:<Lock size={15}/>    },
 ];
 
 const Profile = () => {
   const theme    = useTheme();
+  const isMobile = useIsMobile();
   const { colors, typography, radius, shadows, transitions } = theme;
-  const { user, logout, updateUser, isLoading } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const toast    = useToast();
   const navigate = useNavigate();
+
   const [tab,    setTab]    = useState("account");
   const [name,   setName]   = useState(user?.name ?? "");
   const [email,  setEmail]  = useState(user?.email ?? "");
   const [saving, setSaving] = useState(false);
-
   const [oldPw,  setOldPw]  = useState("");
   const [newPw,  setNewPw]  = useState("");
   const [confPw, setConfPw] = useState("");
+  const [mobileTabOpen, setMobileTabOpen] = useState(false);
 
   if (!user) {
     return (
       <div style={{ minHeight:"60vh", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:"1rem" }}>
-        <p style={{ fontFamily: typography.fontBody, color: colors.textMuted }}>You need to be logged in.</p>
-        <Link to="/login" style={{ color: colors.accentPrimary, fontFamily: typography.fontBody }}>Sign In</Link>
+        <p style={{ fontFamily:typography.fontBody, color:colors.textMuted }}>You need to be logged in.</p>
+        <Link to="/login" style={{ color:colors.accentPrimary, fontFamily:typography.fontBody }}>Sign In</Link>
       </div>
     );
   }
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    await new Promise(r => setTimeout(r, 600));
+    e.preventDefault(); setSaving(true);
+    await new Promise(r => setTimeout(r,600));
     updateUser({ name, email });
-    toast.success("Profile updated!");
-    setSaving(false);
+    toast.success("Profile updated!"); setSaving(false);
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPw !== confPw) { toast.error("Passwords don't match"); return; }
     if (newPw.length < 6) { toast.error("Minimum 6 characters"); return; }
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r,600));
     toast.success("Password changed!");
     setOldPw(""); setNewPw(""); setConfPw("");
   };
 
-  const handleLogout = () => {
-    logout();
-    toast.info("Signed out.");
-    navigate("/");
-  };
+  const handleLogout = () => { logout(); toast.info("Signed out."); navigate("/"); };
 
   const inputStyle: React.CSSProperties = {
     width:"100%", padding:"0.65rem 0.875rem", border:`1.5px solid ${colors.borderLight}`,
-    borderRadius: radius?.md, fontFamily: typography.fontBody, fontSize: typography.sm,
-    color: colors.textPrimary, background: colors.bgPrimary, outline:"none",
+    borderRadius:radius?.md, fontFamily:typography.fontBody, fontSize:typography.sm,
+    color:colors.textPrimary, background:colors.bgPrimary, outline:"none",
   };
 
+  const activeTabLabel = TABS.find(t => t.id === tab)?.label ?? "Account";
+
   return (
-    <div style={{ background: colors.bgPrimary, minHeight:"100vh" }}>
-      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding:"2.5rem 1.5rem 2rem" }}>
+    <div style={{ background:colors.bgPrimary, minHeight:"100vh" }}>
+      <div style={{ background:colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding: isMobile?"1.75rem 1.25rem 1.5rem":"2.5rem 1.5rem 2rem" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
-          <h1 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic" }}>My Account</h1>
+          <h1 style={{ fontFamily:typography.fontDisplay, color:colors.textPrimary, fontStyle:"italic" }}>My Account</h1>
         </div>
       </div>
 
-      <div style={{ maxWidth:1280, margin:"0 auto", padding:"2.5rem 1.5rem", display:"grid", gridTemplateColumns:"240px 1fr", gap:"2rem", alignItems:"start" }}>
+      <div style={{
+        maxWidth:1280, margin:"0 auto",
+        padding: isMobile?"1.25rem":"2.5rem 1.5rem",
+        display:"grid",
+        gridTemplateColumns: isMobile?"1fr":"220px 1fr",
+        gap: isMobile?"1.25rem":"2rem",
+        alignItems:"start",
+      }}>
 
-        {/* Sidebar */}
-        <div style={{ background: colors.bgCard, borderRadius: radius?.xl, padding:"1.5rem", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm, position:"sticky", top:84 }}>
-          {/* Avatar */}
-          <div style={{ textAlign:"center", marginBottom:"1.5rem" }}>
-            <div style={{ position:"relative", display:"inline-block" }}>
-              <div style={{ width:72, height:72, borderRadius: radius?.full, background: colors.accentLight, display:"flex", alignItems:"center", justifyContent:"center", fontFamily: typography.fontDisplay, fontSize: typography["3xl"], color: colors.accentPrimary, margin:"0 auto" }}>
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <button style={{ position:"absolute", bottom:0, right:0, width:24, height:24, borderRadius: radius?.full, background: colors.accentPrimary, border:`2px solid ${colors.bgCard}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <Camera size={12} color="#fff" />
-              </button>
-            </div>
-            <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, marginTop:"0.75rem", marginBottom:2 }}>{user.name}</p>
-            <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{user.email}</p>
-          </div>
-
-          {/* Nav */}
-          <nav style={{ display:"flex", flexDirection:"column", gap:"0.25rem" }}>
-            {TABS.map((t) => (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.625rem 0.875rem", borderRadius: radius?.md, border:"none", cursor:"pointer", background: tab===t.id ? colors.accentLight : "transparent", color: tab===t.id ? colors.accentPrimary : colors.textSecondary, fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: tab===t.id ? typography.weightMedium : typography.weightRegular, transition:`all ${transitions?.fast}` }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8 }}>{t.icon}{t.label}</div>
-                {tab===t.id && <ChevronRight size={14} />}
-              </button>
-            ))}
-            <button onClick={handleLogout}
-              style={{ display:"flex", alignItems:"center", gap:8, padding:"0.625rem 0.875rem", borderRadius: radius?.md, border:"none", cursor:"pointer", background:"transparent", color: colors.error, fontFamily: typography.fontBody, fontSize: typography.sm, marginTop:"0.5rem" }}>
-              <LogOut size={16} /> Sign Out
+        {/* Mobile: tab selector dropdown */}
+        {isMobile ? (
+          <div style={{ position:"relative" }}>
+            <button onClick={() => setMobileTabOpen(p => !p)}
+              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.875rem 1rem", background:colors.bgCard, border:`1px solid ${colors.borderLight}`, borderRadius:radius?.lg, cursor:"pointer", fontFamily:typography.fontBody, fontSize:typography.base, color:colors.textPrimary }}>
+              <span style={{ display:"flex", alignItems:"center", gap:8 }}>
+                {TABS.find(t=>t.id===tab)?.icon} {activeTabLabel}
+              </span>
+              <ChevronDown size={16} style={{ color:colors.textMuted, transition:`transform ${transitions?.fast}`, transform: mobileTabOpen?"rotate(180deg)":"rotate(0deg)" }}/>
             </button>
-          </nav>
-        </div>
+            <AnimatePresence>
+              {mobileTabOpen && (
+                <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }} transition={{ duration:0.18 }}
+                  style={{ position:"absolute", top:"calc(100% + 6px)", left:0, right:0, zIndex:10, background:colors.bgCard, border:`1px solid ${colors.borderLight}`, borderRadius:radius?.lg, overflow:"hidden", boxShadow:shadows?.lg }}>
+                  {TABS.map(t => (
+                    <button key={t.id} onClick={() => { setTab(t.id); setMobileTabOpen(false); }}
+                      style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"0.75rem 1rem", border:"none", cursor:"pointer", background: tab===t.id ? colors.accentLight : "transparent", color: tab===t.id ? colors.accentPrimary : colors.textSecondary, fontFamily:typography.fontBody, fontSize:typography.sm, fontWeight: tab===t.id ? typography.weightMedium : typography.weightRegular }}>
+                      {t.icon}{t.label}
+                    </button>
+                  ))}
+                  <button onClick={handleLogout}
+                    style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"0.75rem 1rem", border:"none", cursor:"pointer", background:"transparent", color:colors.error, fontFamily:typography.fontBody, fontSize:typography.sm, borderTop:`1px solid ${colors.borderLight}` }}>
+                    <LogOut size={15}/> Sign Out
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          /* Desktop sidebar */
+          <div style={{ background:colors.bgCard, borderRadius:radius?.xl, padding:"1.5rem", border:`1px solid ${colors.borderLight}`, boxShadow:shadows?.sm, position:"sticky", top:84 }}>
+            <div style={{ textAlign:"center", marginBottom:"1.5rem" }}>
+              <div style={{ position:"relative", display:"inline-block" }}>
+                <div style={{ width:68,height:68,borderRadius:radius?.full,background:colors.accentLight,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:typography.fontDisplay,fontSize:typography["3xl"],color:colors.accentPrimary,margin:"0 auto" }}>
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <button style={{ position:"absolute",bottom:0,right:0,width:22,height:22,borderRadius:radius?.full,background:colors.accentPrimary,border:`2px solid ${colors.bgCard}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                  <Camera size={11} color="#fff"/>
+                </button>
+              </div>
+              <p style={{ fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight:typography.weightMedium,color:colors.textPrimary,marginTop:"0.75rem",marginBottom:2 }}>{user.name}</p>
+              <p style={{ fontFamily:typography.fontBody,fontSize:typography.xs,color:colors.textMuted }}>{user.email}</p>
+            </div>
+            <nav style={{ display:"flex",flexDirection:"column",gap:"0.2rem" }}>
+              {TABS.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.6rem 0.875rem",borderRadius:radius?.md,border:"none",cursor:"pointer",background: tab===t.id ? colors.accentLight : "transparent",color: tab===t.id ? colors.accentPrimary : colors.textSecondary,fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight: tab===t.id ? typography.weightMedium : typography.weightRegular,transition:`all ${transitions?.fast}` }}>
+                  <div style={{ display:"flex",alignItems:"center",gap:8 }}>{t.icon}{t.label}</div>
+                  {tab===t.id && <ChevronRight size={13}/>}
+                </button>
+              ))}
+              <button onClick={handleLogout}
+                style={{ display:"flex",alignItems:"center",gap:8,padding:"0.6rem 0.875rem",borderRadius:radius?.md,border:"none",cursor:"pointer",background:"transparent",color:colors.error,fontFamily:typography.fontBody,fontSize:typography.sm,marginTop:"0.5rem" }}>
+                <LogOut size={15}/> Sign Out
+              </button>
+            </nav>
+          </div>
+        )}
 
-        {/* Content */}
-        <motion.div key={tab} initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.3 }}
-          style={{ background: colors.bgCard, borderRadius: radius?.xl, padding:"2rem", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
+        {/* Tab content */}
+        <motion.div key={tab} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.28 }}
+          style={{ background:colors.bgCard, borderRadius:radius?.xl, padding: isMobile?"1.25rem":"2rem", border:`1px solid ${colors.borderLight}`, boxShadow:shadows?.sm }}>
 
-          {tab === "account" && (
+          {tab==="account" && (
             <>
-              <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom:"1.5rem" }}>Account Details</h2>
-              <form onSubmit={handleSave} style={{ display:"flex", flexDirection:"column", gap:"1rem", maxWidth:460 }}>
-                {[["Full Name", name, setName, "text"], ["Email", email, setEmail, "email"]].map(([label, value, setter, type]) => (
+              <h2 style={{ fontFamily:typography.fontDisplay,fontSize:typography["2xl"],color:colors.textPrimary,marginBottom:"1.5rem" }}>Account Details</h2>
+              <form onSubmit={handleSave} style={{ display:"flex",flexDirection:"column",gap:"1rem",maxWidth:460 }}>
+                {[["Full Name",name,setName,"text"],["Email",email,setEmail,"email"]].map(([label,value,setter,type]) => (
                   <div key={label as string}>
-                    <label style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, display:"block", marginBottom:4 }}>{label as string}</label>
-                    <input type={type as string} value={value as string} onChange={(e) => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)} style={inputStyle}
-                      onFocus={(e) => { e.currentTarget.style.borderColor=colors.borderFocus; e.currentTarget.style.boxShadow=`0 0 0 3px ${colors.accentLight}`; }}
-                      onBlur={(e)  => { e.currentTarget.style.borderColor=colors.borderLight; e.currentTarget.style.boxShadow="none"; }} />
+                    <label style={{ fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight:typography.weightMedium,color:colors.textPrimary,display:"block",marginBottom:4 }}>{label as string}</label>
+                    <input type={type as string} value={value as string} onChange={e => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)} style={inputStyle}
+                      onFocus={e => { e.currentTarget.style.borderColor=colors.borderFocus; e.currentTarget.style.boxShadow=`0 0 0 3px ${colors.accentLight}`; }}
+                      onBlur={e  => { e.currentTarget.style.borderColor=colors.borderLight; e.currentTarget.style.boxShadow="none"; }}/>
                   </div>
                 ))}
                 <motion.button type="submit" disabled={saving} whileHover={!saving?{scale:1.02}:{}} whileTap={!saving?{scale:0.97}:{}}
-                  style={{ alignSelf:"flex-start", padding:"0.7rem 2rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor: saving?"not-allowed":"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, opacity: saving?0.7:1 }}>
+                  style={{ alignSelf:"flex-start",padding:"0.7rem 2rem",borderRadius:radius?.full,background:colors.accentPrimary,color:colors.textOnAccent,border:"none",cursor:saving?"not-allowed":"pointer",fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight:typography.weightMedium,opacity:saving?0.7:1 }}>
                   {saving ? "Saving…" : "Save Changes"}
                 </motion.button>
               </form>
             </>
           )}
 
-          {tab === "orders" && (
+          {tab==="orders" && (
             <>
-              <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom:"1.5rem" }}>My Orders</h2>
-              <div style={{ textAlign:"center", padding:"3rem 0", color: colors.textMuted }}>
-                <Package size={48} color={colors.borderMedium} style={{ margin:"0 auto 1rem" }} />
-                <p style={{ fontFamily: typography.fontBody, fontSize: typography.base, color: colors.textPrimary, marginBottom:"0.5rem" }}>No orders yet</p>
-                <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm }}>Your order history will appear here.</p>
-                <Link to="/shop" style={{ display:"inline-block", marginTop:"1rem", color: colors.accentPrimary, fontFamily: typography.fontBody, fontSize: typography.sm }}>Start shopping →</Link>
+              <h2 style={{ fontFamily:typography.fontDisplay,fontSize:typography["2xl"],color:colors.textPrimary,marginBottom:"1.5rem" }}>My Orders</h2>
+              <div style={{ textAlign:"center",padding:"3rem 0",color:colors.textMuted }}>
+                <Package size={44} color={colors.borderMedium} style={{ margin:"0 auto 1rem" }}/>
+                <p style={{ fontFamily:typography.fontBody,fontSize:typography.base,color:colors.textPrimary,marginBottom:"0.5rem" }}>No orders yet</p>
+                <Link to="/shop" style={{ color:colors.accentPrimary,fontFamily:typography.fontBody,fontSize:typography.sm }}>Start shopping →</Link>
               </div>
             </>
           )}
 
-          {tab === "wishlist" && (
+          {tab==="wishlist" && (
             <>
-              <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom:"1.5rem" }}>Wishlist</h2>
-              <div style={{ textAlign:"center", padding:"3rem 0", color: colors.textMuted }}>
-                <Heart size={48} color={colors.borderMedium} style={{ margin:"0 auto 1rem" }} />
-                <p style={{ fontFamily: typography.fontBody, fontSize: typography.base, color: colors.textPrimary, marginBottom:"0.5rem" }}>Nothing saved yet</p>
-                <Link to="/wishlist" style={{ display:"inline-block", marginTop:"0.5rem", color: colors.accentPrimary, fontFamily: typography.fontBody, fontSize: typography.sm }}>View Wishlist →</Link>
+              <h2 style={{ fontFamily:typography.fontDisplay,fontSize:typography["2xl"],color:colors.textPrimary,marginBottom:"1.5rem" }}>Wishlist</h2>
+              <div style={{ textAlign:"center",padding:"3rem 0",color:colors.textMuted }}>
+                <Heart size={44} color={colors.borderMedium} style={{ margin:"0 auto 1rem" }}/>
+                <p style={{ fontFamily:typography.fontBody,fontSize:typography.base,color:colors.textPrimary,marginBottom:"0.5rem" }}>Nothing saved yet</p>
+                <Link to="/wishlist" style={{ color:colors.accentPrimary,fontFamily:typography.fontBody,fontSize:typography.sm }}>View Wishlist →</Link>
               </div>
             </>
           )}
 
-          {tab === "security" && (
+          {tab==="security" && (
             <>
-              <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom:"1.5rem" }}>Change Password</h2>
-              <form onSubmit={handlePasswordChange} style={{ display:"flex", flexDirection:"column", gap:"1rem", maxWidth:400 }}>
-                {[["Current Password", oldPw, setOldPw], ["New Password", newPw, setNewPw], ["Confirm New Password", confPw, setConfPw]].map(([label, value, setter]) => (
+              <h2 style={{ fontFamily:typography.fontDisplay,fontSize:typography["2xl"],color:colors.textPrimary,marginBottom:"1.5rem" }}>Change Password</h2>
+              <form onSubmit={handlePasswordChange} style={{ display:"flex",flexDirection:"column",gap:"1rem",maxWidth:400 }}>
+                {[["Current Password",oldPw,setOldPw],["New Password",newPw,setNewPw],["Confirm New Password",confPw,setConfPw]].map(([label,value,setter]) => (
                   <div key={label as string}>
-                    <label style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, display:"block", marginBottom:4 }}>{label as string}</label>
-                    <input type="password" value={value as string} onChange={(e) => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)} style={inputStyle}
-                      onFocus={(e) => { e.currentTarget.style.borderColor=colors.borderFocus; e.currentTarget.style.boxShadow=`0 0 0 3px ${colors.accentLight}`; }}
-                      onBlur={(e)  => { e.currentTarget.style.borderColor=colors.borderLight; e.currentTarget.style.boxShadow="none"; }} />
+                    <label style={{ fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight:typography.weightMedium,color:colors.textPrimary,display:"block",marginBottom:4 }}>{label as string}</label>
+                    <input type="password" value={value as string} onChange={e => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)} style={inputStyle}
+                      onFocus={e => { e.currentTarget.style.borderColor=colors.borderFocus; e.currentTarget.style.boxShadow=`0 0 0 3px ${colors.accentLight}`; }}
+                      onBlur={e  => { e.currentTarget.style.borderColor=colors.borderLight; e.currentTarget.style.boxShadow="none"; }}/>
                   </div>
                 ))}
-                <motion.button type="submit" whileHover={{scale:1.02}} whileTap={{scale:0.97}}
-                  style={{ alignSelf:"flex-start", padding:"0.7rem 2rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium }}>
+                <motion.button type="submit" whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+                  style={{ alignSelf:"flex-start",padding:"0.7rem 2rem",borderRadius:radius?.full,background:colors.accentPrimary,color:colors.textOnAccent,border:"none",cursor:"pointer",fontFamily:typography.fontBody,fontSize:typography.sm,fontWeight:typography.weightMedium }}>
                   Update Password
                 </motion.button>
               </form>
@@ -182,6 +214,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 // ── File Overview ──────────────────────────────────────────────────────────────
 //

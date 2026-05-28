@@ -1,63 +1,60 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Search, SlidersHorizontal, Heart, ShoppingBag, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useToast } from "../components/ui/Toast";
+import { useIsMobile } from "../hooks/useMediaQuery";
 import useDebounce from "../hooks/useDebounce";
 
-// ── Mock Data ─────────────────────────────────────────────────
-
 interface Product {
-  id: string; name: string; price: number; salePrice?: number | null;
-  category: string; badge?: string | null; bg: string; slug: string;
-  tags: string[]; rating: number; reviews: number;
+  id:string; name:string; price:number; salePrice?:number|null;
+  category:string; badge?:string|null; bg:string; slug:string;
+  tags:string[]; rating:number; reviews:number;
 }
 
 const ALL_PRODUCTS: Product[] = [
-  { id:"1",  name:"Radiance Serum",        price:68,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#F5DDD0", slug:"radiance-serum",        tags:["serum","glow"],        rating:4.9, reviews:312 },
-  { id:"2",  name:"Glow Face Mist",        price:42,  salePrice:35,   category:"Skincare", badge:"Sale",        bg:"#D0E8F5", slug:"glow-face-mist",         tags:["mist","hydration"],    rating:4.7, reviews:198 },
-  { id:"3",  name:"Velvet Body Butter",    price:55,  salePrice:null, category:"Wellness", badge:"New",         bg:"#D5EDD5", slug:"velvet-body-butter",     tags:["body","moisturizer"],  rating:4.8, reviews:145 },
-  { id:"4",  name:"Rose Toner",            price:38,  salePrice:null, category:"Skincare", badge:null,          bg:"#F5D0E8", slug:"rose-toner",             tags:["toner","rose"],        rating:4.6, reviews:89  },
-  { id:"5",  name:"Cloud Cream SPF 30",    price:72,  salePrice:null, category:"Skincare", badge:"New",         bg:"#EDE0F5", slug:"cloud-cream-spf",        tags:["spf","moisturizer"],   rating:4.9, reviews:267 },
-  { id:"6",  name:"Lip Treatment Set",     price:34,  salePrice:28,   category:"Beauty",   badge:"Sale",        bg:"#F5EDD0", slug:"lip-treatment-set",      tags:["lips","set"],          rating:4.5, reviews:73  },
-  { id:"7",  name:"Deep Clean Mask",       price:48,  salePrice:null, category:"Skincare", badge:null,          bg:"#D0F5E8", slug:"deep-clean-mask",        tags:["mask","cleansing"],    rating:4.7, reviews:156 },
-  { id:"8",  name:"Vitamin C Booster",     price:85,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#F5F0D0", slug:"vitamin-c-booster",      tags:["vitamin-c","serum"],   rating:4.8, reviews:421 },
-  { id:"9",  name:"Overnight Recovery",    price:92,  salePrice:75,   category:"Skincare", badge:"Sale",        bg:"#E8D0F5", slug:"overnight-recovery",     tags:["night","repair"],      rating:4.9, reviews:203 },
-  { id:"10", name:"Calming Eye Cream",     price:58,  salePrice:null, category:"Beauty",   badge:"New",         bg:"#D0EAF5", slug:"calming-eye-cream",      tags:["eyes","sensitive"],    rating:4.6, reviews:88  },
-  { id:"11", name:"Hydra Boost Essence",   price:65,  salePrice:null, category:"Skincare", badge:null,          bg:"#F5D8D0", slug:"hydra-boost-essence",    tags:["essence","hydration"], rating:4.7, reviews:134 },
-  { id:"12", name:"Wellness Bundle",       price:120, salePrice:99,   category:"Wellness", badge:"Sale",        bg:"#D0F5D0", slug:"wellness-bundle",        tags:["bundle","set"],        rating:4.9, reviews:67  },
+  { id:"1",  name:"Radiance Serum",       price:68,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#F5DDD0", slug:"radiance-serum",       tags:["serum","glow"],        rating:4.9, reviews:312 },
+  { id:"2",  name:"Glow Face Mist",       price:42,  salePrice:35,   category:"Skincare", badge:"Sale",        bg:"#D0E8F5", slug:"glow-face-mist",        tags:["mist","hydration"],    rating:4.7, reviews:198 },
+  { id:"3",  name:"Velvet Body Butter",   price:55,  salePrice:null, category:"Wellness", badge:"New",         bg:"#D5EDD5", slug:"velvet-body-butter",    tags:["body","moisturizer"],  rating:4.8, reviews:145 },
+  { id:"4",  name:"Rose Toner",           price:38,  salePrice:null, category:"Skincare", badge:null,          bg:"#F5D0E8", slug:"rose-toner",            tags:["toner","rose"],        rating:4.6, reviews:89  },
+  { id:"5",  name:"Cloud Cream SPF 30",   price:72,  salePrice:null, category:"Skincare", badge:"New",         bg:"#EDE0F5", slug:"cloud-cream-spf",       tags:["spf","moisturizer"],   rating:4.9, reviews:267 },
+  { id:"6",  name:"Lip Treatment Set",    price:34,  salePrice:28,   category:"Beauty",   badge:"Sale",        bg:"#F5EDD0", slug:"lip-treatment-set",     tags:["lips","set"],          rating:4.5, reviews:73  },
+  { id:"7",  name:"Deep Clean Mask",      price:48,  salePrice:null, category:"Skincare", badge:null,          bg:"#D0F5E8", slug:"deep-clean-mask",       tags:["mask","cleansing"],    rating:4.7, reviews:156 },
+  { id:"8",  name:"Vitamin C Booster",    price:85,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#F5F0D0", slug:"vitamin-c-booster",     tags:["vitamin-c","serum"],   rating:4.8, reviews:421 },
+  { id:"9",  name:"Overnight Recovery",   price:92,  salePrice:75,   category:"Skincare", badge:"Sale",        bg:"#E8D0F5", slug:"overnight-recovery",    tags:["night","repair"],      rating:4.9, reviews:203 },
+  { id:"10", name:"Calming Eye Cream",    price:58,  salePrice:null, category:"Beauty",   badge:"New",         bg:"#D0EAF5", slug:"calming-eye-cream",     tags:["eyes","sensitive"],    rating:4.6, reviews:88  },
+  { id:"11", name:"Hydra Boost Essence",  price:65,  salePrice:null, category:"Skincare", badge:null,          bg:"#F5D8D0", slug:"hydra-boost-essence",   tags:["essence","hydration"], rating:4.7, reviews:134 },
+  { id:"12", name:"Wellness Bundle",      price:120, salePrice:99,   category:"Wellness", badge:"Sale",        bg:"#D0F5D0", slug:"wellness-bundle",       tags:["bundle","set"],        rating:4.9, reviews:67  },
 ];
 
-const CATEGORIES = ["All", "Skincare", "Beauty", "Wellness"];
+const CATEGORIES  = ["All","Skincare","Beauty","Wellness"];
 const SORT_OPTIONS = [
-  { label: "Featured",        value: "featured"  },
-  { label: "Price: Low–High", value: "price-asc" },
-  { label: "Price: High–Low", value: "price-desc"},
-  { label: "Best Rated",      value: "rating"    },
-  { label: "Most Reviewed",   value: "reviews"   },
+  { label:"Featured",       value:"featured"  },
+  { label:"Price: Low–High",value:"price-asc" },
+  { label:"Price: High–Low",value:"price-desc"},
+  { label:"Best Rated",     value:"rating"    },
+  { label:"Most Reviewed",  value:"reviews"   },
 ];
 
-const fadeUp: Variants = {
-  hidden:  { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeInOut" } },
+const fadeUp = {
+  hidden:  { opacity:0, y:18 },
+  visible: { opacity:1, y:0, transition:{ duration:0.38, ease:[0.4,0,0.2,1] as [number,number,number,number] } },
 };
-const stagger: Variants = { visible: { transition: { staggerChildren: 0.06 } } };
-
-// ── Shop Page ─────────────────────────────────────────────────
 
 const Shop = () => {
-  const theme = useTheme();
+  const theme    = useTheme();
+  const isMobile = useIsMobile();
   const { colors, typography, radius, shadows, transitions } = theme;
   const { addItem, isInCart, openDrawer } = useCart();
-  const { toggle, isWishlisted } = useWishlist();
+  const { toggle, isWishlisted }          = useWishlist();
   const toast = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [search,      setSearch]      = useState(searchParams.get("search") ?? "");
-  const [category,    setCategory]    = useState(searchParams.get("filter") === "sale" ? "All" : (searchParams.get("category") ?? "All"));
+  const [category,    setCategory]    = useState(searchParams.get("category") ?? "All");
   const [sort,        setSort]        = useState("featured");
   const [priceMax,    setPriceMax]    = useState(200);
   const [saleOnly,    setSaleOnly]    = useState(searchParams.get("filter") === "sale");
@@ -65,197 +62,206 @@ const Shop = () => {
 
   const debouncedSearch = useDebounce(search, 350);
 
-  // ── Filter + sort ─────────────────────────────────────────
   const filtered = useMemo(() => {
     let list = [...ALL_PRODUCTS];
-
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase();
-      list = list.filter(
-        (p) => p.name.toLowerCase().includes(q) || p.tags.some((t) => t.includes(q))
-      );
+      list = list.filter(p => p.name.toLowerCase().includes(q) || p.tags.some(t => t.includes(q)));
     }
-    if (category !== "All") list = list.filter((p) => p.category === category);
-    if (saleOnly)           list = list.filter((p) => p.salePrice != null);
-    list = list.filter((p) => (p.salePrice ?? p.price) <= priceMax);
-
+    if (category !== "All") list = list.filter(p => p.category === category);
+    if (saleOnly)           list = list.filter(p => p.salePrice != null);
+    list = list.filter(p => (p.salePrice ?? p.price) <= priceMax);
     switch (sort) {
-      case "price-asc":  list.sort((a,b) => (a.salePrice??a.price) - (b.salePrice??b.price)); break;
-      case "price-desc": list.sort((a,b) => (b.salePrice??b.price) - (a.salePrice??a.price)); break;
-      case "rating":     list.sort((a,b) => b.rating  - a.rating);  break;
-      case "reviews":    list.sort((a,b) => b.reviews - a.reviews); break;
+      case "price-asc":  list.sort((a,b) => (a.salePrice??a.price)-(b.salePrice??b.price)); break;
+      case "price-desc": list.sort((a,b) => (b.salePrice??b.price)-(a.salePrice??a.price)); break;
+      case "rating":     list.sort((a,b) => b.rating-a.rating);   break;
+      case "reviews":    list.sort((a,b) => b.reviews-a.reviews); break;
     }
     return list;
   }, [debouncedSearch, category, sort, priceMax, saleOnly]);
 
   const handleAddToCart = (p: Product) => {
-    addItem({ id: p.id, name: p.name, price: p.price, salePrice: p.salePrice, image: p.bg, slug: p.slug });
+    addItem({ id:p.id, name:p.name, price:p.price, salePrice:p.salePrice, image:p.bg, slug:p.slug });
     openDrawer();
     toast.success(`${p.name} added to cart!`);
   };
 
   const handleWishlist = (p: Product) => {
-    toggle({ id: p.id, name: p.name, price: p.price, salePrice: p.salePrice, image: p.bg, slug: p.slug });
+    toggle({ id:p.id, name:p.name, price:p.price, salePrice:p.salePrice, image:p.bg, slug:p.slug });
     toast.info(isWishlisted(p.id) ? "Removed from wishlist" : `${p.name} saved!`);
   };
 
-  // ── Shared styles ─────────────────────────────────────────
   const filterLabel: React.CSSProperties = {
     fontFamily: typography.fontBody, fontSize: typography.xs,
     fontWeight: typography.weightBold, color: colors.textPrimary,
-    letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "0.625rem", display: "block",
+    letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:"0.5rem", display:"block",
   };
 
-  return (
-    <div style={{ background: colors.bgPrimary, minHeight: "100vh" }}>
+  // ── Filters panel (shared desktop sidebar + mobile sheet)
+  const FiltersPanel = () => (
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <span style={{ fontFamily: typography.fontDisplay, fontSize: typography.lg, color: colors.textPrimary }}>Filters</span>
+        <button onClick={() => { setCategory("All"); setSaleOnly(false); setPriceMax(200); setSearch(""); }}
+          style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.accentPrimary, background:"none", border:"none", cursor:"pointer" }}>
+          Clear all
+        </button>
+      </div>
 
-      {/* ── Header ────────────────────────────────────────── */}
-      <div style={{ background: colors.bgSecondary, borderBottom: `1px solid ${colors.borderLight}`, padding: "3rem 1.5rem 2rem" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <motion.h1 initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
-            style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic", marginBottom:"0.5rem" }}>
-            Shop All
-          </motion.h1>
-          <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.5, delay:0.1 }}
-            style={{ fontFamily: typography.fontBody, color: colors.textMuted, fontSize: typography.base }}>
-            {filtered.length} products
-          </motion.p>
+      {/* Search */}
+      <div>
+        <span style={filterLabel}>Search</span>
+        <div style={{ position:"relative" }}>
+          <Search size={14} style={{ position:"absolute", left:9, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }}/>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
+            style={{ width:"100%", paddingLeft:30, paddingRight:10, paddingTop:"0.55rem", paddingBottom:"0.55rem", border:`1px solid ${colors.borderLight}`, borderRadius: radius?.md, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, background: colors.bgPrimary, outline:"none" }}/>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.5rem", display: "grid", gridTemplateColumns: "260px 1fr", gap: "2.5rem", alignItems: "start" }}>
-
-        {/* ── Sidebar Filters (desktop) ──────────────────── */}
-        <aside style={{ position: "sticky", top: 84, background: colors.bgCard, borderRadius: radius?.xl, padding: "1.75rem", border: `1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.5rem" }}>
-            <span style={{ fontFamily: typography.fontDisplay, fontSize: typography.lg, color: colors.textPrimary }}>Filters</span>
-            <button onClick={() => { setCategory("All"); setSaleOnly(false); setPriceMax(200); setSearch(""); }}
-              style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.accentPrimary, background:"none", border:"none", cursor:"pointer" }}>
-              Clear all
+      {/* Category */}
+      <div>
+        <span style={filterLabel}>Category</span>
+        <div style={{ display:"flex", flexDirection:"column", gap:"0.2rem" }}>
+          {CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setCategory(cat)}
+              style={{ textAlign:"left", padding:"0.45rem 0.75rem", borderRadius: radius?.md, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: category===cat ? typography.weightMedium : typography.weightRegular, background: category===cat ? colors.accentLight : "transparent", color: category===cat ? colors.accentPrimary : colors.textSecondary, transition:`all ${transitions?.fast}` }}>
+              {cat}
             </button>
-          </div>
+          ))}
+        </div>
+      </div>
 
-          {/* Search */}
-          <div style={{ marginBottom:"1.5rem" }}>
-            <span style={filterLabel}>Search</span>
-            <div style={{ position:"relative" }}>
-              <Search size={15} style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }} />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products…"
-                style={{ width:"100%", paddingLeft:32, paddingRight:12, paddingTop:"0.55rem", paddingBottom:"0.55rem", border:`1px solid ${colors.borderLight}`, borderRadius: radius?.md, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, background: colors.bgPrimary, outline:"none" }} />
-            </div>
-          </div>
+      {/* Price */}
+      <div>
+        <span style={filterLabel}>Max Price — <span style={{ color: colors.accentPrimary }}>${priceMax}</span></span>
+        <input type="range" min={20} max={200} step={5} value={priceMax} onChange={e => setPriceMax(Number(e.target.value))}
+          style={{ width:"100%", accentColor: colors.accentPrimary, cursor:"pointer" }}/>
+        <div style={{ display:"flex", justifyContent:"space-between", fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, marginTop:3 }}>
+          <span>$20</span><span>$200</span>
+        </div>
+      </div>
 
-          {/* Category */}
-          <div style={{ marginBottom:"1.5rem" }}>
-            <span style={filterLabel}>Category</span>
-            <div style={{ display:"flex", flexDirection:"column", gap:"0.25rem" }}>
-              {CATEGORIES.map((cat) => (
-                <button key={cat} onClick={() => setCategory(cat)}
-                  style={{ textAlign:"left", padding:"0.5rem 0.75rem", borderRadius: radius?.md, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: category === cat ? typography.weightMedium : typography.weightRegular, background: category === cat ? colors.accentLight : "transparent", color: category === cat ? colors.accentPrimary : colors.textSecondary, transition:`all ${transitions?.fast}` }}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Sale only */}
+      <label style={{ display:"flex", alignItems:"center", gap:"0.5rem", cursor:"pointer" }}>
+        <input type="checkbox" checked={saleOnly} onChange={e => setSaleOnly(e.target.checked)}
+          style={{ width:15, height:15, accentColor: colors.accentPrimary, cursor:"pointer" }}/>
+        <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>Sale items only</span>
+      </label>
+    </div>
+  );
 
-          {/* Price */}
-          <div style={{ marginBottom:"1.5rem" }}>
-            <span style={filterLabel}>Max Price — <span style={{ color: colors.accentPrimary }}>${priceMax}</span></span>
-            <input type="range" min={20} max={200} step={5} value={priceMax} onChange={(e) => setPriceMax(Number(e.target.value))}
-              style={{ width:"100%", accentColor: colors.accentPrimary, cursor:"pointer" }} />
-            <div style={{ display:"flex", justifyContent:"space-between", fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, marginTop:4 }}>
-              <span>$20</span><span>$200</span>
-            </div>
-          </div>
+  return (
+    <div style={{ background: colors.bgPrimary, minHeight:"100vh" }}>
 
-          {/* Sale only */}
-          <div>
-            <label style={{ display:"flex", alignItems:"center", gap:"0.625rem", cursor:"pointer" }}>
-              <input type="checkbox" checked={saleOnly} onChange={(e) => setSaleOnly(e.target.checked)}
-                style={{ width:16, height:16, accentColor: colors.accentPrimary, cursor:"pointer" }} />
-              <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>Sale items only</span>
-            </label>
-          </div>
-        </aside>
+      {/* Header */}
+      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding: isMobile ? "2rem 1.25rem 1.5rem" : "3rem 1.5rem 2rem" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto" }}>
+          <h1 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic", marginBottom:"0.25rem" }}>Shop All</h1>
+          <p style={{ fontFamily: typography.fontBody, color: colors.textMuted, fontSize: typography.sm }}>{filtered.length} products</p>
+        </div>
+      </div>
 
-        {/* ── Product Grid ───────────────────────────────── */}
+      <div style={{ maxWidth:1280, margin:"0 auto", padding: isMobile ? "1.25rem" : "2rem 1.5rem", display:"grid", gridTemplateColumns: isMobile ? "1fr" : "240px 1fr", gap:"2rem", alignItems:"start" }}>
+
+        {/* ── Desktop sidebar ─────────────────────────────── */}
+        {!isMobile && (
+          <aside style={{ position:"sticky", top:80, background: colors.bgCard, borderRadius: radius?.xl, padding:"1.5rem", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
+            <FiltersPanel/>
+          </aside>
+        )}
+
+        {/* ── Product area ────────────────────────────────── */}
         <div>
-          {/* Sort bar */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.5rem", gap:"1rem", flexWrap:"wrap" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <SlidersHorizontal size={16} style={{ color: colors.textMuted }} />
+          {/* Mobile: filter toggle + sort bar */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1rem", gap:"0.75rem" }}>
+            {isMobile && (
+              <motion.button whileTap={{ scale:0.96 }} onClick={() => setFiltersOpen(p => !p)}
+                style={{ display:"flex", alignItems:"center", gap:6, padding:"0.5rem 1rem", borderRadius: radius?.full, border:`1px solid ${colors.borderLight}`, background: colors.bgCard, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, cursor:"pointer" }}>
+                <SlidersHorizontal size={15}/> Filters
+                {(category !== "All" || saleOnly || priceMax < 200) && (
+                  <span style={{ width:7, height:7, borderRadius:"50%", background: colors.accentPrimary }}/>
+                )}
+              </motion.button>
+            )}
+            {!isMobile && (
               <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>
                 {filtered.length} results
               </span>
-            </div>
-            <div style={{ position:"relative" }}>
-              <select value={sort} onChange={(e) => setSort(e.target.value)}
-                style={{ appearance:"none", padding:"0.5rem 2.25rem 0.5rem 0.875rem", border:`1px solid ${colors.borderLight}`, borderRadius: radius?.full, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, background: colors.bgCard, cursor:"pointer", outline:"none" }}>
-                {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            )}
+            <div style={{ position:"relative", marginLeft:"auto" }}>
+              <select value={sort} onChange={e => setSort(e.target.value)}
+                style={{ appearance:"none", padding:"0.5rem 2rem 0.5rem 0.875rem", border:`1px solid ${colors.borderLight}`, borderRadius: radius?.full, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textPrimary, background: colors.bgCard, cursor:"pointer", outline:"none" }}>
+                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
-              <ChevronDown size={14} style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }} />
+              <ChevronDown size={13} style={{ position:"absolute", right:9, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }}/>
             </div>
           </div>
+
+          {/* Mobile filter drawer */}
+          <AnimatePresence>
+            {isMobile && filtersOpen && (
+              <>
+                <motion.div key="foverlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={{ duration:0.2 }}
+                  onClick={() => setFiltersOpen(false)}
+                  style={{ position:"fixed", inset:0, zIndex:50, background: colors.bgOverlay, backdropFilter:"blur(2px)" }}/>
+                <motion.div key="fdrawer" initial={{ y:"100%" }} animate={{ y:0 }} exit={{ y:"100%" }} transition={{ duration:0.3, ease:"easeInOut" }}
+                  style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:51, background: colors.bgCard, borderRadius:`${radius?.xl} ${radius?.xl} 0 0`, padding:"1.5rem", maxHeight:"85vh", overflowY:"auto", boxShadow: shadows?.xl }}>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.25rem" }}>
+                    <span style={{ fontFamily: typography.fontDisplay, fontSize: typography.xl, color: colors.textPrimary }}>Filters</span>
+                    <button onClick={() => setFiltersOpen(false)} style={{ background:"none", border:"none", cursor:"pointer", color: colors.textMuted, display:"flex" }}><X size={20}/></button>
+                  </div>
+                  <FiltersPanel/>
+                  <motion.button whileTap={{ scale:0.97 }} onClick={() => setFiltersOpen(false)}
+                    style={{ width:"100%", marginTop:"1.25rem", padding:"0.875rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium }}>
+                    Show {filtered.length} products
+                  </motion.button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           {/* Grid */}
           <AnimatePresence mode="wait">
             {filtered.length === 0 ? (
               <motion.div key="empty" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-                style={{ textAlign:"center", padding:"5rem 0", color: colors.textMuted, fontFamily: typography.fontBody }}>
+                style={{ textAlign:"center", padding:"4rem 0", color: colors.textMuted, fontFamily: typography.fontBody }}>
                 <div style={{ fontSize:"3rem", marginBottom:"1rem" }}>🔍</div>
                 <p style={{ fontSize: typography.lg, marginBottom:"0.5rem", color: colors.textPrimary }}>No products found</p>
                 <p style={{ fontSize: typography.sm }}>Try adjusting your filters</p>
               </motion.div>
             ) : (
-              <motion.div key="grid" variants={stagger} initial="hidden" animate="visible"
-                style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(220px, 1fr))", gap:"1.25rem" }}>
-                {filtered.map((product) => (
+              <motion.div key="grid" initial="hidden" animate="visible" variants={{ visible:{ transition:{ staggerChildren:0.05 } } }}
+                style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fill,minmax(210px,1fr))", gap: isMobile ? "0.75rem" : "1.25rem" }}>
+                {filtered.map(product => (
                   <motion.div key={product.id} variants={fadeUp} layout>
-                    <motion.div whileHover={{ y:-4, boxShadow: shadows?.lg }}
-                      transition={{ duration:0.22 }}
-                      style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow:"hidden", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm, cursor:"pointer" }}>
-
-                      {/* Image */}
-                      <div style={{ height:200, background: product.bg, position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <span style={{ fontSize:"3rem" }}>✨</span>
-
+                    <motion.div whileHover={{ y:-3, boxShadow: shadows?.lg }} transition={{ duration:0.2 }}
+                      style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow:"hidden", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
+                      <div style={{ height: isMobile ? 140 : 190, background: product.bg, position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize: isMobile ? "2.25rem" : "3rem" }}>✨</span>
                         {product.badge && (
-                          <span style={{ position:"absolute", top:10, left:10, background: product.badge==="Sale" ? colors.accentPrimary : product.badge==="New" ? colors.accentSecondary : colors.textPrimary, color:"#fff", fontSize:"0.62rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", padding:"3px 9px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
+                          <span style={{ position:"absolute", top:9, left:9, background: product.badge==="Sale" ? colors.accentPrimary : product.badge==="New" ? colors.accentSecondary : colors.textPrimary, color:"#fff", fontSize:"0.58rem", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", padding:"2px 7px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
                             {product.badge}
                           </span>
                         )}
-
-                        {/* Wishlist btn */}
                         <motion.button whileTap={{ scale:0.88 }} onClick={() => handleWishlist(product)}
-                          style={{ position:"absolute", top:10, right:10, width:32, height:32, borderRadius: radius?.full, background: colors.bgCard, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: shadows?.sm }}>
-                          <Heart size={15} fill={isWishlisted(product.id) ? colors.accentPrimary : "none"} color={isWishlisted(product.id) ? colors.accentPrimary : colors.textMuted} />
+                          style={{ position:"absolute", top:9, right:9, width:30, height:30, borderRadius: radius?.full, background: colors.bgCard, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: shadows?.sm }}>
+                          <Heart size={14} fill={isWishlisted(product.id) ? colors.accentPrimary : "none"} color={isWishlisted(product.id) ? colors.accentPrimary : colors.textMuted}/>
                         </motion.button>
                       </div>
-
-                      {/* Info */}
-                      <div style={{ padding:"1.1rem" }}>
-                        <h3 style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom:"0.375rem" }}>
-                          {product.name}
-                        </h3>
-
-                        <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:"0.625rem" }}>
-                          <span style={{ fontSize:"0.65rem", color: colors.accentPrimary }}>{"★".repeat(Math.round(product.rating))}</span>
-                          <span style={{ fontFamily: typography.fontBody, fontSize:"0.68rem", color: colors.textMuted }}>({product.reviews})</span>
+                      <div style={{ padding: isMobile ? "0.75rem" : "1rem" }}>
+                        <h3 className="product-name" style={{ marginBottom:"0.25rem", fontSize: isMobile ? typography.xs : typography.sm }}>{product.name}</h3>
+                        <div style={{ display:"flex", alignItems:"center", gap:3, marginBottom:"0.5rem" }}>
+                          <span style={{ fontSize:"0.6rem", color: colors.accentPrimary }}>{"★".repeat(Math.round(product.rating))}</span>
+                          <span style={{ fontFamily: typography.fontBody, fontSize:"0.62rem", color: colors.textMuted }}>({product.reviews})</span>
                         </div>
-
                         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                            <span style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightBold, color: product.salePrice ? colors.accentPrimary : colors.textPrimary }}>
-                              ${product.salePrice ?? product.price}
-                            </span>
-                            {product.salePrice && (
-                              <span style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, textDecoration:"line-through" }}>${product.price}</span>
-                            )}
+                          <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                            <span className="price" style={{ fontSize: isMobile ? typography.sm : typography.base }}>${product.salePrice ?? product.price}</span>
+                            {product.salePrice && <span className="price-original">${product.price}</span>}
                           </div>
-
                           <motion.button whileTap={{ scale:0.9 }} onClick={() => handleAddToCart(product)}
-                            style={{ width:32, height:32, borderRadius: radius?.full, background: isInCart(product.id) ? colors.accentPrimary : colors.bgSecondary, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:`background ${transitions?.fast}` }}>
-                            <ShoppingBag size={15} color={isInCart(product.id) ? "#fff" : colors.textSecondary} />
+                            style={{ width:30, height:30, borderRadius: radius?.full, background: isInCart(product.id) ? colors.accentPrimary : colors.bgSecondary, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:`background ${transitions?.fast}` }}>
+                            <ShoppingBag size={13} color={isInCart(product.id) ? "#fff" : colors.textSecondary}/>
                           </motion.button>
                         </div>
                       </div>
@@ -272,6 +278,7 @@ const Shop = () => {
 };
 
 export default Shop;
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // FILE OVERVIEW: Shop.tsx

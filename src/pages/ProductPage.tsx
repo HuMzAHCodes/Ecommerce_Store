@@ -1,50 +1,42 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingBag, Star, ChevronRight, Minus, Plus, RotateCcw, Truck, Shield } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useToast } from "../components/ui/Toast";
-
-// ── Mock data (replace with React Query API call later) ───────
+import { useIsMobile } from "../hooks/useMediaQuery";
 
 const MOCK_PRODUCTS: Record<string, {
-  id: string; name: string; price: number; salePrice?: number | null;
-  category: string; badge?: string | null; slug: string;
-  description: string; benefits: string[]; howToUse: string;
-  images: { bg: string; label: string }[];
-  reviews: { id: string; name: string; rating: number; date: string; body: string }[];
-  sizes: string[];
+  id:string; name:string; price:number; salePrice?:number|null;
+  category:string; badge?:string|null; slug:string;
+  description:string; benefits:string[]; howToUse:string;
+  images:{bg:string; label:string}[];
+  reviews:{id:string; name:string; rating:number; date:string; body:string}[];
+  sizes:string[];
 }> = {
   "radiance-serum": {
     id:"1", name:"Radiance Serum", price:68, salePrice:null, category:"Skincare", badge:"Best Seller", slug:"radiance-serum",
     description:"A lightweight, fast-absorbing serum packed with Vitamin C and hyaluronic acid that visibly brightens, evens skin tone, and delivers lasting hydration. Formulated without parabens, sulfates, or artificial fragrances.",
     benefits:["Visibly brightens in 2 weeks","Evens skin tone","24hr hydration","Dermatologist tested","Fragrance-free"],
     howToUse:"Apply 3–4 drops to cleansed skin morning and evening. Gently pat into face and neck. Follow with moisturiser. Use SPF in the morning.",
-    images:[{ bg:"#F5DDD0", label:"Front" },{ bg:"#EDD0C0", label:"Side" },{ bg:"#F0E8E0", label:"Detail" }],
+    images:[{bg:"#F5DDD0",label:"Front"},{bg:"#EDD0C0",label:"Side"},{bg:"#F0E8E0",label:"Detail"}],
     reviews:[
-      { id:"r1", name:"Amara K.", rating:5, date:"May 2025", body:"Genuinely the best serum I've ever used. My skin is glowing after just two weeks." },
-      { id:"r2", name:"Priya M.", rating:5, date:"Apr 2025", body:"Lightweight, absorbs fast, and my dark spots have faded noticeably." },
-      { id:"r3", name:"Sophie L.", rating:4, date:"Mar 2025", body:"Love this. Wish the bottle was bigger for the price." },
+      {id:"r1",name:"Amara K.",rating:5,date:"May 2025",body:"Genuinely the best serum I've ever used. My skin is glowing after just two weeks."},
+      {id:"r2",name:"Priya M.",rating:5,date:"Apr 2025",body:"Lightweight, absorbs fast, and my dark spots have faded noticeably."},
+      {id:"r3",name:"Sophie L.",rating:4,date:"Mar 2025",body:"Love this. Wish the bottle was bigger for the price."},
     ],
-    sizes:["15ml", "30ml", "50ml"],
+    sizes:["15ml","30ml","50ml"],
   },
 };
 
-// Fallback for any slug not in mock
 const DEFAULT = Object.values(MOCK_PRODUCTS)[0];
 
-const fadeUp: Variants = {
-  hidden:  { opacity:0, y:20 },
-  visible: { opacity:1, y:0, transition:{ duration:0.45, ease:"easeInOut" } },
-};
-
-// ── Component ─────────────────────────────────────────────────
-
 const ProductPage = () => {
-  const { slug }  = useParams<{ slug: string }>();
+  const { slug }  = useParams<{slug:string}>();
   const theme     = useTheme();
+  const isMobile  = useIsMobile();
   const { colors, typography, radius, shadows, transitions } = theme;
   const { addItem, isInCart, openDrawer } = useCart();
   const { toggle, isWishlisted }          = useWishlist();
@@ -59,206 +51,191 @@ const ProductPage = () => {
 
   const handleAddToCart = () => {
     for (let i = 0; i < qty; i++) {
-      addItem({ id: product.id, name: product.name, price: product.price, salePrice: product.salePrice, image: product.images[0].bg, slug: product.slug });
+      addItem({ id:product.id, name:product.name, price:product.price, salePrice:product.salePrice, image:product.images[0].bg, slug:product.slug });
     }
     openDrawer();
     toast.success(`${product.name} added to cart!`);
   };
 
-  const avgRating = product.reviews.reduce((s,r) => s + r.rating, 0) / product.reviews.length;
+  const avgRating = product.reviews.reduce((s,r) => s+r.rating, 0) / product.reviews.length;
 
   return (
     <div style={{ background: colors.bgPrimary, minHeight:"100vh" }}>
 
-      {/* ── Breadcrumb ───────────────────────────────────── */}
-      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding:"0.875rem 1.5rem" }}>
-        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", gap:6, fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>
-          <Link to="/"    style={{ color: colors.textMuted, textDecoration:"none" }}>Home</Link>
-          <ChevronRight size={12} />
+      {/* Breadcrumb */}
+      <div style={{ background: colors.bgSecondary, borderBottom:`1px solid ${colors.borderLight}`, padding:"0.75rem 1.25rem" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", gap:5, fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted, flexWrap:"wrap" }}>
+          <Link to="/"     style={{ color: colors.textMuted, textDecoration:"none" }}>Home</Link>
+          <ChevronRight size={11}/>
           <Link to="/shop" style={{ color: colors.textMuted, textDecoration:"none" }}>Shop</Link>
-          <ChevronRight size={12} />
+          <ChevronRight size={11}/>
           <span style={{ color: colors.textPrimary }}>{product.name}</span>
         </div>
       </div>
 
-      {/* ── Main content ──────────────────────────────────── */}
-      <div style={{ maxWidth:1280, margin:"0 auto", padding:"3rem 1.5rem", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4rem", alignItems:"start" }}>
+      {/* Main */}
+      <div style={{
+        maxWidth:1280, margin:"0 auto",
+        padding: isMobile ? "1.5rem 1.25rem" : "3rem 1.5rem",
+        display:"grid",
+        gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+        gap: isMobile ? "2rem" : "4rem",
+        alignItems:"start",
+      }}>
 
-        {/* Left — Images */}
-        <motion.div initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.5 }}>
-          {/* Main image */}
+        {/* Images */}
+        <div>
           <AnimatePresence mode="wait">
             <motion.div key={activeImg}
               initial={{ opacity:0, scale:0.97 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.97 }}
-              transition={{ duration:0.3 }}
-              style={{ height:460, borderRadius: radius?.xl, background: product.images[activeImg].bg, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"1rem", boxShadow: shadows?.lg, position:"relative" }}>
-              <span style={{ fontSize:"6rem" }}>✨</span>
+              transition={{ duration:0.28 }}
+              style={{ height: isMobile ? 280 : 440, borderRadius: radius?.xl, background: product.images[activeImg].bg, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"0.875rem", boxShadow: shadows?.lg, position:"relative" }}>
+              <span style={{ fontSize: isMobile ? "4rem" : "6rem" }}>✨</span>
               {product.badge && (
-                <span style={{ position:"absolute", top:16, left:16, background: product.badge==="Sale" ? colors.accentPrimary : product.badge==="New" ? colors.accentSecondary : colors.textPrimary, color:"#fff", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", padding:"4px 12px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
+                <span style={{ position:"absolute", top:14, left:14, background: product.badge==="Sale" ? colors.accentPrimary : product.badge==="New" ? colors.accentSecondary : colors.textPrimary, color:"#fff", fontSize:"0.66rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", padding:"4px 10px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
                   {product.badge}
                 </span>
               )}
             </motion.div>
           </AnimatePresence>
-
-          {/* Thumbnails */}
-          <div style={{ display:"flex", gap:"0.75rem" }}>
-            {product.images.map((img, i) => (
+          <div style={{ display:"flex", gap:"0.625rem" }}>
+            {product.images.map((img,i) => (
               <button key={i} onClick={() => setActiveImg(i)}
-                style={{ flex:1, height:88, borderRadius: radius?.lg, background: img.bg, border:`2px solid ${activeImg===i ? colors.accentPrimary : colors.borderLight}`, cursor:"pointer", transition:`border-color ${transitions?.fast}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ fontSize:"1.5rem" }}>✨</span>
+                style={{ flex:1, height: isMobile ? 68 : 88, borderRadius: radius?.lg, background: img.bg, border:`2px solid ${activeImg===i ? colors.accentPrimary : colors.borderLight}`, cursor:"pointer", transition:`border-color ${transitions?.fast}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ fontSize:"1.25rem" }}>✨</span>
               </button>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Right — Info */}
-        <motion.div variants={{ visible:{ transition:{ staggerChildren:0.08 } } }} initial="hidden" animate="visible">
+        {/* Info */}
+        <div>
+          <Link to={`/shop?category=${product.category}`}
+            style={{ fontFamily: typography.fontBody, fontSize: typography.xs, fontWeight: typography.weightMedium, color: colors.accentPrimary, textDecoration:"none", letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            {product.category}
+          </Link>
 
-          <motion.div variants={fadeUp}>
-            <Link to={`/shop?category=${product.category}`}
-              style={{ fontFamily: typography.fontBody, fontSize: typography.xs, fontWeight: typography.weightMedium, color: colors.accentPrimary, textDecoration:"none", letterSpacing:"0.08em", textTransform:"uppercase" }}>
-              {product.category}
-            </Link>
-          </motion.div>
-
-          <motion.h1 variants={fadeUp} style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle:"italic", margin:"0.5rem 0 0.75rem" }}>
+          <h1 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, margin:"0.5rem 0 0.75rem", fontSize: isMobile ? "clamp(1.75rem,5vw,2.25rem)" : undefined }}>
             {product.name}
-          </motion.h1>
+          </h1>
 
           {/* Rating */}
-          <motion.div variants={fadeUp} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"1.25rem" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"1.25rem" }}>
             <div style={{ display:"flex", gap:2 }}>
-              {[1,2,3,4,5].map((s) => (
-                <Star key={s} size={15} fill={s <= Math.round(avgRating) ? colors.accentPrimary : "none"} color={colors.accentPrimary} />
+              {[1,2,3,4,5].map(s => (
+                <Star key={s} size={14} fill={s<=Math.round(avgRating) ? colors.accentPrimary : "none"} color={colors.accentPrimary}/>
               ))}
             </div>
             <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>
               {avgRating.toFixed(1)} ({product.reviews.length} reviews)
             </span>
-          </motion.div>
+          </div>
 
           {/* Price */}
-          <motion.div variants={fadeUp} style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"1.75rem" }}>
-            <span style={{ fontFamily: typography.fontDisplay, fontSize: typography["3xl"], color: product.salePrice ? colors.accentPrimary : colors.textPrimary }}>
-              ${product.salePrice ?? product.price}
-            </span>
-            {product.salePrice && (
-              <span style={{ fontFamily: typography.fontBody, fontSize: typography.xl, color: colors.textMuted, textDecoration:"line-through" }}>${product.price}</span>
-            )}
-          </motion.div>
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"1.5rem" }}>
+            <span className="price" style={{ fontSize: typography["3xl"] }}>${product.salePrice ?? product.price}</span>
+            {product.salePrice && <span className="price-original" style={{ fontSize: typography.xl }}>${product.price}</span>}
+          </div>
 
           {/* Size */}
-          <motion.div variants={fadeUp} style={{ marginBottom:"1.5rem" }}>
-            <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom:"0.625rem" }}>
+          <div style={{ marginBottom:"1.25rem" }}>
+            <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom:"0.5rem" }}>
               Size — <span style={{ color: colors.accentPrimary }}>{activeSize}</span>
             </p>
-            <div style={{ display:"flex", gap:"0.5rem" }}>
-              {product.sizes.map((s) => (
+            <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap" }}>
+              {product.sizes.map(s => (
                 <button key={s} onClick={() => setActiveSize(s)}
-                  style={{ padding:"0.5rem 1.125rem", borderRadius: radius?.full, border:`1.5px solid ${activeSize===s ? colors.accentPrimary : colors.borderLight}`, background: activeSize===s ? colors.accentLight : "transparent", color: activeSize===s ? colors.accentPrimary : colors.textSecondary, fontFamily: typography.fontBody, fontSize: typography.sm, cursor:"pointer", transition:`all ${transitions?.fast}` }}>
+                  style={{ padding:"0.5rem 1rem", borderRadius: radius?.full, border:`1.5px solid ${activeSize===s ? colors.accentPrimary : colors.borderLight}`, background: activeSize===s ? colors.accentLight : "transparent", color: activeSize===s ? colors.accentPrimary : colors.textSecondary, fontFamily: typography.fontBody, fontSize: typography.sm, cursor:"pointer", transition:`all ${transitions?.fast}` }}>
                   {s}
                 </button>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Qty + Add to cart */}
-          <motion.div variants={fadeUp} style={{ display:"flex", gap:"0.875rem", alignItems:"center", marginBottom:"1rem" }}>
-            {/* Qty stepper */}
-            <div style={{ display:"flex", alignItems:"center", gap:0, border:`1px solid ${colors.borderLight}`, borderRadius: radius?.full, overflow:"hidden" }}>
-              <button onClick={() => setQty(q => Math.max(1, q-1))}
-                style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}>
-                <Minus size={14} />
-              </button>
-              <span style={{ width:36, textAlign:"center", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>
-                {qty}
-              </span>
-              <button onClick={() => setQty(q => q+1)}
-                style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}>
-                <Plus size={14} />
-              </button>
+          <div style={{ display:"flex", gap:"0.75rem", alignItems:"center", marginBottom:"1rem", flexWrap: isMobile ? "wrap" : "nowrap" }}>
+            <div style={{ display:"flex", alignItems:"center", border:`1px solid ${colors.borderLight}`, borderRadius: radius?.full, overflow:"hidden" }}>
+              <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}><Minus size={13}/></button>
+              <span style={{ width:34, textAlign:"center", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{qty}</span>
+              <button onClick={() => setQty(q => q+1)} style={{ width:38, height:42, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:"none", cursor:"pointer", color: colors.textPrimary }}><Plus size={13}/></button>
             </div>
 
-            {/* Add to cart */}
             <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }} onClick={handleAddToCart}
-              style={{ flex:1, height:42, borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, display:"flex", alignItems:"center", justifyContent:"center", gap:8, boxShadow: shadows?.md }}>
-              <ShoppingBag size={18} /> {isInCart(product.id) ? "Add More" : "Add to Cart"}
+              style={{ flex:1, minWidth: isMobile ? "100%" : "auto", height:42, borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, display:"flex", alignItems:"center", justifyContent:"center", gap:8, boxShadow: shadows?.md }}>
+              <ShoppingBag size={17}/> {isInCart(product.id) ? "Add More" : "Add to Cart"}
             </motion.button>
 
-            {/* Wishlist */}
-            <motion.button whileTap={{ scale:0.88 }} onClick={() => { toggle({ id:product.id, name:product.name, price:product.price, salePrice:product.salePrice, image:product.images[0].bg, slug:product.slug }); toast.info(isWishlisted(product.id) ? "Removed from wishlist" : "Saved to wishlist!"); }}
-              style={{ width:42, height:42, borderRadius: radius?.full, border:`1.5px solid ${isWishlisted(product.id) ? colors.accentPrimary : colors.borderLight}`, background: isWishlisted(product.id) ? colors.accentLight : "transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <Heart size={18} fill={isWishlisted(product.id) ? colors.accentPrimary : "none"} color={isWishlisted(product.id) ? colors.accentPrimary : colors.textMuted} />
+            <motion.button whileTap={{ scale:0.88 }} onClick={() => { toggle({ id:product.id, name:product.name, price:product.price, salePrice:product.salePrice, image:product.images[0].bg, slug:product.slug }); toast.info(isWishlisted(product.id) ? "Removed from wishlist" : "Saved!"); }}
+              style={{ width:42, height:42, borderRadius: radius?.full, border:`1.5px solid ${isWishlisted(product.id) ? colors.accentPrimary : colors.borderLight}`, background: isWishlisted(product.id) ? colors.accentLight : "transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Heart size={17} fill={isWishlisted(product.id) ? colors.accentPrimary : "none"} color={isWishlisted(product.id) ? colors.accentPrimary : colors.textMuted}/>
             </motion.button>
-          </motion.div>
+          </div>
 
           {/* Perks */}
-          <motion.div variants={fadeUp} style={{ display:"flex", flexDirection:"column", gap:"0.5rem", padding:"1.25rem", background: colors.bgSecondary, borderRadius: radius?.lg, marginBottom:"1.75rem" }}>
-            {[{ icon:<Truck size={15}/>,     text:"Free shipping on orders over $50" },
-              { icon:<RotateCcw size={15}/>, text:"30-day easy returns" },
-              { icon:<Shield size={15}/>,    text:"Clean, dermatologist-tested formula" }]
+          <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem", padding:"1.1rem", background: colors.bgSecondary, borderRadius: radius?.lg, marginBottom:"1.5rem" }}>
+            {[{icon:<Truck size={14}/>, text:"Free shipping on orders over $50"},
+              {icon:<RotateCcw size={14}/>, text:"30-day easy returns"},
+              {icon:<Shield size={14}/>, text:"Clean, dermatologist-tested formula"}]
               .map((p,i) => (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
-                  <span style={{ color: colors.accentPrimary }}>{p.icon}</span> {p.text}
-                </div>
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:9, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
+                <span style={{ color: colors.accentPrimary }}>{p.icon}</span>{p.text}
+              </div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Tabs */}
-          <motion.div variants={fadeUp}>
-            <div style={{ display:"flex", borderBottom:`1px solid ${colors.borderLight}`, marginBottom:"1.25rem" }}>
-              {(["details","how-to","reviews"] as const).map((tab) => (
-                <button key={tab} onClick={() => setActiveTab(tab)}
-                  style={{ padding:"0.625rem 1.25rem", border:"none", background:"transparent", cursor:"pointer", fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: activeTab===tab ? typography.weightMedium : typography.weightRegular, color: activeTab===tab ? colors.accentPrimary : colors.textMuted, borderBottom: `2px solid ${activeTab===tab ? colors.accentPrimary : "transparent"}`, marginBottom:-1, transition:`all ${transitions?.fast}` }}>
-                  {tab === "how-to" ? "How to Use" : tab.charAt(0).toUpperCase()+tab.slice(1)}
-                </button>
-              ))}
-            </div>
+          <div style={{ borderBottom:`1px solid ${colors.borderLight}`, display:"flex", marginBottom:"1.1rem" }}>
+            {(["details","how-to","reviews"] as const).map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                style={{ padding:"0.6rem 1rem", border:"none", background:"transparent", cursor:"pointer", fontFamily: typography.fontBody, fontSize: isMobile ? typography.xs : typography.sm, fontWeight: activeTab===tab ? typography.weightMedium : typography.weightRegular, color: activeTab===tab ? colors.accentPrimary : colors.textMuted, borderBottom:`2px solid ${activeTab===tab ? colors.accentPrimary : "transparent"}`, marginBottom:-1, transition:`all ${transitions?.fast}` }}>
+                {tab==="how-to" ? "How to Use" : tab.charAt(0).toUpperCase()+tab.slice(1)}
+              </button>
+            ))}
+          </div>
 
-            <AnimatePresence mode="wait">
-              {activeTab === "details" && (
-                <motion.div key="details" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }}>
-                  <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.7, marginBottom:"1rem" }}>{product.description}</p>
-                  <ul style={{ display:"flex", flexDirection:"column", gap:"0.375rem" }}>
-                    {product.benefits.map((b) => (
-                      <li key={b} style={{ display:"flex", alignItems:"center", gap:8, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
-                        <span style={{ color: colors.accentPrimary, fontSize:"0.7rem" }}>●</span> {b}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-              {activeTab === "how-to" && (
-                <motion.div key="how-to" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }}>
-                  <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.8 }}>{product.howToUse}</p>
-                </motion.div>
-              )}
-              {activeTab === "reviews" && (
-                <motion.div key="reviews" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.25 }} style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
-                  {product.reviews.map((r) => (
-                    <div key={r.id} style={{ padding:"1rem", background: colors.bgSecondary, borderRadius: radius?.lg, border:`1px solid ${colors.borderLight}` }}>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.375rem" }}>
-                        <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{r.name}</span>
-                        <span style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{r.date}</span>
-                      </div>
-                      <div style={{ display:"flex", gap:2, marginBottom:"0.5rem" }}>
-                        {[1,2,3,4,5].map((s) => <Star key={s} size={12} fill={s<=r.rating ? colors.accentPrimary : "none"} color={colors.accentPrimary} />)}
-                      </div>
-                      <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.6, margin:0 }}>{r.body}</p>
-                    </div>
+          <AnimatePresence mode="wait">
+            {activeTab==="details" && (
+              <motion.div key="details" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.22 }}>
+                <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.75, marginBottom:"1rem" }}>{product.description}</p>
+                <ul style={{ display:"flex", flexDirection:"column", gap:"0.35rem" }}>
+                  {product.benefits.map(b => (
+                    <li key={b} style={{ display:"flex", alignItems:"center", gap:8, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary }}>
+                      <span style={{ color: colors.accentPrimary, fontSize:"0.65rem" }}>●</span>{b}
+                    </li>
                   ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+                </ul>
+              </motion.div>
+            )}
+            {activeTab==="how-to" && (
+              <motion.div key="how-to" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.22 }}>
+                <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.8 }}>{product.howToUse}</p>
+              </motion.div>
+            )}
+            {activeTab==="reviews" && (
+              <motion.div key="reviews" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.22 }} style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
+                {product.reviews.map(r => (
+                  <div key={r.id} style={{ padding:"1rem", background: colors.bgSecondary, borderRadius: radius?.lg, border:`1px solid ${colors.borderLight}` }}>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.35rem" }}>
+                      <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{r.name}</span>
+                      <span style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{r.date}</span>
+                    </div>
+                    <div style={{ display:"flex", gap:2, marginBottom:"0.4rem" }}>
+                      {[1,2,3,4,5].map(s => <Star key={s} size={11} fill={s<=r.rating ? colors.accentPrimary : "none"} color={colors.accentPrimary}/>)}
+                    </div>
+                    <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textSecondary, lineHeight:1.6, margin:0 }}>{r.body}</p>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
 };
 
 export default ProductPage;
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // FILE OVERVIEW: ProductPage.tsx

@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // ── Login ─────────────────────────────────────────────────
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, _password: string): Promise<void> => {
     dispatch({ type: "LOGIN_START" });
     try {
       // TODO: replace with real API call
@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ── Register ──────────────────────────────────────────────
-  const register = async (name: string, email: string, password: string): Promise<void> => {
+  const register = async (name: string, email: string, _password: string): Promise<void> => {
     dispatch({ type: "LOGIN_START" });
     try {
       // TODO: replace with real API call

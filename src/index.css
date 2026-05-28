@@ -208,6 +208,21 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
 .section    { padding: 5rem 0; }
 .section-sm { padding: 3rem 0; }
 
+/* Responsive utility classes */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+  .show-mobile {
+    display: flex !important;
+  }
+}
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
+
 /* ── Animations ──────────────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(22px); }
