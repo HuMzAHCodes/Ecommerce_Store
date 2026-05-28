@@ -1,60 +1,250 @@
- *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ /* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-body);
-  line-height: 1.6;
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.65;
   min-height: 100vh;
   transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
-h1,h2,h3,h4,h5,h6 { font-family: var(--font-display); line-height: 1.2; font-weight: 500; }
-h1 { font-size: clamp(2rem, 5vw, 3.75rem); }
-h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
-h3 { font-size: clamp(1.25rem, 2.5vw, 1.875rem); }
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY — Playfair Display + DM Sans
+   Cosmetics store techniques applied throughout
+   ═══════════════════════════════════════════════════════════════ */
 
-p { color: var(--color-text-secondary); line-height: 1.7; }
-a { color: var(--color-accent-primary); text-decoration: none; transition: color var(--transition-fast); }
-a:hover { color: var(--color-accent-hover); }
+/*
+  TECHNIQUE 1: Heading hierarchy
+  Playfair Display bold with tight tracking on large sizes
+  creates the "luxury magazine" look used by Chanel, La Mer etc.
+*/
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+  line-height: 1.15;
+  font-weight: 700;
+}
+h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.75rem, 3vw, 2.5rem);  letter-spacing: -0.025em; }
+h3 { font-size: clamp(1.25rem, 2vw, 1.875rem); letter-spacing: -0.015em; }
+h4 { font-size: 1.25rem;  letter-spacing: -0.01em; }
+h5 { font-size: 1.125rem; letter-spacing: 0; }
+h6 { font-size: 1rem;     letter-spacing: 0; }
 
-::selection { background-color: var(--color-accent-light); color: var(--color-text-primary); }
+/*
+  TECHNIQUE 2: Italic serif — the signature cosmetics move
+  Mixing upright bold + italic weight in the same heading
+  creates elegance without using a separate decorative font.
+  Usage: <h1>Rare <em>beauty</em></h1>
+*/
+h1 em, h2 em, h3 em,
+.italic-accent {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--color-border-medium); border-radius: var(--radius-full); }
+/*
+  TECHNIQUE 3: Hero display class
+  Full italic Playfair at light weight — used on landing hero
+  where the heading needs to feel poetic, not powerful.
+  Usage: <h1 class="display-hero">Simple. Clean. Beautiful.</h1>
+*/
+.display-hero {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
 
-:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 3px; }
+/*
+  TECHNIQUE 4: Section label — DM Sans uppercase tracked
+  Used above section headings e.g. "NEW ARRIVALS", "OUR STORY"
+  Wide tracking on short uppercase text = premium, editorial feel.
+  Usage: <p class="overline">New Collection</p>
+*/
+.overline {
+  font-family: var(--font-body);
+  font-size: 0.70rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-secondary);
+}
 
+/*
+  TECHNIQUE 5: Price styling — DM Sans tabular figures
+  Prices use medium weight + tabular-nums so digits align
+  in product grids and cart lists.
+  Usage: <span class="price">$68.00</span>
+*/
+.price {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--color-accent-primary);
+}
+.price-original {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+  font-size: 0.875em;
+}
+
+/*
+  TECHNIQUE 6: CTA / button label — DM Sans medium + tracked caps
+  Short uppercase labels with moderate tracking feel intentional
+  and premium without being hard to read.
+  Usage: <button class="btn-label">Add to Cart</button>
+*/
+.btn-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+/*
+  TECHNIQUE 7: Body copy — DM Sans light/regular
+  Skincare copy should feel clean and breathable.
+  300 weight for long descriptions, 400 for short callouts.
+*/
+p {
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+  line-height: 1.75;
+}
+.body-light {
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+}
+
+/*
+  TECHNIQUE 8: Product name in cards — DM Sans medium
+  Not a heading, not body — a distinct in-between size
+  that reads cleanly in tight card layouts.
+*/
+.product-name {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+/* ── General links ───────────────────────────────────────────── */
+a {
+  color: var(--color-accent-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--color-accent-primary); }
+
+/* ── Selection ───────────────────────────────────────────────── */
+::selection {
+  background-color: var(--color-accent-light);
+  color: var(--color-text-primary);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: var(--color-bg-secondary); }
+::-webkit-scrollbar-thumb  { background: var(--color-border-medium); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-accent-primary); }
+
+/* ── Focus ───────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Images ──────────────────────────────────────────────────── */
 img, video { max-width: 100%; display: block; }
+
+/* ── Buttons reset ───────────────────────────────────────────── */
 button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
+
+/* ── Inputs ──────────────────────────────────────────────────── */
 input, textarea, select {
-  font-family: var(--font-body); font-size: 1rem;
-  color: var(--color-text-primary); background: var(--color-bg-card);
-  border: 1px solid var(--color-border-light); border-radius: var(--radius-md);
-  padding: 0.6rem 0.875rem; outline: none; width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.875rem;
+  outline: none;
+  width: 100%;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-input:focus, textarea:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-light); }
-input::placeholder { color: var(--color-text-muted); }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+input::placeholder, textarea::placeholder { color: var(--color-text-muted); }
+option { background: var(--color-bg-secondary); color: var(--color-text-primary); }
 
+/* ── Layout ──────────────────────────────────────────────────── */
 .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-.section { padding: 5rem 0; }
+.section    { padding: 5rem 0; }
+.section-sm { padding: 3rem 0; }
 
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes skeleton-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.25; }
+}
 
-.fade-up { animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
-.skeleton { background: var(--color-bg-tertiary); border-radius: var(--radius-md); animation: skeleton-pulse 1.5s ease-in-out infinite; }
-.stagger-1 { animation-delay: 0.05s; } .stagger-2 { animation-delay: 0.10s; }
-.stagger-3 { animation-delay: 0.15s; } .stagger-4 { animation-delay: 0.20s; } 
+.fade-up { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) both; }
+.fade-in { animation: fadeIn 0.4s ease both; }
+.skeleton {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
 
+/* Stagger delays */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
 
-
-
-
+/* ── Underline hover ─────────────────────────────────────────── */
+.underline-hover { position: relative; display: inline-block; }
+.underline-hover::after {
+  content: ""; position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: var(--color-accent-primary);
+  transition: width var(--transition-normal);
+}
+.underline-hover:hover::after { width: 100%; }
 
 
 
