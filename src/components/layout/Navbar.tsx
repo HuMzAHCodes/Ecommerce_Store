@@ -5,6 +5,7 @@ import {
   ShoppingBag, Heart, Search, Menu, X, User, ChevronDown,
 } from "lucide-react";
 import { useTheme } from "../../theme/ThemeContext";
+import { useCart } from "../../context/CartContext";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -160,6 +161,8 @@ const hoverColor = "#013e37";
       e.currentTarget.style.color      = colors.textSecondary;
     },
   };
+
+    const { openDrawer } = useCart();
 
   return (
     <>
@@ -326,7 +329,7 @@ const hoverColor = "#013e37";
 
           {/* ── Right Icons ───────────────────────────────── */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
-
+        
             {/* Search */}
             <motion.button
               whileTap={{ scale: 0.92 }}
@@ -345,10 +348,17 @@ const hoverColor = "#013e37";
             </Link>
 
             {/* Cart */}
-            <Link to="/cart" style={{ ...iconBtn, textDecoration: "none" }} {...iconHover}>
-              <ShoppingBag size={19} />
-              {cartCount > 0 && <CountBadge count={cartCount} color={colors.accentPrimary} />}
-            </Link>
+           {/* Cart */}
+<motion.button
+  whileTap={{ scale: 0.92 }}
+  style={iconBtn}
+  {...iconHover}
+  onClick={openDrawer}
+  aria-label="Open cart"
+>
+  <ShoppingBag size={19} />
+  {cartCount > 0 && <CountBadge count={cartCount} color={colors.accentPrimary} />}
+</motion.button>
 
             {/* User */}
             <Link

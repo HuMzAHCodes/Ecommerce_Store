@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles, Truck, RotateCcw, Shield } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
 import { useIsMobile } from "../hooks/useMediaQuery";
+import ScrollReveal from "../components/ui/ScrollReveal";
 
 // ── Data ──────────────────────────────────────────────────────
 
@@ -183,117 +184,107 @@ const Home = () => {
 
       {/* ── PERKS BAR ─────────────────────────────────────── */}
       <section style={{ background: colors.bgSecondary, borderTop: `1px solid ${colors.borderLight}`, borderBottom: `1px solid ${colors.borderLight}` }}>
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
-          style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}
-        >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
           {PERKS.map((perk) => (
-            <motion.div key={perk.title} variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <div style={{ color: colors.accentPrimary, flexShrink: 0 }}>{perk.icon}</div>
-              <div>
-                <div style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{perk.title}</div>
-                <div style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{perk.desc}</div>
+            <ScrollReveal key={perk.title} y={28}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div style={{ color: colors.accentPrimary, flexShrink: 0 }}>{perk.icon}</div>
+                <div>
+                  <div style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>{perk.title}</div>
+                  <div style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.textMuted }}>{perk.desc}</div>
+                </div>
               </div>
-            </motion.div>
+            </ScrollReveal>
           ))}
-        </motion.div>
+        </div>
       </section>
 
       {/* ── CATEGORIES ────────────────────────────────────── */}
       <section style={{ maxWidth: 1280, margin: "0 auto", padding: "5rem 1.5rem" }}>
-        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}>
-          <motion.div variants={fadeUp} style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <h2 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle: "italic", marginBottom: "0.5rem" }}>Shop by Category</h2>
-            <p style={{ fontFamily: typography.fontBody, color: colors.textMuted, fontSize: typography.base }}>Find exactly what your skin needs</p>
-          </motion.div>
+        <ScrollReveal style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <h2 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle: "italic", marginBottom: "0.5rem" }}>Shop by Category</h2>
+          <p style={{ fontFamily: typography.fontBody, color: colors.textMuted, fontSize: typography.base }}>Find exactly what your skin needs</p>
+        </ScrollReveal>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
-            {CATEGORIES.map((cat) => (
-              <motion.div key={cat.label} variants={fadeUp}>
-                <Link to={cat.href} style={{ textDecoration: "none", display: "block" }}>
-                  <motion.div
-                    whileHover={{ y: -5, boxShadow: shadows?.lg }}
-                    transition={{ duration: 0.25 }}
-                    style={{ background: colors.bgSecondary, borderRadius: radius?.xl, padding: "2.5rem 1.5rem", textAlign: "center", border: `1px solid ${colors.borderLight}`, cursor: "pointer", boxShadow: shadows?.sm, transition: `border-color ${transitions?.normal}` }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = colors.accentPrimary; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = colors.borderLight; }}
-                  >
-                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>{cat.emoji}</div>
-                    <div style={{ fontFamily: typography.fontDisplay, fontSize: typography.xl, color: colors.textPrimary, marginBottom: "0.375rem" }}>{cat.label}</div>
-                    <div style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>{cat.desc}</div>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
+          {CATEGORIES.map((cat) => (
+            <ScrollReveal key={cat.label} y={36}>
+              <Link to={cat.href} style={{ textDecoration: "none", display: "block" }}>
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: shadows?.lg }}
+                  transition={{ duration: 0.25 }}
+                  style={{ background: colors.bgSecondary, borderRadius: radius?.xl, padding: "2.5rem 1.5rem", textAlign: "center", border: `1px solid ${colors.borderLight}`, cursor: "pointer", boxShadow: shadows?.sm, transition: `border-color ${transitions?.normal}` }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = colors.accentPrimary; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = colors.borderLight; }}
+                >
+                  <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>{cat.emoji}</div>
+                  <div style={{ fontFamily: typography.fontDisplay, fontSize: typography.xl, color: colors.textPrimary, marginBottom: "0.375rem" }}>{cat.label}</div>
+                  <div style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>{cat.desc}</div>
+                </motion.div>
+              </Link>
+            </ScrollReveal>
+          ))}
+        </div>
       </section>
 
       {/* ── FEATURED PRODUCTS ─────────────────────────────── */}
       <section style={{ background: colors.bgSecondary, padding: "5rem 0" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem" }}>
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}>
-            <motion.div variants={fadeUp} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "3rem", flexWrap: "wrap", gap: "1rem" }}>
-              <div>
-                <h2 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle: "italic", marginBottom: "0.5rem" }}>Featured Products</h2>
-                <p style={{ fontFamily: typography.fontBody, color: colors.textMuted }}>Our most-loved essentials</p>
-              </div>
-              <Link to="/shop" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.accentPrimary, textDecoration: "none", fontWeight: typography.weightMedium }}>
-                View all <ArrowRight size={15} />
-              </Link>
-            </motion.div>
+          <ScrollReveal style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "3rem", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <h2 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle: "italic", marginBottom: "0.5rem" }}>Featured Products</h2>
+              <p style={{ fontFamily: typography.fontBody, color: colors.textMuted }}>Our most-loved essentials</p>
+            </div>
+            <Link to="/shop" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.accentPrimary, textDecoration: "none", fontWeight: typography.weightMedium }}>
+              View all <ArrowRight size={15} />
+            </Link>
+          </ScrollReveal>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1.5rem" }}>
-              {FEATURED.map((product) => (
-                <motion.div key={product.id} variants={fadeUp}>
-                  <Link to={`/shop/${product.id}`} style={{ textDecoration: "none", display: "block" }}>
-                    <motion.div
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.22 }}
-                      style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow: "hidden", boxShadow: shadows?.sm, border: `1px solid ${colors.borderLight}`, cursor: "pointer" }}
-                    >
-                      {/* Product image area */}
-                      <div style={{ height: 220, background: product.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                        <div style={{ fontSize: "3.5rem" }}>✨</div>
-                        {product.badge && (
-                          <span style={{ position: "absolute", top: 12, left: 12, background: product.badge === "Sale" ? colors.accentPrimary : product.badge === "New" ? colors.accentSecondary : colors.textPrimary, color: "#fff", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", padding: "3px 10px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
-                            {product.badge}
-                          </span>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1.5rem" }}>
+            {FEATURED.map((product) => (
+              <ScrollReveal key={product.id} y={44}>
+                <Link to={`/shop/${product.id}`} style={{ textDecoration: "none", display: "block" }}>
+                  <motion.div
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.22 }}
+                    style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow: "hidden", boxShadow: shadows?.sm, border: `1px solid ${colors.borderLight}`, cursor: "pointer" }}
+                  >
+                    <div style={{ height: 220, background: product.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      <div style={{ fontSize: "3.5rem" }}>✨</div>
+                      {product.badge && (
+                        <span style={{ position: "absolute", top: 12, left: 12, background: product.badge === "Sale" ? colors.accentPrimary : product.badge === "New" ? colors.accentSecondary : colors.textPrimary, color: "#fff", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", padding: "3px 10px", borderRadius: radius?.full, fontFamily: typography.fontBody }}>
+                          {product.badge}
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ padding: "1.25rem" }}>
+                      <h3 style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom: "0.5rem" }}>
+                        {product.name}
+                      </h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        {product.salePrice ? (
+                          <>
+                            <span style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightBold, color: colors.accentPrimary }}>${product.salePrice}</span>
+                            <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted, textDecoration: "line-through" }}>${product.price}</span>
+                          </>
+                        ) : (
+                          <span style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightBold, color: colors.textPrimary }}>${product.price}</span>
                         )}
                       </div>
-
-                      {/* Product info */}
-                      <div style={{ padding: "1.25rem" }}>
-                        <h3 style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, color: colors.textPrimary, marginBottom: "0.5rem" }}>
-                          {product.name}
-                        </h3>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                          {product.salePrice ? (
-                            <>
-                              <span style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightBold, color: colors.accentPrimary }}>${product.salePrice}</span>
-                              <span style={{ fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted, textDecoration: "line-through" }}>${product.price}</span>
-                            </>
-                          ) : (
-                            <span style={{ fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightBold, color: colors.textPrimary }}>${product.price}</span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+                    </div>
+                  </motion.div>
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── BANNER ────────────────────────────────────────── */}
       <section style={{ maxWidth: 1280, margin: "0 auto", padding: "5rem 1.5rem" }}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
+        <ScrollReveal y={32}>
+        <div
           style={{ background: `linear-gradient(135deg, ${colors.accentLight} 0%, ${colors.bgSecondary} 60%, ${colors.accentSecondary}22 100%)`, borderRadius: radius?.xl, padding: isMobile ? "2.5rem 1.5rem" : "4rem 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "2rem", border: `1px solid ${colors.borderLight}` }}
         >
           <div>
@@ -316,7 +307,8 @@ const Home = () => {
               Claim Discount <ArrowRight size={17} />
             </motion.span>
           </Link>
-        </motion.div>
+        </div>
+        </ScrollReveal>
       </section>
 
     </div>
