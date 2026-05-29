@@ -4,10 +4,12 @@ import { lazy, Suspense } from "react";
 import { CartProvider, useCart }         from "./context/CartContext";
 import { AuthProvider, useAuth }         from "./context/AuthContext";
 import { WishlistProvider, useWishlist } from "./context/WishlistContext";
-import PageLayout from "./components/layout/PageLayout";
-import { useTheme } from "./theme/ThemeContext";
+import PageLayout    from "./components/layout/PageLayout";
+import CartDrawer    from "./components/cart/CartDrawer";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useTheme }  from "./theme/ThemeContext";
 
-// ── Pages (lazy loaded) ───────────────────────────────────────
+// ── Pages ─────────────────────────────────────────────────────
 const Home        = lazy(() => import("./pages/Home"));
 const Shop        = lazy(() => import("./pages/Shop"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
@@ -28,22 +30,22 @@ const queryClient = new QueryClient({
   },
 });
 
-// ── Spinner ───────────────────────────────────────────────────
+// ── Page loader spinner ───────────────────────────────────────
 const PageLoader = () => {
   const theme = useTheme();
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", border: `3px solid ${theme.colors.borderLight}`, borderTopColor: theme.colors.accentPrimary, animation: "spin 0.8s linear infinite" }} />
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
+      <div style={{ width:34, height:34, borderRadius:"50%", border:`3px solid ${theme.colors.borderLight}`, borderTopColor: theme.colors.accentPrimary, animation:"spin 0.8s linear infinite" }}/>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };
 
-// ── Inner App — reads from contexts ──────────────────────────
+// ── Inner app — reads from contexts ──────────────────────────
 const AppInner = () => {
-  const { totalItems }    = useCart();
-  const { totalItems: wishlistCount } = useWishlist();
-  const { isLoggedIn, user } = useAuth();
+  const { totalItems }                  = useCart();
+  const { totalItems: wishlistCount }   = useWishlist();
+  const { isLoggedIn, user }            = useAuth();
 
   return (
     <PageLayout
@@ -54,25 +56,38 @@ const AppInner = () => {
     >
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* ── Public routes ──────────────────────────── */}
           <Route path="/"           element={<Home />}        />
           <Route path="/shop"       element={<Shop />}        />
           <Route path="/shop/:slug" element={<ProductPage />} />
           <Route path="/cart"       element={<Cart />}        />
-          <Route path="/checkout"   element={<Checkout />}    />
           <Route path="/login"      element={<Login />}       />
           <Route path="/register"   element={<Register />}    />
-          <Route path="/profile"    element={<Profile />}     />
-          <Route path="/orders"     element={<Orders />}      />
-          <Route path="/wishlist"   element={<Wishlist />}    />
           <Route path="/about"      element={<About />}       />
-          <Route path="*"           element={<NotFound />}    />
+
+          {/* ── Protected routes ───────────────────────── */}
+          <Route path="/checkout" element={
+            <ProtectedRoute><Checkout /></ProtectedRoute>
+          }/>
+          <Route path="/profile" element={
+            <ProtectedRoute><Profile /></ProtectedRoute>
+          }/>
+          <Route path="/orders" element={
+            <ProtectedRoute><Orders /></ProtectedRoute>
+          }/>
+          <Route path="/wishlist" element={
+            <ProtectedRoute><Wishlist /></ProtectedRoute>
+          }/>
+
+          {/* ── 404 ────────────────────────────────────── */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </PageLayout>
   );
 };
 
-// ── Root App — provides all contexts ─────────────────────────
+// ── Root app ──────────────────────────────────────────────────
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
@@ -80,6 +95,7 @@ const App = () => (
         <CartProvider>
           <WishlistProvider>
             <AppInner />
+            <CartDrawer />
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>
@@ -88,6 +104,7 @@ const App = () => (
 );
 
 export default App;
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // FILE OVERVIEW: App.tsx
