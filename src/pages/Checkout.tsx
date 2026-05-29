@@ -62,7 +62,7 @@ const Checkout = () => {
     await new Promise(r => setTimeout(r,1500));
     clearCart();
     toast.success("Order placed! Thank you 🎉");
-    navigate("/orders");
+    navigate("/order-success");
     setPlacing(false);
   };
 
