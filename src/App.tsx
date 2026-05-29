@@ -4,33 +4,32 @@ import { lazy, Suspense } from "react";
 import { CartProvider, useCart }         from "./context/CartContext";
 import { AuthProvider, useAuth }         from "./context/AuthContext";
 import { WishlistProvider, useWishlist } from "./context/WishlistContext";
-import PageLayout    from "./components/layout/PageLayout";
-import CartDrawer    from "./components/cart/CartDrawer";
+import PageLayout     from "./components/layout/PageLayout";
+import CartDrawer     from "./components/cart/CartDrawer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import { useTheme }  from "./theme/ThemeContext";
+import { useTheme }   from "./theme/ThemeContext";
 
-// ── Pages ─────────────────────────────────────────────────────
-const Home        = lazy(() => import("./pages/Home"));
-const Shop        = lazy(() => import("./pages/Shop"));
-const ProductPage = lazy(() => import("./pages/ProductPage"));
-const Cart        = lazy(() => import("./pages/Cart"));
-const Checkout    = lazy(() => import("./pages/Checkout"));
-const Login       = lazy(() => import("./pages/Login"));
-const Register    = lazy(() => import("./pages/Register"));
-const Profile     = lazy(() => import("./pages/profile"));
-const Orders      = lazy(() => import("./pages/Orders"));
-const Wishlist    = lazy(() => import("./pages/Wishlist"));
-const About       = lazy(() => import("./pages/About"));
-const NotFound    = lazy(() => import("./pages/NotFound"));
+const Home         = lazy(() => import("./pages/Home"));
+const Shop         = lazy(() => import("./pages/Shop"));
+const ProductPage  = lazy(() => import("./pages/ProductPage"));
+const Cart         = lazy(() => import("./pages/Cart"));
+const Checkout     = lazy(() => import("./pages/Checkout"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
+const Login        = lazy(() => import("./pages/Login"));
+const Register     = lazy(() => import("./pages/Register"));
+const Profile      = lazy(() => import("./pages/profile"));
+const Orders       = lazy(() => import("./pages/Orders"));
+const Wishlist     = lazy(() => import("./pages/Wishlist"));
+const About        = lazy(() => import("./pages/About"));
+const Collections  = lazy(() => import("./pages/Collections"));
+const NotFound     = lazy(() => import("./pages/NotFound"));
 
-// ── Query Client ──────────────────────────────────────────────
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { staleTime: 1000 * 60 * 5, retry: 1, refetchOnWindowFocus: false },
   },
 });
 
-// ── Page loader spinner ───────────────────────────────────────
 const PageLoader = () => {
   const theme = useTheme();
   return (
@@ -41,11 +40,10 @@ const PageLoader = () => {
   );
 };
 
-// ── Inner app — reads from contexts ──────────────────────────
 const AppInner = () => {
-  const { totalItems }                  = useCart();
-  const { totalItems: wishlistCount }   = useWishlist();
-  const { isLoggedIn, user }            = useAuth();
+  const { totalItems }                = useCart();
+  const { totalItems: wishlistCount } = useWishlist();
+  const { isLoggedIn, user }          = useAuth();
 
   return (
     <PageLayout
@@ -56,18 +54,23 @@ const AppInner = () => {
     >
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* ── Public routes ──────────────────────────── */}
-          <Route path="/"           element={<Home />}        />
-          <Route path="/shop"       element={<Shop />}        />
-          <Route path="/shop/:slug" element={<ProductPage />} />
-          <Route path="/cart"       element={<Cart />}        />
-          <Route path="/login"      element={<Login />}       />
-          <Route path="/register"   element={<Register />}    />
-          <Route path="/about"      element={<About />}       />
+          {/* ── Public ─────────────────────────────────── */}
+          <Route path="/"                       element={<Home />}         />
+          <Route path="/shop"                   element={<Shop />}         />
+          <Route path="/shop/:slug"             element={<ProductPage />}  />
+          <Route path="/cart"                   element={<Cart />}         />
+          <Route path="/login"                  element={<Login />}        />
+          <Route path="/register"               element={<Register />}     />
+          <Route path="/about"                  element={<About />}        />
+          <Route path="/collections"            element={<Collections />}  />
+          <Route path="/collections/:category"  element={<Collections />}  />
 
-          {/* ── Protected routes ───────────────────────── */}
+          {/* ── Protected ──────────────────────────────── */}
           <Route path="/checkout" element={
             <ProtectedRoute><Checkout /></ProtectedRoute>
+          }/>
+          <Route path="/order-success" element={
+            <ProtectedRoute><OrderSuccess /></ProtectedRoute>
           }/>
           <Route path="/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
@@ -79,7 +82,6 @@ const AppInner = () => {
             <ProtectedRoute><Wishlist /></ProtectedRoute>
           }/>
 
-          {/* ── 404 ────────────────────────────────────── */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -87,7 +89,6 @@ const AppInner = () => {
   );
 };
 
-// ── Root app ──────────────────────────────────────────────────
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
@@ -104,6 +105,7 @@ const App = () => (
 );
 
 export default App;
+
 
 
 // ──────────────────────────────────────────────────────────────────────────────
