@@ -1,4 +1,9 @@
- /* ── Reset ───────────────────────────────────────────────────── */
+/* ── Tailwind directives ─────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Reset ───────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
@@ -21,14 +26,8 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    TYPOGRAPHY — Playfair Display + DM Sans
-   Cosmetics store techniques applied throughout
    ═══════════════════════════════════════════════════════════════ */
 
-/*
-  TECHNIQUE 1: Heading hierarchy
-  Playfair Display bold with tight tracking on large sizes
-  creates the "luxury magazine" look used by Chanel, La Mer etc.
-*/
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   color: var(--color-text-primary);
@@ -42,12 +41,6 @@ h4 { font-size: 1.25rem;  letter-spacing: -0.01em; }
 h5 { font-size: 1.125rem; letter-spacing: 0; }
 h6 { font-size: 1rem;     letter-spacing: 0; }
 
-/*
-  TECHNIQUE 2: Italic serif — the signature cosmetics move
-  Mixing upright bold + italic weight in the same heading
-  creates elegance without using a separate decorative font.
-  Usage: <h1>Rare <em>beauty</em></h1>
-*/
 h1 em, h2 em, h3 em,
 .italic-accent {
   font-style: italic;
@@ -55,12 +48,6 @@ h1 em, h2 em, h3 em,
   letter-spacing: 0;
 }
 
-/*
-  TECHNIQUE 3: Hero display class
-  Full italic Playfair at light weight — used on landing hero
-  where the heading needs to feel poetic, not powerful.
-  Usage: <h1 class="display-hero">Simple. Clean. Beautiful.</h1>
-*/
 .display-hero {
   font-family: var(--font-display);
   font-style: italic;
@@ -69,12 +56,6 @@ h1 em, h2 em, h3 em,
   line-height: 1.1;
 }
 
-/*
-  TECHNIQUE 4: Section label — DM Sans uppercase tracked
-  Used above section headings e.g. "NEW ARRIVALS", "OUR STORY"
-  Wide tracking on short uppercase text = premium, editorial feel.
-  Usage: <p class="overline">New Collection</p>
-*/
 .overline {
   font-family: var(--font-body);
   font-size: 0.70rem;
@@ -84,12 +65,6 @@ h1 em, h2 em, h3 em,
   color: var(--color-accent-secondary);
 }
 
-/*
-  TECHNIQUE 5: Price styling — DM Sans tabular figures
-  Prices use medium weight + tabular-nums so digits align
-  in product grids and cart lists.
-  Usage: <span class="price">$68.00</span>
-*/
 .price {
   font-family: var(--font-body);
   font-weight: 600;
@@ -106,12 +81,6 @@ h1 em, h2 em, h3 em,
   font-size: 0.875em;
 }
 
-/*
-  TECHNIQUE 6: CTA / button label — DM Sans medium + tracked caps
-  Short uppercase labels with moderate tracking feel intentional
-  and premium without being hard to read.
-  Usage: <button class="btn-label">Add to Cart</button>
-*/
 .btn-label {
   font-family: var(--font-body);
   font-weight: 500;
@@ -120,11 +89,6 @@ h1 em, h2 em, h3 em,
   font-size: 0.8rem;
 }
 
-/*
-  TECHNIQUE 7: Body copy — DM Sans light/regular
-  Skincare copy should feel clean and breathable.
-  300 weight for long descriptions, 400 for short callouts.
-*/
 p {
   font-family: var(--font-body);
   color: var(--color-text-secondary);
@@ -136,11 +100,6 @@ p {
   letter-spacing: 0.01em;
 }
 
-/*
-  TECHNIQUE 8: Product name in cards — DM Sans medium
-  Not a heading, not body — a distinct in-between size
-  that reads cleanly in tight card layouts.
-*/
 .product-name {
   font-family: var(--font-body);
   font-weight: 500;
@@ -150,7 +109,7 @@ p {
   line-height: 1.4;
 }
 
-/* ── General links ───────────────────────────────────────────── */
+/* ── Links ───────────────────────────────────────────────────── */
 a {
   color: var(--color-accent-secondary);
   text-decoration: none;
@@ -158,9 +117,9 @@ a {
 }
 a:hover { color: var(--color-accent-primary); }
 
-/* ── Selection ───────────────────────────────────────────────── */
+/* ── Selection — uses butter tint + dark green text ─────────── */
 ::selection {
-  background-color: var(--color-accent-light);
+  background-color: var(--color-bg-tertiary);
   color: var(--color-text-primary);
 }
 
@@ -208,19 +167,13 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
 .section    { padding: 5rem 0; }
 .section-sm { padding: 3rem 0; }
 
-/* Responsive utility classes */
+/* ── Responsive utilities ────────────────────────────────────── */
 @media (max-width: 768px) {
-  .hidden-mobile {
-    display: none !important;
-  }
-  .show-mobile {
-    display: flex !important;
-  }
+  .hidden-mobile { display: none !important; }
+  .show-mobile   { display: flex !important; }
 }
 @media (min-width: 769px) {
-  .show-mobile {
-    display: none !important;
-  }
+  .show-mobile   { display: none !important; }
 }
 
 /* ── Animations ──────────────────────────────────────────────── */
@@ -243,7 +196,6 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
   animation: skeleton-pulse 1.6s ease-in-out infinite;
 }
 
-/* Stagger delays */
 .stagger-1 { animation-delay: 0.05s; }
 .stagger-2 { animation-delay: 0.10s; }
 .stagger-3 { animation-delay: 0.15s; }
@@ -260,11 +212,6 @@ option { background: var(--color-bg-secondary); color: var(--color-text-primary)
   transition: width var(--transition-normal);
 }
 .underline-hover:hover::after { width: 100%; }
-
-
-
-
-
 
 
 
