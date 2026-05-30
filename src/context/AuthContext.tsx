@@ -1,76 +1,53 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
+import {
+  useAuth  as useClerkAuth,
+  useUser  as useClerkUser,
+} from "@clerk/clerk-react";
 
 // ── Types ─────────────────────────────────────────────────────
 
-export interface User {
-  id:     string;
-  name:   string;
-  email:  string;
+export interface AuthUser {
+  id:      string;
+  name:    string;
+  email:   string;
   avatar?: string;
-  role:   "CUSTOMER" | "ADMIN";
+  role:    "CUSTOMER" | "ADMIN";
 }
 
-interface AuthState {
-  user:        User | null;
-  token:       string | null;
-  isLoading:   boolean;
-  isLoggedIn:  boolean;
+interface AuthContextValue {
+  user:          AuthUser | null;
+  isLoggedIn:    boolean;
+  isLoading:     boolean;
+  getToken:      () => Promise<string | null>;
 }
 
-type AuthAction =
-  | { type: "LOGIN_START" }
-  | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
-  | { type: "LOGIN_FAIL" }
-  | { type: "LOGOUT" }
-  | { type: "UPDATE_USER"; payload: Partial<User> }
-  | { type: "HYDRATE"; payload: { user: User; token: string } };
+// ── Helpers ───────────────────────────────────────────────────
 
-interface AuthContextValue extends AuthState {
-  login:      (email: string, password: string) => Promise<void>;
-  register:   (name: string, email: string, password: string) => Promise<void>;
-  logout:     () => void;
-  updateUser: (data: Partial<User>) => void;
-}
+/**
+ * Maps a Clerk user object to our internal AuthUser shape.
+ * Keeps Clerk implementation details out of the rest of the app.
+ */
+const mapClerkUserToAuthUser = (
+  clerkUser: ReturnType<typeof useClerkUser>["user"]
+): AuthUser | null => {
+  if (!clerkUser) return null;
 
-// ── Reducer ───────────────────────────────────────────────────
+  const primaryEmail = clerkUser.primaryEmailAddress?.emailAddress ?? "";
+  const fullName     = clerkUser.fullName ?? clerkUser.username ?? "User";
+  const avatarUrl    = clerkUser.imageUrl;
 
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case "LOGIN_START":
-      return { ...state, isLoading: true };
-
-    case "LOGIN_SUCCESS":
-      return {
-        ...state,
-        isLoading:  false,
-        isLoggedIn: true,
-        user:       action.payload.user,
-        token:      action.payload.token,
-      };
-
-    case "LOGIN_FAIL":
-      return { ...state, isLoading: false };
-
-    case "LOGOUT":
-      return { user: null, token: null, isLoading: false, isLoggedIn: false };
-
-    case "UPDATE_USER":
-      return {
-        ...state,
-        user: state.user ? { ...state.user, ...action.payload } : null,
-      };
-
-    case "HYDRATE":
-      return {
-        ...state,
-        isLoggedIn: true,
-        user:       action.payload.user,
-        token:      action.payload.token,
-      };
-
-    default:
-      return state;
-  }
+  return {
+    id:     clerkUser.id,
+    name:   fullName,
+    email:  primaryEmail,
+    avatar: avatarUrl,
+    role:   "CUSTOMER",
+  };
 };
 
 // ── Context ───────────────────────────────────────────────────
@@ -78,105 +55,46 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const useAuth = (): AuthContextValue => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used inside <AuthProvider>");
+  }
+  return context;
 };
 
 // ── Provider ──────────────────────────────────────────────────
 
-const TOKEN_KEY = "blum_token";
-const USER_KEY  = "blum_user";
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(authReducer, {
-    user:       null,
-    token:      null,
-    isLoading:  false,
-    isLoggedIn: false,
-  });
+  const { isSignedIn, isLoaded, getToken: clerkGetToken } = useClerkAuth();
+  const { user: clerkUser }                                = useClerkUser();
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
+  // Map Clerk user → our internal shape (memoized to avoid re-renders)
+  const mappedUser = useMemo(
+    () => mapClerkUserToAuthUser(clerkUser ?? null),
+    [clerkUser]
+  );
+
+  // Exposes Clerk session token for future authenticated API calls
+  const getToken = async (): Promise<string | null> => {
     try {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const user  = localStorage.getItem(USER_KEY);
-      if (token && user) {
-        dispatch({ type: "HYDRATE", payload: { token, user: JSON.parse(user) } });
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  // ── Login ─────────────────────────────────────────────────
-  const login = async (email: string, _password: string): Promise<void> => {
-    dispatch({ type: "LOGIN_START" });
-    try {
-      // TODO: replace with real API call
-      // const res = await axios.post("/api/auth/login", { email, password });
-      // const { user, token } = res.data;
-
-      // ── Mock response (remove when backend is ready) ──────
-      await new Promise((r) => setTimeout(r, 800));
-      const user: User = { id: "u1", name: "Demo User", email, role: "CUSTOMER" };
-      const token = "mock_jwt_token";
-      // ──────────────────────────────────────────────────────
-
-      localStorage.setItem(TOKEN_KEY, token);
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
-      dispatch({ type: "LOGIN_SUCCESS", payload: { user, token } });
+      return await clerkGetToken();
     } catch {
-      dispatch({ type: "LOGIN_FAIL" });
-      throw new Error("Invalid email or password");
+      return null;
     }
   };
 
-  // ── Register ──────────────────────────────────────────────
-  const register = async (name: string, email: string, _password: string): Promise<void> => {
-    dispatch({ type: "LOGIN_START" });
-    try {
-      // TODO: replace with real API call
-      // const res = await axios.post("/api/auth/register", { name, email, password });
-      // const { user, token } = res.data;
-
-      // ── Mock response ─────────────────────────────────────
-      await new Promise((r) => setTimeout(r, 800));
-      const user: User = { id: "u2", name, email, role: "CUSTOMER" };
-      const token = "mock_jwt_token";
-      // ──────────────────────────────────────────────────────
-
-      localStorage.setItem(TOKEN_KEY, token);
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
-      dispatch({ type: "LOGIN_SUCCESS", payload: { user, token } });
-    } catch {
-      dispatch({ type: "LOGIN_FAIL" });
-      throw new Error("Registration failed");
-    }
+  const contextValue: AuthContextValue = {
+    user:       mappedUser,
+    isLoggedIn: isSignedIn ?? false,
+    isLoading:  !isLoaded,
+    getToken,
   };
 
-  // ── Logout ────────────────────────────────────────────────
-  const logout = () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    dispatch({ type: "LOGOUT" });
-  };
-
-  // ── Update user ───────────────────────────────────────────
-  const updateUser = (data: Partial<User>) => {
-    dispatch({ type: "UPDATE_USER", payload: data });
-    if (state.user) {
-      localStorage.setItem(USER_KEY, JSON.stringify({ ...state.user, ...data }));
-    }
-  };
-
-  const value: AuthContextValue = {
-    ...state,
-    login,
-    register,
-    logout,
-    updateUser,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthContext;
