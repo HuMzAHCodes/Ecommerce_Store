@@ -75,4 +75,4 @@ export const SOCIAL_LINKS: SocialEntry[] = [
 export const LEGAL_LINKS = ["Privacy Policy", "Terms of Service", "Cookie Policy"];
 
 export const FOOTER_TAGLINE =
-  "Simple. Clean. Beautiful. Crafted with care for the ones who care about what they put on their skin.";
+  "Simple, Clean, Beautiful. Crafted with care for the ones who care about what they put on their skin.";
