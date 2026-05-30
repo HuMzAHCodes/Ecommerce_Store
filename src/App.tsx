@@ -29,7 +29,7 @@ const Profile      = lazy(() => import("./pages/profile"));
 const AccountProfile = lazy(() => import("./pages/AccountProfile"));
 const Orders       = lazy(() => import("./pages/Orders"));
 const Wishlist     = lazy(() => import("./pages/Wishlist"));
-const About        = lazy(() => import("./pages/About"));
+const About        = lazy(() => import("./pages/About/About"));
 const Collections  = lazy(() => import("./pages/Collections"));
 const NotFound     = lazy(() => import("./pages/NotFound"));
 
