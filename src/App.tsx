@@ -17,7 +17,7 @@ import CartDrawer from "./components/cart/CartDrawer";
 
 
 
-const Home         = lazy(() => import("./pages/Home"));
+const Home         = lazy(() => import("./pages/Home/Home"));
 const Shop         = lazy(() => import("./pages/Shop/Shop"));
 const ProductPage  = lazy(() => import("./pages/ProdustPage/ProductPage"));
 const Cart         = lazy(() => import("./pages/Cart"));
