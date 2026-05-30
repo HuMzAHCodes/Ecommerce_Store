@@ -1,24 +1,37 @@
+import { useState, useEffect } from "react";
 import { useTheme }    from "../../theme/ThemeContext";
 import OrdersHeader    from "./OrdersHeader";
 import OrderCard       from "./OrderCard";
 import OrdersEmpty     from "./OrdersEmpty";
 import { pageStyles, ordersListStyles } from "./ordersStyles";
-import { MOCK_ORDERS } from "./ordersData";
+import { MOCK_ORDERS, type Order } from "./ordersData";
 
 // ── Component ─────────────────────────────────────────────────
 
 const Orders = () => {
   const { colors } = useTheme();
-  const hasOrders  = MOCK_ORDERS.length > 0;
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    try {
+      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+      setOrders([...existingOrders, ...MOCK_ORDERS]);
+    } catch {
+      setOrders(MOCK_ORDERS);
+    }
+  }, []);
+
+  const hasOrders  = orders.length > 0;
 
   return (
     <div style={pageStyles(colors)}>
 
-      <OrdersHeader orderCount={MOCK_ORDERS.length} />
+      <OrdersHeader orderCount={orders.length} />
 
       <div style={ordersListStyles}>
         {hasOrders
-          ? MOCK_ORDERS.map((order, index) => (
+          ? orders.map((order, index) => (
               <OrderCard
                 key={order.id}
                 order={order}

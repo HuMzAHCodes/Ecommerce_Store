@@ -64,9 +64,40 @@ const Checkout = () => {
   const handlePlaceOrder = async () => {
     setIsPlacing(true);
     await new Promise((r) => setTimeout(r, 1500));
+
+    // Construct the new order object matching OrderData shape
+    const newOrder = {
+      id: "ORD-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+      items: items.reduce((sum, item) => sum + item.quantity, 0),
+      total: orderTotal,
+      shipping: "Standard · 3–5 business days",
+      email: shipping.email || "customer@email.com",
+    };
+
+    // Save to localStorage under blum_orders using the Order shape expected by OrderCard
+    try {
+      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+      const ordersItemForLocalStorage = {
+        id: newOrder.id,
+        date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+        status: "PROCESSING",
+        total: newOrder.total,
+        items: items.map(item => ({
+          name: item.product.name,
+          qty: item.quantity,
+          price: item.product.salePrice ?? item.product.price
+        }))
+      };
+      localStorage.setItem("blum_orders", JSON.stringify([ordersItemForLocalStorage, ...existingOrders]));
+    } catch (e) {
+      console.error("Failed to save order to localStorage", e);
+    }
+
     clearCart();
     toast.success("Order placed! Thank you 🎉");
-    navigate("/order-success");
+    navigate("/order-success", { state: { order: newOrder } });
     setIsPlacing(false);
   };
 

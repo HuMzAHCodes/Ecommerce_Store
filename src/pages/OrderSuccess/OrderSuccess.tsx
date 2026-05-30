@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "../../theme/ThemeContext";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MOCK_ORDER } from "./types";
@@ -20,9 +20,12 @@ import SuccessActions    from "./SuccessActions";
 const OrderSuccess = () => {
   const { colors, typography } = useTheme();
   const isMobile = useIsMobile();
+  const location = useLocation();
+
+  const passedOrder = location.state?.order;
 
   // Stable ref so the mock order ID doesn't regenerate on re-renders
-  const orderRef = useRef(MOCK_ORDER);
+  const orderRef = useRef(passedOrder || MOCK_ORDER);
 
   return (
     <div

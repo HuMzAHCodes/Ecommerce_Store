@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Package, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useTheme } from "../../theme/ThemeContext";
 import EmptyState from "./EmptyState";
+import OrderCard from "../Orders/OrderCard";
+import { MOCK_ORDERS, type Order } from "../Orders/ordersData";
+import { useWishlist } from "../../context/WishlistContext";
+import { useCart } from "../../context/CartContext";
+import { useToast } from "../../components/ui/Toast";
+import WishlistGrid from "../Wishlist/WishlistGrid";
 
 interface AccountTabProps {
   userName:  string;
@@ -54,28 +61,67 @@ export const AccountTab = ({ userName, userEmail }: AccountTabProps) => {
   );
 };
 
-/** Orders tab — empty state until order history is implemented */
+/** Orders tab — displays dynamic order list combined with mock history */
 export const OrdersTab = () => {
   const { colors, typography } = useTheme();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    try {
+      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+      setOrders([...existingOrders, ...MOCK_ORDERS]);
+    } catch {
+      setOrders(MOCK_ORDERS);
+    }
+  }, []);
+
   return (
     <div>
       <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom: "1.5rem" }}>
         My Orders
       </h2>
-      <EmptyState icon={<Package size={44} />} title="No orders yet" linkTo="/shop" linkLabel="Start shopping" />
+      {orders.length > 0 ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {orders.map((order, index) => (
+            <OrderCard key={order.id} order={order} animationDelay={index * 0.08} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState icon={<Package size={44} />} title="No orders yet" linkTo="/shop" linkLabel="Start shopping" />
+      )}
     </div>
   );
 };
 
-/** Wishlist tab — empty state until wishlist is implemented */
+/** Wishlist tab — displays dynamic wishlisted items */
 export const WishlistTab = () => {
   const { colors, typography } = useTheme();
+  const { items, removeItem } = useWishlist();
+  const { addItem, isInCart, openDrawer } = useCart();
+  const toast = useToast();
+
+  const handleAddToCart = (item: typeof items[0]) => {
+    addItem(item);
+    openDrawer();
+    toast.success(`${item.name} added to cart!`);
+  };
+
   return (
     <div>
       <h2 style={{ fontFamily: typography.fontDisplay, fontSize: typography["2xl"], color: colors.textPrimary, marginBottom: "1.5rem" }}>
         Wishlist
       </h2>
-      <EmptyState icon={<Heart size={44} />} title="Nothing saved yet" linkTo="/wishlist" linkLabel="View Wishlist" />
+      {items.length > 0 ? (
+        <WishlistGrid
+          items={items}
+          isInCart={isInCart}
+          onAddToCart={handleAddToCart}
+          onRemove={removeItem}
+        />
+      ) : (
+        <EmptyState icon={<Heart size={44} />} title="Nothing saved yet" linkTo="/wishlist" linkLabel="View Wishlist" />
+      )}
     </div>
   );
 };
