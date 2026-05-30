@@ -1,117 +1,143 @@
-import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { SignIn, useAuth } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
-import { useAuth } from "../context/AuthContext";
-import { useToast } from "../components/ui/Toast";
+
+// ── Helpers ───────────────────────────────────────────────────
+
+/** Reads the intended destination the user was trying to visit */
+const getRedirectDestination = (locationState: unknown): string => {
+  if (
+    locationState &&
+    typeof locationState === "object" &&
+    "from" in locationState &&
+    typeof (locationState as { from: unknown }).from === "string"
+  ) {
+    return (locationState as { from: string }).from;
+  }
+  return "/";
+};
+
+// ── Component ─────────────────────────────────────────────────
 
 const Login = () => {
-  const theme = useTheme();
-  const { colors, typography, radius, shadows, transitions } = theme;
-  const { login, isLoading } = useAuth();
-  const toast    = useToast();
+  const theme    = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const from     = (location.state as { from?: string })?.from ?? "/";
+  const { isSignedIn } = useAuth();
 
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [showPw,   setShowPw]   = useState(false);
-  const [errors,   setErrors]   = useState<{ email?: string; password?: string }>({});
+  const redirectTo = getRedirectDestination(location.state);
 
-  const validate = () => {
-    const e: typeof errors = {};
-    if (!email)                          e.email    = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email   = "Enter a valid email";
-    if (!password)                       e.password = "Password is required";
-    else if (password.length < 6)        e.password = "Minimum 6 characters";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
+  // If already signed in, redirect away from login page
+  useEffect(() => {
+    if (isSignedIn) navigate(redirectTo, { replace: true });
+  }, [isSignedIn, navigate, redirectTo]);
 
-  const handleSubmit = async (ev: React.FormEvent) => {
-    ev.preventDefault();
-    if (!validate()) return;
-    try {
-      await login(email, password);
-      toast.success("Welcome back!");
-      navigate(from, { replace: true });
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Login failed");
-    }
-  };
-
-  const inputStyle = (hasError?: string): React.CSSProperties => ({
-    width:"100%", padding:"0.7rem 0.875rem 0.7rem 2.5rem",
-    border:`1.5px solid ${hasError ? colors.error : colors.borderLight}`,
-    borderRadius: radius?.md, fontFamily: typography.fontBody, fontSize: typography.base,
-    color: colors.textPrimary, background: colors.bgCard, outline:"none",
-    transition:`border-color ${transitions?.fast}, box-shadow ${transitions?.fast}`,
-  });
+  const { colors, typography, radius } = theme;
 
   return (
-    <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background: colors.bgPrimary, padding:"2rem 1.5rem" }}>
-      <motion.div initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
-        style={{ width:"100%", maxWidth:420, background: colors.bgCard, borderRadius: radius?.xl, padding:"2.5rem", boxShadow: shadows?.xl, border:`1px solid ${colors.borderLight}` }}>
-
-        {/* Logo */}
-        <Link to="/" style={{ display:"block", textAlign:"center", fontFamily: typography.fontDisplay, fontSize: typography["3xl"], color: colors.textPrimary, textDecoration:"none", letterSpacing:"0.06em", marginBottom:"0.5rem" }}>
+    <div
+      style={{
+        minHeight:      "100vh",
+        display:        "flex",
+        flexDirection:  "column",
+        alignItems:     "center",
+        justifyContent: "center",
+        background:     colors.bgPrimary,
+        padding:        "2rem 1.25rem",
+        gap:            "1.5rem",
+      }}
+    >
+      {/* Brand header */}
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0  }}
+        transition={{ duration: 0.4 }}
+        style={{ textAlign: "center" }}
+      >
+        <Link
+          to="/"
+          style={{
+            fontFamily:    typography.fontDisplay,
+            fontSize:      typography["3xl"],
+            fontWeight:    typography.weightBold,
+            color:         colors.textPrimary,
+            textDecoration:"none",
+            letterSpacing: "0.06em",
+          }}
+        >
           BLÜM
         </Link>
-        <h2 style={{ fontFamily: typography.fontDisplay, textAlign:"center", color: colors.textPrimary, fontStyle:"italic", marginBottom:"0.375rem", fontSize: typography["2xl"] }}>Welcome back</h2>
-        <p style={{ fontFamily: typography.fontBody, textAlign:"center", color: colors.textMuted, fontSize: typography.sm, marginBottom:"2rem" }}>Sign in to your account</p>
-
-        <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:"1.1rem" }}>
-
-          {/* Email */}
-          <div>
-            <label style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, display:"block", marginBottom:5 }}>Email</label>
-            <div style={{ position:"relative" }}>
-              <Mail size={16} style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }} />
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" style={inputStyle(errors.email)}
-                onFocus={(e) => { e.currentTarget.style.borderColor = colors.borderFocus; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.accentLight}`; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = errors.email ? colors.error : colors.borderLight; e.currentTarget.style.boxShadow = "none"; }} />
-            </div>
-            {errors.email && <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.error, marginTop:3 }}>{errors.email}</p>}
-          </div>
-
-          {/* Password */}
-          <div>
-            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
-              <label style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary }}>Password</label>
-              <Link to="/forgot-password" style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.accentPrimary, textDecoration:"none" }}>Forgot password?</Link>
-            </div>
-            <div style={{ position:"relative" }}>
-              <Lock size={16} style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none" }} />
-              <input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ ...inputStyle(errors.password), paddingRight:"2.5rem" }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = colors.borderFocus; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.accentLight}`; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = errors.password ? colors.error : colors.borderLight; e.currentTarget.style.boxShadow = "none"; }} />
-              <button type="button" onClick={() => setShowPw(p => !p)}
-                style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color: colors.textMuted, display:"flex" }}>
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-            {errors.password && <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.error, marginTop:3 }}>{errors.password}</p>}
-          </div>
-
-          {/* Submit */}
-          <motion.button type="submit" disabled={isLoading} whileHover={!isLoading ? { scale:1.02 } : {}} whileTap={!isLoading ? { scale:0.97 } : {}}
-            style={{ width:"100%", padding:"0.875rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor: isLoading ? "not-allowed" : "pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, opacity: isLoading ? 0.7 : 1, marginTop:"0.25rem" }}>
-            {isLoading ? "Signing in…" : "Sign In"}
-          </motion.button>
-        </form>
-
-        <div style={{ textAlign:"center", marginTop:"1.5rem", fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>
-          Don't have an account?{" "}
-          <Link to="/register" style={{ color: colors.accentPrimary, fontWeight: typography.weightMedium, textDecoration:"none" }}>Create one</Link>
-        </div>
+        <p
+          style={{
+            fontFamily: typography.fontBody,
+            fontSize:   typography.sm,
+            color:      colors.textMuted,
+            marginTop:  "0.375rem",
+          }}
+        >
+          Sign in to your account
+        </p>
       </motion.div>
+
+      {/* Clerk SignIn component — handles everything including Google OAuth */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.1 }}
+      >
+        <SignIn
+          routing="hash"
+          afterSignInUrl={redirectTo}
+          appearance={{
+            variables: {
+              colorPrimary:        colors.accentPrimary,
+              colorBackground:     colors.bgCard,
+              colorText:           colors.textPrimary,
+              colorTextSecondary:  colors.textSecondary,
+              colorInputBackground:colors.bgPrimary,
+              colorInputText:      colors.textPrimary,
+              borderRadius:        radius?.md ?? "8px",
+              fontFamily:          typography.fontBody,
+            },
+            elements: {
+              card:             { boxShadow: "none", border: `1px solid ${colors.borderLight}` },
+              headerTitle:      { fontFamily: typography.fontDisplay, fontStyle: "italic" },
+              formButtonPrimary:{ fontFamily: typography.fontBody, fontWeight: String(typography.weightMedium) },
+            },
+          }}
+        />
+      </motion.div>
+
+      {/* Link to register */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+        style={{
+          fontFamily: typography.fontBody,
+          fontSize:   typography.sm,
+          color:      colors.textMuted,
+        }}
+      >
+        Don't have an account?{" "}
+        <Link
+          to="/register"
+          style={{
+            color:      colors.accentPrimary,
+            fontWeight: typography.weightMedium,
+          }}
+        >
+          Create one
+        </Link>
+      </motion.p>
     </div>
   );
 };
 
 export default Login;
+
 
 // ── File Overview ──────────────────────────────────────────────────────────────
 //

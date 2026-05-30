@@ -9,6 +9,8 @@ import CartDrawer     from "./components/cart/CartDrawer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { useTheme }   from "./theme/ThemeContext";
 
+
+
 const Home         = lazy(() => import("./pages/Home"));
 const Shop         = lazy(() => import("./pages/Shop"));
 const ProductPage  = lazy(() => import("./pages/ProductPage"));
@@ -18,6 +20,7 @@ const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
 const Login        = lazy(() => import("./pages/Login"));
 const Register     = lazy(() => import("./pages/Register"));
 const Profile      = lazy(() => import("./pages/profile"));
+const AccountProfile = lazy(() => import("./pages/AccountProfile"));
 const Orders       = lazy(() => import("./pages/Orders"));
 const Wishlist     = lazy(() => import("./pages/Wishlist"));
 const About        = lazy(() => import("./pages/About"));
@@ -64,6 +67,8 @@ const AppInner = () => {
           <Route path="/about"                  element={<About />}        />
           <Route path="/collections"            element={<Collections />}  />
           <Route path="/collections/:category"  element={<Collections />}  />
+          <Route path="/account/profile" element={<ProtectedRoute> <AccountProfile /></ProtectedRoute>
+}/>
 
           {/* ── Protected ──────────────────────────────── */}
           <Route path="/checkout" element={

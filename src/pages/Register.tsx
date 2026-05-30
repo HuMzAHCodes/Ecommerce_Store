@@ -1,114 +1,119 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { SignUp, useAuth } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useTheme } from "../theme/ThemeContext";
-import { useAuth } from "../context/AuthContext";
-import { useToast } from "../components/ui/Toast";
+
+// ── Component ─────────────────────────────────────────────────
 
 const Register = () => {
-  const theme = useTheme();
-  const { colors, typography, radius, shadows, transitions } = theme;
-  const { register, isLoading } = useAuth();
-  const toast    = useToast();
+  const theme    = useTheme();
   const navigate = useNavigate();
+  const { isSignedIn } = useAuth();
 
-  const [name,     setName]     = useState("");
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm,  setConfirm]  = useState("");
-  const [showPw,   setShowPw]   = useState(false);
-  const [errors,   setErrors]   = useState<Record<string,string>>({});
+  // Redirect away if already signed in
+  useEffect(() => {
+    if (isSignedIn) navigate("/", { replace: true });
+  }, [isSignedIn, navigate]);
 
-  const validate = () => {
-    const e: Record<string,string> = {};
-    if (!name.trim())                          e.name     = "Name is required";
-    if (!email)                                e.email    = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email))      e.email    = "Enter a valid email";
-    if (!password)                             e.password = "Password is required";
-    else if (password.length < 6)              e.password = "Minimum 6 characters";
-    if (confirm !== password)                  e.confirm  = "Passwords do not match";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const handleSubmit = async (ev: React.FormEvent) => {
-    ev.preventDefault();
-    if (!validate()) return;
-    try {
-      await register(name, email, password);
-      toast.success("Account created! Welcome to Blüm 🌿");
-      navigate("/");
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Registration failed");
-    }
-  };
-
-  const inputStyle = (hasError?: string): React.CSSProperties => ({
-    width:"100%", padding:"0.7rem 0.875rem 0.7rem 2.5rem",
-    border:`1.5px solid ${hasError ? colors.error : colors.borderLight}`,
-    borderRadius: radius?.md, fontFamily: typography.fontBody, fontSize: typography.base,
-    color: colors.textPrimary, background: colors.bgCard, outline:"none",
-    transition:`border-color ${transitions?.fast}, box-shadow ${transitions?.fast}`,
-  });
-
-  const fields = [
-    { id:"name",     label:"Full Name",       icon:<User size={16}/>,  type:"text",     value:name,     set:setName,     placeholder:"Jane Doe" },
-    { id:"email",    label:"Email",           icon:<Mail size={16}/>,  type:"email",    value:email,    set:setEmail,    placeholder:"you@email.com" },
-    { id:"password", label:"Password",        icon:<Lock size={16}/>,  type:"password", value:password, set:setPassword, placeholder:"Min. 6 characters" },
-    { id:"confirm",  label:"Confirm Password",icon:<Lock size={16}/>,  type:"password", value:confirm,  set:setConfirm,  placeholder:"Repeat password" },
-  ];
+  const { colors, typography, radius } = theme;
 
   return (
-    <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background: colors.bgPrimary, padding:"2rem 1.5rem" }}>
-      <motion.div initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
-        style={{ width:"100%", maxWidth:440, background: colors.bgCard, borderRadius: radius?.xl, padding:"2.5rem", boxShadow: shadows?.xl, border:`1px solid ${colors.borderLight}` }}>
-
-        <Link to="/" style={{ display:"block", textAlign:"center", fontFamily: typography.fontDisplay, fontSize: typography["3xl"], color: colors.textPrimary, textDecoration:"none", letterSpacing:"0.06em", marginBottom:"0.5rem" }}>
+    <div
+      style={{
+        minHeight:      "100vh",
+        display:        "flex",
+        flexDirection:  "column",
+        alignItems:     "center",
+        justifyContent: "center",
+        background:     colors.bgPrimary,
+        padding:        "2rem 1.25rem",
+        gap:            "1.5rem",
+      }}
+    >
+      {/* Brand header */}
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0  }}
+        transition={{ duration: 0.4 }}
+        style={{ textAlign: "center" }}
+      >
+        <Link
+          to="/"
+          style={{
+            fontFamily:     typography.fontDisplay,
+            fontSize:       typography["3xl"],
+            fontWeight:     typography.weightBold,
+            color:          colors.textPrimary,
+            textDecoration: "none",
+            letterSpacing:  "0.06em",
+          }}
+        >
           BLÜM
         </Link>
-        <h2 style={{ fontFamily: typography.fontDisplay, textAlign:"center", color: colors.textPrimary, fontStyle:"italic", marginBottom:"0.375rem", fontSize: typography["2xl"] }}>Create an account</h2>
-        <p style={{ fontFamily: typography.fontBody, textAlign:"center", color: colors.textMuted, fontSize: typography.sm, marginBottom:"2rem" }}>Join thousands of happy customers</p>
-
-        <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
-          {fields.map(({ id, label, icon, type, value, set, placeholder }) => {
-            const isPassword = id === "password" || id === "confirm";
-            return (
-              <div key={id}>
-                <label style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, display:"block", marginBottom:5 }}>{label}</label>
-                <div style={{ position:"relative" }}>
-                  <span style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color: colors.textMuted, pointerEvents:"none", display:"flex" }}>{icon}</span>
-                  <input
-                    type={isPassword ? (showPw ? "text" : "password") : type}
-                    value={value} onChange={(e) => set(e.target.value)}
-                    placeholder={placeholder}
-                    style={{ ...inputStyle(errors[id]), paddingRight: isPassword ? "2.5rem" : "0.875rem" }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.borderFocus; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.accentLight}`; }}
-                    onBlur={(e)  => { e.currentTarget.style.borderColor = errors[id] ? colors.error : colors.borderLight; e.currentTarget.style.boxShadow="none"; }}
-                  />
-                  {id === "password" && (
-                    <button type="button" onClick={() => setShowPw(p=>!p)}
-                      style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color: colors.textMuted, display:"flex" }}>
-                      {showPw ? <EyeOff size={16}/> : <Eye size={16}/>}
-                    </button>
-                  )}
-                </div>
-                {errors[id] && <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: colors.error, marginTop:3 }}>{errors[id]}</p>}
-              </div>
-            );
-          })}
-
-          <motion.button type="submit" disabled={isLoading} whileHover={!isLoading?{scale:1.02}:{}} whileTap={!isLoading?{scale:0.97}:{}}
-            style={{ width:"100%", padding:"0.875rem", borderRadius: radius?.full, background: colors.accentPrimary, color: colors.textOnAccent, border:"none", cursor: isLoading?"not-allowed":"pointer", fontFamily: typography.fontBody, fontSize: typography.base, fontWeight: typography.weightMedium, opacity: isLoading?0.7:1, marginTop:"0.25rem" }}>
-            {isLoading ? "Creating account…" : "Create Account"}
-          </motion.button>
-        </form>
-
-        <p style={{ textAlign:"center", marginTop:"1.5rem", fontFamily: typography.fontBody, fontSize: typography.sm, color: colors.textMuted }}>
-          Already have an account?{" "}
-          <Link to="/login" style={{ color: colors.accentPrimary, fontWeight: typography.weightMedium, textDecoration:"none" }}>Sign in</Link>
+        <p
+          style={{
+            fontFamily: typography.fontBody,
+            fontSize:   typography.sm,
+            color:      colors.textMuted,
+            marginTop:  "0.375rem",
+          }}
+        >
+          Create your account
         </p>
       </motion.div>
+
+      {/* Clerk SignUp — handles Google OAuth + email/password */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.1 }}
+      >
+        <SignUp
+          routing="hash"
+          afterSignUpUrl="/"
+          appearance={{
+            variables: {
+              colorPrimary:        colors.accentPrimary,
+              colorBackground:     colors.bgCard,
+              colorText:           colors.textPrimary,
+              colorTextSecondary:  colors.textSecondary,
+              colorInputBackground:colors.bgPrimary,
+              colorInputText:      colors.textPrimary,
+              borderRadius:        radius?.md ?? "8px",
+              fontFamily:          typography.fontBody,
+            },
+            elements: {
+              card:             { boxShadow: "none", border: `1px solid ${colors.borderLight}` },
+              headerTitle:      { fontFamily: typography.fontDisplay, fontStyle: "italic" },
+              formButtonPrimary:{ fontFamily: typography.fontBody, fontWeight: String(typography.weightMedium) },
+            },
+          }}
+        />
+      </motion.div>
+
+      {/* Link to login */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+        style={{
+          fontFamily: typography.fontBody,
+          fontSize:   typography.sm,
+          color:      colors.textMuted,
+        }}
+      >
+        Already have an account?{" "}
+        <Link
+          to="/login"
+          style={{
+            color:      colors.accentPrimary,
+            fontWeight: typography.weightMedium,
+          }}
+        >
+          Sign in
+        </Link>
+      </motion.p>
     </div>
   );
 };
