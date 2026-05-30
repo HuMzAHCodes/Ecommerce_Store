@@ -14,7 +14,7 @@ interface WishlistCardProps {
     id:        string;
     name:      string;
     price:     number;
-    salePrice: number | null | undefined;
+    salePrice?: number | null;
     image:     string;
     slug:      string;
   };
