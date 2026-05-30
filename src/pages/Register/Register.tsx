@@ -42,6 +42,7 @@ const Register = () => {
       >
         <SignUp
           routing="hash"
+          signInUrl="/login"
           afterSignUpUrl="/"
           appearance={buildClerkAppearance(colors, typography, radius)}
         />

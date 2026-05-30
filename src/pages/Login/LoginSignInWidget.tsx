@@ -21,6 +21,7 @@ const LoginSignInWidget = ({ redirectTo }: LoginSignInWidgetProps) => {
     >
       <SignIn
         routing="hash"
+        signUpUrl="/register"
         afterSignInUrl={redirectTo}
         appearance={{
           variables: {
