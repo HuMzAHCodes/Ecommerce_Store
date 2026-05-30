@@ -3,8 +3,9 @@ import ReactDOM from "react-dom/client";
 import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App.tsx";
 import ThemeProvider from "./theme/ThemeProvider.tsx";
-import { ToastProvider } from "./components/ui/Toast.tsx";
+
 import "./index.css";
+import { ToastProvider } from "./components/ui/Toast";
 
 // ── Clerk publishable key — set in .env ───────────────────────
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
