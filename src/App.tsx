@@ -18,8 +18,8 @@ import CartDrawer from "./components/cart/CartDrawer";
 
 
 const Home         = lazy(() => import("./pages/Home"));
-const Shop         = lazy(() => import("./pages/Shop"));
-const ProductPage  = lazy(() => import("./pages/ProductPage"));
+const Shop         = lazy(() => import("./pages/Shop/Shop"));
+const ProductPage  = lazy(() => import("./pages/ProdustPage/ProductPage"));
 const Cart         = lazy(() => import("./pages/Cart"));
 const Checkout     = lazy(() => import("./pages/Checkout"));
 const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
@@ -27,10 +27,10 @@ const Login        = lazy(() => import("./pages/Login"));
 const Register     = lazy(() => import("./pages/Register"));
 const Profile      = lazy(() => import("./pages/profile"));
 const AccountProfile = lazy(() => import("./pages/AccountProfile"));
-const Orders       = lazy(() => import("./pages/Orders"));
+const Orders       = lazy(() => import("./pages/Orders/Orders"));
 const Wishlist     = lazy(() => import("./pages/Wishlist"));
 const About        = lazy(() => import("./pages/About/About"));
-const Collections  = lazy(() => import("./pages/Collections"));
+const Collections  = lazy(() => import("./pages/Collections/Collections"));
 const NotFound     = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
