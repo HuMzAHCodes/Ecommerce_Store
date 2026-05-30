@@ -87,7 +87,7 @@ const Home = () => {
           <motion.div variants={stagger} initial="hidden" animate="visible">
             <motion.div variants={fadeUp}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: colors.accentLight, color: colors.accentPrimary, borderRadius: radius?.full, padding: "0.35rem 1rem", fontSize: typography.xs, fontWeight: typography.weightMedium, fontFamily: typography.fontBody, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1.5rem" }}>
-                <Sparkles size={12} /> New Collection 2025
+                <Sparkles size={12} /> New Collection 2026
               </span>
             </motion.div>
 
