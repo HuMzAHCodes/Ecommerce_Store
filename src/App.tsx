@@ -4,10 +4,16 @@ import { lazy, Suspense } from "react";
 import { CartProvider, useCart }         from "./context/CartContext";
 import { AuthProvider, useAuth }         from "./context/AuthContext";
 import { WishlistProvider, useWishlist } from "./context/WishlistContext";
-import PageLayout     from "./components/layout/PageLayout";
-import CartDrawer     from "./components/cart/CartDrawer";
+// import PageLayout     from "./components/layout/PageLayout/PageLayout";
+// import CartDrawer     from "./components/cart/CartDrawer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { useTheme }   from "./theme/ThemeContext";
+
+
+import PageLayout from "./components/layout/PageLayout";
+import Navbar     from "./components/layout/Navbar";
+import Footer     from "./components/layout/Footer";
+import CartDrawer from "./components/cart/CartDrawer";
 
 
 
