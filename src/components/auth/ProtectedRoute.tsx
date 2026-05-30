@@ -1,67 +1,45 @@
-import { type ReactNode } from "react";
-import { useAuth as useClerkAuth } from "@clerk/clerk-react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useTheme } from "../../theme/ThemeContext";
+import { type ReactNode }    from "react";
+import { Navigate }          from "react-router-dom";
+import LoadingSpinner        from "./LoadingSpinner";
+import useProtectedRoute     from "./useProtectedRoute";
 
-// ── Types ─────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-// ── Sub-components ────────────────────────────────────────────
-
-const LoadingSpinner = () => {
-  const theme = useTheme();
-  const { colors } = theme;
-
-  return (
-    <div
-      style={{
-        display:        "flex",
-        alignItems:     "center",
-        justifyContent: "center",
-        minHeight:      "60vh",
-      }}
-    >
-      <div
-        style={{
-          width:          34,
-          height:         34,
-          borderRadius:   "50%",
-          border:         `3px solid ${colors.borderLight}`,
-          borderTopColor: colors.accentPrimary,
-          animation:      "spin 0.8s linear infinite",
-        }}
-      />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-};
-
-// ── Component ─────────────────────────────────────────────────
+// ── Component ────────────────────────────────────────────────
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isSignedIn, isLoaded } = useClerkAuth();
-  const location                 = useLocation();
+  const { isHydrating, isUnauthenticated, intendedPath } = useProtectedRoute();
 
-  // Still hydrating Clerk session — show spinner briefly
-  const isHydrating = !isLoaded;
-  if (isHydrating) return <LoadingSpinner />;
-
-  // Not signed in — redirect to login, preserve intended destination
-  const isUnauthenticated = !isSignedIn;
-  if (isUnauthenticated) {
-    return (
-      <Navigate
-        to="/login"
-        state={{ from: location.pathname }}
-        replace
-      />
-    );
-  }
+  if (isHydrating)       return <LoadingSpinner />;
+  if (isUnauthenticated) return <Navigate to="/login" state={{ from: intendedPath }} replace />;
 
   return <>{children}</>;
 };
 
 export default ProtectedRoute;
+
+/*
+ * ── ProtectedRoute — What this folder does ──────────────────────────────────
+ *
+ * Guards any route that requires the user to be signed in via Clerk.
+ *
+ * Flow:
+ *   1. Clerk is still hydrating its session  →  show a centered loading spinner
+ *      (avoids a flash-redirect before Clerk has even checked localStorage)
+ *
+ *   2. Clerk has loaded, user is NOT signed in  →  redirect to /login
+ *      The current pathname is passed as { from } in router state so the login
+ *      page can bounce the user back to where they were trying to go.
+ *
+ *   3. Clerk has loaded, user IS signed in  →  render the protected children
+ *
+ * Files in this folder:
+ *   useProtectedRoute.ts  —  all auth-state logic (hydration + sign-in checks)
+ *   LoadingSpinner.tsx    —  pure UI spinner shown during Clerk hydration
+ *   spinnerStyles.ts      —  CSSProperties factories + keyframe string; no JSX
+ *   ProtectedRoute.tsx    —  thin orchestrator; reads like a plain-English flow
+ */
