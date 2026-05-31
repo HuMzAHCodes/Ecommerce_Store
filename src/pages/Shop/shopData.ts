@@ -14,7 +14,7 @@ export interface Product {
 }
 
 export const ALL_PRODUCTS: Product[] = [
-  { id:"1",  name:"Radiance Serum",      price:68,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#FFEFB3", image:"/images/products/radiance-serum.png", slug:"radiance-serum",      tags:["serum","glow"],        rating:4.9, reviews:312 },
+  { id:"1",  name:"Radiance Serum",      price:68,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#FFEFB3", image:"/images/products/radiance-serum/radiance-serum.jpeg", slug:"radiance-serum",      tags:["serum","glow"],        rating:4.9, reviews:312 },
   { id:"2",  name:"Glow Face Mist",      price:42,  salePrice:35,   category:"Skincare", badge:"Sale",        bg:"#C5E8E3", image:"/images/products/glow-face-mist.png", slug:"glow-face-mist",       tags:["mist","hydration"],    rating:4.7, reviews:198 },
   { id:"3",  name:"Velvet Body Butter",  price:55,  salePrice:null, category:"Wellness", badge:"New",         bg:"#FFF5D0", image:"/images/products/velvet-body-butter.png", slug:"velvet-body-butter",   tags:["body","moisturizer"],  rating:4.8, reviews:145 },
   { id:"4",  name:"Rose Toner",          price:38,  salePrice:null, category:"Skincare", badge:null,          bg:"#A8D9D2", image:"/images/products/rose-toner.png", slug:"rose-toner",           tags:["toner","rose"],        rating:4.6, reviews:89  },

@@ -124,7 +124,7 @@ const HeroVisual = () => {
       {/* Main product card */}
       <div style={{ width: 340, height: 420, borderRadius: radius?.xl, background: `linear-gradient(145deg, ${colors.accentLight}, ${colors.bgSecondary})`, boxShadow: shadows?.xl, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
         <img 
-          src="/images/products/radiance-serum.png" 
+          src="/images/products/radiance-serum/radiance-serum.jpeg" 
           alt="Radiance Serum" 
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
