@@ -7,6 +7,16 @@ import ThemeProvider from "./theme/ThemeProvider.tsx";
 import "./index.css";
 import { ToastProvider } from "./components/ui/Toast";
 
+
+import { CursorProvider, CursorDot } from "./components/cursor";
+import { useIsMobile } from "./hooks/useMediaQuery";
+
+const AppCursor = () => {
+  const isMobile = useIsMobile();
+  if (isMobile) return null;
+  return <CursorDot />;
+};
+
 // ── Clerk publishable key — set in .env ───────────────────────
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -25,7 +35,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       <ThemeProvider theme="blushAndSlate">
         <ToastProvider>
-          <App />
+          <CursorProvider>
+            <AppCursor />
+             <App />
+          </CursorProvider>
         </ToastProvider>
       </ThemeProvider>
     </ClerkProvider>
