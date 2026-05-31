@@ -3,9 +3,9 @@ import { Sparkles, Truck, RotateCcw, Shield } from "lucide-react";
 
 export type Category = {
   label: string;
-  href:  string;
-  emoji: string;
-  desc:  string;
+  href: string;
+  image: string;
+  desc: string;
 };
 
 export type FeaturedProduct = {
@@ -26,10 +26,30 @@ export type Perk = {
 };
 
 export const CATEGORIES: Category[] = [
-  { label: "Skincare",  href: "/collections/skincare",  emoji: "🌿", desc: "Clean formulas"       },
-  { label: "Beauty",    href: "/collections/beauty",    emoji: "✨", desc: "Effortless glow"      },
-  { label: "Wellness",  href: "/collections/wellness",  emoji: "🫧", desc: "Feel-good rituals"    },
-  { label: "Gift Sets", href: "/collections/gifts",     emoji: "🎁", desc: "Beautifully curated"  },
+  {
+    label: "Skincare",
+    href: "/collections/skincare",
+    image: "/images/products/skincare/skincare.jpeg",
+    desc: "Clean formulas",
+  },
+  {
+    label: "Beauty",
+    href: "/collections/beauty",
+    image: "/images/products/beauty/beauty.jpeg",
+    desc: "Effortless glow",
+  },
+  {
+    label: "Wellness",
+    href: "/collections/wellness",
+    image: "/images/products/radiance-serum/radiance-serum.jpeg",
+    desc: "Feel-good rituals",
+  },
+  {
+    label: "Gift Sets",
+    href: "/collections/gifts",
+    image:  "/images/products/radiance-serum/radiance-serum.jpeg",
+    desc: "Beautifully curated",
+  },
 ];
 
 export const FEATURED: FeaturedProduct[] = [
