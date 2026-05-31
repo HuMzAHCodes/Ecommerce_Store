@@ -77,10 +77,10 @@ const HeroCopy = () => {
       {/* Headline */}
       <motion.h1
         variants={fadeUpVariant}
-        style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, lineHeight: 1.1, marginBottom: "1.25rem", fontWeight: typography.weightLight, fontStyle: "italic" }}
+        style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, lineHeight: 1.1, marginBottom: "1.25rem", fontWeight: typography.weightBold, fontStyle: "italic", letterSpacing: "-0.01em" }}
       >
         Simple.<br />
-        <span style={{ fontStyle: "normal", fontWeight: typography.weightMedium }}>Clean.</span><br />
+        <span style={{ fontStyle: "normal", fontWeight: typography.weightBold }}>Clean.</span><br />
         Beautiful.
       </motion.h1>
 
@@ -173,7 +173,9 @@ const HomeHero = () => {
     >
       <HeroBackground y={heroY} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: isMobile ? "3rem 1.25rem" : "6rem 1.5rem", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems: "center", width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", 
+        padding: isMobile ? "2rem 1.25rem" : "2.3rem 3.2rem",
+        display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems: "center", width: "100%" }}>
         <HeroCopy />
         <HeroVisual />
       </div>

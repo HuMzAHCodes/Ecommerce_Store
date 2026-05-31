@@ -58,6 +58,10 @@ const ThemeProvider = ({ theme: themeName = "blushAndSlate", children }: ThemePr
 // Loads correct weights per font family for cosmetics store typography
 
 const FONT_CONFIG: Record<string, string> = {
+  // Lora — warm bold serif, needs italic + all weights for editorial headings
+  "Lora":
+    "family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700",
+
   // Playfair Display — needs italic + all weights for editorial headings
   "Playfair Display":
     "family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700",
