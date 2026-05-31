@@ -33,12 +33,12 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const FEATURED: FeaturedProduct[] = [
-  { id: "1", name: "Radiance Serum",     price: 68, salePrice: null, badge: "Best Seller", bg: "#FFEFB3", image: "/images/products/radiance-serum.png", slug: "radiance-serum" },
-  { id: "2", name: "Glow Face Mist",     price: 42, salePrice: 35,  badge: "Sale",        bg: "#C5E8E3", image: "/images/products/glow-face-mist.png", slug: "glow-face-mist" },
-  { id: "3", name: "Velvet Body Butter", price: 55, salePrice: null, badge: "New",         bg: "#FFF5D0", image: "/images/products/velvet-body-butter.png", slug: "velvet-body-butter" },
-  { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2", image: "/images/products/rose-toner.png", slug: "rose-toner" },
-  { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8", image: "/images/products/cloud-cream-spf.png", slug: "cloud-cream-spf" },
-  { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2", image: "/images/products/lip-treatment-set.png", slug: "lip-treatment-set" },
+  { id: "1", name: "Radiance Serum",     price: 68, salePrice: null, badge: "Best Seller", bg: "#FFEFB3", image: "/images/products/radiance-serum/radiance-serum.jpeg", slug: "radiance-serum" },
+  { id: "2", name: "Glow Face Mist",     price: 42, salePrice: 35,  badge: "Sale",        bg: "#C5E8E3", image: "/images/products/glow-face-mist/glow-face-mist.jpeg", slug: "glow-face-mist" },
+  { id: "3", name: "Velvet Body Butter", price: 55, salePrice: null, badge: "New",         bg: "#FFF5D0", image: "/images/products/velvet-body-butter/velvet-body-butter.jpeg", slug: "velvet-body-butter" },
+  { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2", image: "/images/products/rose-toner/rose-toner.jpeg", slug: "rose-toner" },
+  { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8", image: "/images/products/could-cream-spf/cloud-cream-spf.jpeg", slug: "cloud-cream-spf" },
+  { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2", image: "/images/products/lip-treatment-set/lip-treatment-set.jpeg", slug: "lip-treatment-set" },
 ];
 
 export const PERKS: Perk[] = [
