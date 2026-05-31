@@ -36,14 +36,21 @@ const CartDrawerItem = ({
       style={itemRowWrapperStyles}
     >
       <div style={itemCardStyles(colors, radius)}>
-
         {/* Product thumbnail */}
         <Link
           to={`/shop/${product.slug}`}
           onClick={onLinkClick}
-          style={itemImageStyles(radius)}
+          style={{ ...itemImageStyles(radius), overflow: "hidden", background: product.image.startsWith("#") ? product.image : colors.bgTertiary }}
         >
-          ✨
+          {(product.image.startsWith("http") || product.image.startsWith("/")) ? (
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            "✨"
+          )}
         </Link>
 
         {/* Name, price, qty controls */}

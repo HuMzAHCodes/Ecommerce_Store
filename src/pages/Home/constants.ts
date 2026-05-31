@@ -15,6 +15,8 @@ export type FeaturedProduct = {
   salePrice: number | null;
   badge:     string | null;
   bg:        string;
+  image:     string;
+  slug:      string;
 };
 
 export type Perk = {
@@ -31,12 +33,12 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const FEATURED: FeaturedProduct[] = [
-  { id: "1", name: "Radiance Serum",     price: 68, salePrice: null, badge: "Best Seller", bg: "#FFEFB3" },
-  { id: "2", name: "Glow Face Mist",     price: 42, salePrice: 35,  badge: "Sale",        bg: "#C5E8E3" },
-  { id: "3", name: "Velvet Body Butter", price: 55, salePrice: null, badge: "New",         bg: "#FFF5D0" },
-  { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2" },
-  { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8" },
-  { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2" },
+  { id: "1", name: "Radiance Serum",     price: 68, salePrice: null, badge: "Best Seller", bg: "#FFEFB3", image: "/images/products/radiance-serum.png", slug: "radiance-serum" },
+  { id: "2", name: "Glow Face Mist",     price: 42, salePrice: 35,  badge: "Sale",        bg: "#C5E8E3", image: "/images/products/glow-face-mist.png", slug: "glow-face-mist" },
+  { id: "3", name: "Velvet Body Butter", price: 55, salePrice: null, badge: "New",         bg: "#FFF5D0", image: "/images/products/velvet-body-butter.png", slug: "velvet-body-butter" },
+  { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2", image: "/images/products/rose-toner.png", slug: "rose-toner" },
+  { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8", image: "/images/products/cloud-cream-spf.png", slug: "cloud-cream-spf" },
+  { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2", image: "/images/products/lip-treatment-set.png", slug: "lip-treatment-set" },
 ];
 
 export const PERKS: Perk[] = [

@@ -33,7 +33,7 @@ const useCollections = (): CollectionsState => {
       name:      product.name,
       price:     product.price,
       salePrice: product.salePrice,
-      image:     product.bg,
+      image:     product.image,
       slug:      product.slug,
     });
     openDrawer();
@@ -46,7 +46,7 @@ const useCollections = (): CollectionsState => {
       name:      product.name,
       price:     product.price,
       salePrice: product.salePrice,
-      image:     product.bg,
+      image:     product.image,
       slug:      product.slug,
     });
     toast.info(isWishlisted(product.id) ? "Removed from wishlist" : `${product.name} saved!`);

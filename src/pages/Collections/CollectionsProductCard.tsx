@@ -39,7 +39,15 @@ const CollectionsProductCard = ({
       >
         {/* Image area */}
         <div style={cardImageAreaStyles(product.bg, isMobile)}>
-          <span style={{ fontSize: isMobile ? "2.5rem" : "3.5rem" }}>✨</span>
+          {product.image ? (
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <span style={{ fontSize: isMobile ? "2.5rem" : "3.5rem" }}>✨</span>
+          )}
 
           {product.badge && (
             <span style={cardBadgeStyles(getBadgeColor(product.badge, colors), typography, radius)}>

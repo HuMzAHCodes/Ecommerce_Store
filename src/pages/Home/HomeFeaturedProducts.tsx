@@ -73,7 +73,7 @@ const HomeFeaturedProducts = () => {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1.5rem" }}>
           {FEATURED.map((product) => (
             <ScrollReveal key={product.id} y={44}>
-              <Link to={`/shop/${product.id}`} style={{ textDecoration: "none", display: "block" }}>
+              <Link to={`/shop/${product.slug}`} style={{ textDecoration: "none", display: "block" }}>
                 <motion.div
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.22 }}
@@ -81,7 +81,15 @@ const HomeFeaturedProducts = () => {
                 >
                   {/* Product image area */}
                   <div style={{ height: 220, background: product.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                    <div style={{ fontSize: "3.5rem" }}>✨</div>
+                    {product.image ? (
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div style={{ fontSize: "3.5rem" }}>✨</div>
+                    )}
                     {product.badge && <ProductBadge badge={product.badge} />}
                   </div>
 

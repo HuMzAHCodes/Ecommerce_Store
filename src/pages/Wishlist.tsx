@@ -48,15 +48,7 @@ const Wishlist = () => {
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div key={item.id} initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.9 }} transition={{ duration:0.25 }} layout>
-                  <motion.div whileHover={{ y:-4 }} transition={{ duration:0.2 }}
-                    style={{ background: colors.bgCard, borderRadius: radius?.xl, overflow:"hidden", border:`1px solid ${colors.borderLight}`, boxShadow: shadows?.sm }}>
-                    <div style={{ height: isMobile ? 130 : 180, background: item.image, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem", position:"relative" }}>
-                      ✨
-                      <button onClick={() => { removeItem(item.id); toast.info("Removed from wishlist"); }}
-                        style={{ position:"absolute", top:8, right:8, width:28, height:28, borderRadius: radius?.full, background: colors.bgCard, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: shadows?.sm }}>
-                        <X size={13} color={colors.textMuted} />
-                      </button>
-                    </div>
+
                     <div style={{ padding: isMobile ? "0.75rem" : "1rem" }}>
                       <Link to={`/shop/${item.slug}`} style={{ fontFamily: typography.fontBody, fontSize: isMobile ? typography.xs : typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, textDecoration:"none", display:"block", marginBottom:"0.375rem" }}>
                         {item.name}

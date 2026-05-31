@@ -77,15 +77,24 @@ const CartItemRow = ({ item, onUpdate, onRemove }: CartItemRowProps) => {
           width:           isMobile ? 60 : 80,
           height:          isMobile ? 60 : 80,
           borderRadius:    radius?.lg,
-          background:      product.image,
+          background:      product.image.startsWith("#") ? product.image : colors.bgTertiary,
           flexShrink:      0,
           display:         "flex",
           alignItems:      "center",
           justifyContent:  "center",
           fontSize:        isMobile ? "1.5rem" : "1.75rem",
+          overflow:        "hidden",
         }}
       >
-        ✨
+        {(product.image.startsWith("http") || product.image.startsWith("/")) ? (
+          <img 
+            src={product.image} 
+            alt={product.name} 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          "✨"
+        )}
       </div>
 
       {/* Product name + mobile controls */}

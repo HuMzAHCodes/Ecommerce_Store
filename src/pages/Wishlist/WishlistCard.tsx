@@ -43,8 +43,16 @@ const WishlistCard = ({
         style={cardStyles(colors, radius, shadows)}
       >
         {/* Image */}
-        <div style={cardImageAreaStyles(item.image, isMobile)}>
-          ✨
+        <div style={{ ...cardImageAreaStyles(item.image, isMobile), overflow: "hidden" }}>
+          {(item.image.startsWith("http") || item.image.startsWith("/")) ? (
+            <img 
+              src={item.image} 
+              alt={item.name} 
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            "✨"
+          )}
           <button
             onClick={() => onRemove(item.id)}
             style={removeButtonStyles(colors, radius, shadows)}

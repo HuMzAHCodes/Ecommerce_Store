@@ -36,9 +36,24 @@ const ProductImageGallery = ({
           animate={{ opacity: 1, scale: 1    }}
           exit={{    opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.28 }}
-          style={mainImageStyles(images[activeIndex].bg, isMobile, radius, shadows)}
+          style={mainImageStyles(
+            (images[activeIndex].bg.startsWith("http") || images[activeIndex].bg.startsWith("/")) 
+              ? "transparent" 
+              : images[activeIndex].bg, 
+            isMobile, 
+            radius, 
+            shadows
+          )}
         >
-          <span style={{ fontSize: isMobile ? "4rem" : "6rem" }}>✨</span>
+          {(images[activeIndex].bg.startsWith("http") || images[activeIndex].bg.startsWith("/")) ? (
+            <img 
+              src={images[activeIndex].bg} 
+              alt={images[activeIndex].label} 
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: radius?.xl }}
+            />
+          ) : (
+            <span style={{ fontSize: isMobile ? "4rem" : "6rem" }}>✨</span>
+          )}
 
           {badge && (
             <span style={imageBadgeStyles(getBadgeColor(badge, colors), typography, radius)}>
@@ -54,9 +69,24 @@ const ProductImageGallery = ({
           <button
             key={i}
             onClick={() => onThumbClick(i)}
-            style={thumbnailButtonStyles(img.bg, activeIndex === i, isMobile, colors, radius, transitions)}
+            style={thumbnailButtonStyles(
+              (img.bg.startsWith("http") || img.bg.startsWith("/")) ? "transparent" : img.bg, 
+              activeIndex === i, 
+              isMobile, 
+              colors, 
+              radius, 
+              transitions
+            )}
           >
-            <span style={{ fontSize: "1.25rem" }}>✨</span>
+            {(img.bg.startsWith("http") || img.bg.startsWith("/")) ? (
+              <img 
+                src={img.bg} 
+                alt={img.label} 
+                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: radius?.lg }}
+              />
+            ) : (
+              <span style={{ fontSize: "1.25rem" }}>✨</span>
+            )}
           </button>
         ))}
       </div>

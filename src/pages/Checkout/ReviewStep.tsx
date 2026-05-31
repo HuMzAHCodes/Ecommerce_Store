@@ -49,8 +49,16 @@ const ReviewStep = ({
             key={product.id}
             style={{ display: "flex", alignItems: "center", gap: "0.875rem", padding: "0.75rem 0", borderBottom: `1px solid ${colors.borderLight}` }}
           >
-            <div style={{ width: 48, height: 48, borderRadius: radius?.md, background: product.image, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", flexShrink: 0 }}>
-              ✨
+            <div style={{ width: 48, height: 48, borderRadius: radius?.md, background: product.image.startsWith("#") ? product.image : colors.bgTertiary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", flexShrink: 0, overflow: "hidden" }}>
+              {(product.image.startsWith("http") || product.image.startsWith("/")) ? (
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                "✨"
+              )}
             </div>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: typography.fontBody, fontSize: typography.sm, fontWeight: typography.weightMedium, color: colors.textPrimary, margin: 0 }}>
