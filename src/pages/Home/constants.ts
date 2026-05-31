@@ -59,6 +59,9 @@ export const FEATURED: FeaturedProduct[] = [
   { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2", image: "/images/products/rose-toner/rose-toner.jpeg", slug: "rose-toner" },
   { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8", image: "/images/products/could-cream-spf/cloud-cream-spf.jpeg", slug: "cloud-cream-spf" },
   { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2", image: "/images/products/lip-treatment-set/lip-treatment-set.jpeg", slug: "lip-treatment-set" },
+  { id: "7", name: "Deep Clean Mask",    price: 48, salePrice: null, badge: null,          bg: "#B8E8E3", image: "/images/products/deep-clean-mask/deep-clean-mask.jpeg",         slug: "deep-clean-mask",    },
+{ id: "8", name: "Vitamin C Booster",  price: 85, salePrice: null, badge: "Best Seller", bg: "#FFF0B8", image: "/images/products/vitamin-c-booster/vitamin-c-booster.jpeg",     slug: "vitamin-c-booster",  },
+{ id: "9", name: "Overnight Recovery", price: 92, salePrice: 75,  badge: "Sale",        bg: "#9ECFC6", image: "/images/products/overnight-recovery/overnight-recovery.jpeg",   slug: "overnight-recovery", },
 ];
 
 export const PERKS: Perk[] = [
