@@ -49,7 +49,9 @@ const ProductImageGallery = ({
             <img 
               src={images[activeIndex].bg} 
               alt={images[activeIndex].label} 
-              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: radius?.xl }}
+              style={{ width: "100%", height: "100%", objectFit: "cover",
+                objectPosition: "center center",
+               borderRadius: radius?.xl }}
             />
           ) : (
             <span style={{ fontSize: isMobile ? "4rem" : "6rem" }}>✨</span>

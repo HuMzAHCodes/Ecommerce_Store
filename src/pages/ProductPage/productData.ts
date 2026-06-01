@@ -46,9 +46,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Apply 3–4 drops to cleansed skin morning and evening. Gently pat into face and neck. Follow with moisturiser. Use SPF in the morning.",
     images: [
-      { bg: "/images/products/radiance-serum.png", label: "Front"  },
-      { bg: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop", label: "Texture" },
-      { bg: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=600&auto=format&fit=crop", label: "Detail" },
+      { bg: "/images/products/radiance-serum/radiance-serum.jpeg", label: "Front"  },
+      { bg: "/images/products/radiance-serum/radiance-serum-top.jpeg", label: "Texture" },
+      { bg: "/images/products/radiance-serum/radiance-serum-side.jpeg", label: "Detail" },
     ],
     reviews: [
       { id: "r1", name: "Amara K.",  rating: 5, date: "May 2025", body: "Genuinely the best serum I've ever used. My skin is glowing after just two weeks." },
@@ -75,7 +75,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Mist onto face before skincare, after makeup application, or anytime throughout the day for an instant pick-me-up.",
     images: [
-      { bg: "/images/products/glow-face-mist.png", label: "Front" },
+      { bg: "/images/products/glow-face-mist/glow-face-mist.jpeg", label: "Front" },
+      { bg: "/images/products/glow-face-mist/glow-face-mist-top.jpeg", label: "top" },
+       { bg: "/images/products/glow-face-mist/glow-face-mist-close.jpeg", label: "close" },
     ],
     reviews: [
       { id: "r4", name: "Emma T.", rating: 5, date: "May 2025", body: "Keep this on my desk and spray it all day long. Incredibly hydrating!" },
@@ -101,7 +103,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Massage generously into clean skin all over the body, paying extra attention to dry areas like elbows and knees.",
     images: [
-      { bg: "/images/products/velvet-body-butter.png", label: "Front" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter.jpeg", label: "Front" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter-top.jpeg", label: "top" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter-close.jpeg", label: "close" },
     ],
     reviews: [
       { id: "r6", name: "Sarah L.", rating: 5, date: "May 2025", body: "Honestly feels like velvet. Smells incredible too!" },
@@ -125,7 +129,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "After cleansing, sweep over face and neck using a cotton pad, or pat directly into the skin using clean hands.",
     images: [
-      { bg: "/images/products/rose-toner.png", label: "Front" },
+      { bg: "/images/products/rose-toner/rose-toner.jpeg", label: "Front" },
+      { bg: "/images/products/rose-toner/rose-toner-top.jpeg", label: "top" },
+      { bg: "/images/products/rose-toner/rose-toner-close.jpeg", label: "close" },
     ],
     reviews: [
       { id: "r7", name: "Diana B.", rating: 5, date: "Mar 2025", body: "Super gentle and smells like real roses. My skin loves this." },
