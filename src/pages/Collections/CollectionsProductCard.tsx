@@ -1,13 +1,15 @@
-import { motion }        from "framer-motion";
-import { Link }          from "react-router-dom";
+import { motion }             from "framer-motion";
+import { Link }               from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
-import { useTheme }      from "../../theme/ThemeContext";
-import { useIsMobile }   from "../../hooks/useMediaQuery";
+import { useTheme }           from "../../theme/ThemeContext";
+import { useIsMobile }        from "../../hooks/useMediaQuery";
 import {
-  cardStyles,          cardImageAreaStyles, cardBadgeStyles,
-  wishlistButtonStyles, cardBodyStyles,     addToCartButtonStyles,
+  cardStyles, cardImageAreaStyles, cardBadgeStyles,
+  wishlistButtonStyles, cardBodyStyles, addToCartButtonStyles,
 } from "./collectionsStyles";
 import { CARD_FADE_UP_VARIANT, type CollectionProduct } from "./collectionsData";
+// ADDED: view cursor for product cards
+import useCursor from "../../components/cursor/useCursor";
 
 interface CollectionsProductCardProps {
   product:      CollectionProduct;
@@ -30,19 +32,24 @@ const CollectionsProductCard = ({
   const { colors, typography, radius, shadows, transitions } = useTheme();
   const isMobile = useIsMobile();
 
+  // ADDED: "view" cursor — large circle with VIEW label on card hover
+  const viewCursor = useCursor("view");
+
   return (
     <motion.div variants={CARD_FADE_UP_VARIANT}>
       <motion.div
         whileHover={{ y: -4, boxShadow: shadows?.lg }}
         transition={{ duration: 0.2 }}
-        style={cardStyles(colors, radius, shadows)}
+        // ADDED: view cursor handlers + cursor none
+        {...viewCursor.handlers}
+        style={{ ...cardStyles(colors, radius, shadows), cursor: "none" }}
       >
         {/* Image area */}
         <div style={cardImageAreaStyles(product.bg, isMobile)}>
           {product.image ? (
-            <img 
-              src={product.image} 
-              alt={product.name} 
+            <img
+              src={product.image}
+              alt={product.name}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
@@ -57,8 +64,8 @@ const CollectionsProductCard = ({
 
           <motion.button
             whileTap={{ scale: 0.88 }}
-            onClick={() => onWishlist(product)}
-            style={wishlistButtonStyles(colors, radius, shadows)}
+            onClick={(e) => { e.stopPropagation(); onWishlist(product); }}
+            style={{ ...wishlistButtonStyles(colors, radius, shadows), cursor: "none" }}
           >
             <Heart
               size={14}
@@ -71,7 +78,10 @@ const CollectionsProductCard = ({
         {/* Card body */}
         <div style={cardBodyStyles(isMobile)}>
           <Link to={`/shop/${product.slug}`} style={{ textDecoration: "none" }}>
-            <h3 className="product-name" style={{ marginBottom: "0.375rem", fontSize: isMobile ? typography.xs : typography.sm }}>
+            <h3
+              className="product-name"
+              style={{ marginBottom: "0.375rem", fontSize: isMobile ? typography.xs : typography.sm }}
+            >
               {product.name}
             </h3>
           </Link>
@@ -88,8 +98,8 @@ const CollectionsProductCard = ({
 
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={() => onAddToCart(product)}
-              style={addToCartButtonStyles(colors, transitions, radius, isInCart)}
+              onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+              style={{ ...addToCartButtonStyles(colors, transitions, radius, isInCart), cursor: "none" }}
             >
               <ShoppingBag size={14} color={isInCart ? "#fff" : colors.textSecondary} />
             </motion.button>
