@@ -41,13 +41,13 @@ export const CATEGORIES: Category[] = [
   {
     label: "Wellness",
     href: "/collections/wellness",
-    image: "/images/products/radiance-serum/radiance-serum.jpeg",
+    image: "/images/products/wellness/wellness.jpeg",
     desc: "Feel-good rituals",
   },
   {
     label: "Gift Sets",
     href: "/collections/gifts",
-    image:  "/images/products/radiance-serum/radiance-serum.jpeg",
+    image:  "/images/products/gift-sets/gift-sets.jpeg",
     desc: "Beautifully curated",
   },
 ];

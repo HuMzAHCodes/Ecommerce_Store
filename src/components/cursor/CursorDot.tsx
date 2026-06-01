@@ -57,7 +57,7 @@ const MODE_STYLES: Record<CursorMode, ModeStyle> = {
     dotColor:  "transparent",
     ringColor: "rgba(181, 114, 74, 0.85)",
     ringOpacity: 1, ringBlur: 0,
-    label: "🌸", labelSize: 22,
+    label: undefined, labelSize: 22,
     dotScale: 0, ringScale: 1,
   },
   pill: {
