@@ -29,13 +29,15 @@ const Shop = () => {
   } = useShopFilters();
 
   const handleAddToCart = (product: Product) => {
-    addItem({ id: product.id, name: product.name, price: product.price, salePrice: product.salePrice, image: product.image, slug: product.slug });
+    addItem({ id: product.id, name: product.name, price: product.price,
+       salePrice: product.salePrice, image: product.image, slug: product.slug });
     openDrawer();
     toast.success(`${product.name} added to cart!`);
   };
 
   const handleWishlist = (product: Product) => {
-    toggle({ id: product.id, name: product.name, price: product.price, salePrice: product.salePrice, image: product.image, slug: product.slug });
+    toggle({ id: product.id, name: product.name, price: product.price,
+       salePrice: product.salePrice, image: product.image, slug: product.slug });
     toast.info(isWishlisted(product.id) ? "Removed from wishlist" : `${product.name} saved!`);
   };
 

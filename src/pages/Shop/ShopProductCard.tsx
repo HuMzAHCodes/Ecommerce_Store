@@ -1,12 +1,14 @@
-import { motion }        from "framer-motion";
+import { motion }             from "framer-motion";
 import { Heart, ShoppingBag } from "lucide-react";
-import { useTheme }      from "../../theme/ThemeContext";
-import { useIsMobile }   from "../../hooks/useMediaQuery";
+import { useTheme }           from "../../theme/ThemeContext";
+import { useIsMobile }        from "../../hooks/useMediaQuery";
 import {
   cardWrapperStyles, cardImageAreaStyles, cardBadgeStyles,
-  wishlistButtonStyles,  cardBodyStyles, addToCartButtonStyles,
+  wishlistButtonStyles, cardBodyStyles, addToCartButtonStyles,
 } from "./shopStyles";
 import { CARD_FADE_UP_VARIANT, type Product } from "./shopData";
+// ADDED: view cursor for product cards
+import useCursor from "../../components/cursor/useCursor";
 
 interface ShopProductCardProps {
   product:      Product;
@@ -17,8 +19,8 @@ interface ShopProductCardProps {
 }
 
 const getBadgeColor = (badge: string, colors: ReturnType<typeof useTheme>["colors"]) => {
-  if (badge === "Sale")    return colors.accentPrimary;
-  if (badge === "New")     return colors.accentSecondary;
+  if (badge === "Sale") return colors.accentPrimary;
+  if (badge === "New")  return colors.accentSecondary;
   return colors.textPrimary;
 };
 
@@ -29,6 +31,10 @@ const ShopProductCard = ({
   const { colors, typography, radius, shadows, transitions } = useTheme();
   const isMobile = useIsMobile();
 
+  // ADDED: "view" mode — large circle with VIEW label appears on card hover.
+  // Applied to the inner card div, not the outer animation wrapper.
+  const viewCursor = useCursor("view");
+
   const activePrice = product.salePrice ?? product.price;
 
   return (
@@ -36,14 +42,16 @@ const ShopProductCard = ({
       <motion.div
         whileHover={{ y: -3, boxShadow: shadows?.lg }}
         transition={{ duration: 0.2 }}
-        style={cardWrapperStyles(colors, radius, shadows)}
+        // ADDED: spread view cursor handlers + cursor none
+        {...viewCursor.handlers}
+        style={{ ...cardWrapperStyles(colors, radius, shadows), cursor: "none" }}
       >
         {/* Image area */}
         <div style={cardImageAreaStyles(product.bg, isMobile)}>
           {product.image ? (
-            <img 
-              src={product.image} 
-              alt={product.name} 
+            <img
+              src={product.image}
+              alt={product.name}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
@@ -56,10 +64,15 @@ const ShopProductCard = ({
             </span>
           )}
 
+          {/* Wishlist button — gets its own cursor override so it doesn't
+              inherit the card's "none" cursor on the button itself */}
           <motion.button
             whileTap={{ scale: 0.88 }}
-            onClick={() => onWishlist(product)}
-            style={wishlistButtonStyles(colors, radius, shadows)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onWishlist(product);
+            }}
+            style={{ ...wishlistButtonStyles(colors, radius, shadows), cursor: "none" }}
           >
             <Heart
               size={14}
@@ -71,7 +84,10 @@ const ShopProductCard = ({
 
         {/* Card body */}
         <div style={cardBodyStyles(isMobile)}>
-          <h3 className="product-name" style={{ marginBottom: "0.25rem", fontSize: isMobile ? typography.xs : typography.sm }}>
+          <h3
+            className="product-name"
+            style={{ marginBottom: "0.25rem", fontSize: isMobile ? typography.xs : typography.sm }}
+          >
             {product.name}
           </h3>
 
@@ -98,8 +114,11 @@ const ShopProductCard = ({
 
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={() => onAddToCart(product)}
-              style={addToCartButtonStyles(colors, transitions, radius, isInCart)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart(product);
+              }}
+              style={{ ...addToCartButtonStyles(colors, transitions, radius, isInCart), cursor: "none" }}
             >
               <ShoppingBag size={13} color={isInCart ? "#fff" : colors.textSecondary} />
             </motion.button>
