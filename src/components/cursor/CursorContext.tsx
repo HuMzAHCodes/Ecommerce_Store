@@ -10,7 +10,8 @@ export type CursorMode =
   | "drag"      // ↔ drag hint — horizontal scroll sections
   | "bloom"     // 🌸 — category cards
   | "pill"      // expanding pill — CTA buttons
-  | "link";     // slim underline — navbar links
+  | "link"      // slim underline — navbar links
+  | "blob";     // large expanding circle with mix-blend-mode:difference — hero headline
 
 // ── Context shape ─────────────────────────────────────────────
 interface CursorContextValue {

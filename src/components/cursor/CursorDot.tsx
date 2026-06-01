@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from "react";
+import type React from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useCursorContext, type CursorMode } from "./CursorContext";
 
 // ── Mode config ───────────────────────────────────────────────
 // To add a new cursor mode: add an entry here. Nothing else changes.
 interface ModeStyle {
-  dotSize:   number;   // inner dot diameter px
-  ringSize:  number;   // outer glow ring diameter px
-  ringOpacity: number; // glow ring opacity
-  ringBlur:  number;   // glow blur radius px
-  label?:    string;   // optional text label (e.g. "VIEW", "↔", "🌸")
-  labelSize: number;   // label font size px
-  ringColor: string;   // glow ring color
-  dotColor:  string;   // inner dot color
-  dotScale:  number;   // inner dot scale multiplier on this mode
-  ringScale: number;   // ring scale multiplier on this mode
+  dotSize:      number;   // inner dot diameter px
+  ringSize:     number;   // outer glow ring diameter px
+  ringOpacity:  number;   // glow ring opacity
+  ringBlur:     number;   // glow blur radius px
+  label?:       string;   // optional text label (e.g. "VIEW", "↔", "🌸")
+  labelSize:    number;   // label font size px
+  ringColor:    string;   // glow ring color
+  dotColor:     string;   // inner dot color
+  dotScale:     number;   // inner dot scale multiplier on this mode
+  ringScale:    number;   // ring scale multiplier on this mode
+  mixBlendMode?: string;  // CSS mix-blend-mode — "difference" for blob inversion effect
 }
 
 const MODE_STYLES: Record<CursorMode, ModeStyle> = {
@@ -73,6 +75,28 @@ const MODE_STYLES: Record<CursorMode, ModeStyle> = {
     ringOpacity: 1, ringBlur: 4,
     label: undefined, labelSize: 0,
     dotScale: 1, ringScale: 0.8,
+  },
+
+  // ── Blob ──────────────────────────────────────────────────────
+  // Large white circle with mix-blend-mode: difference.
+  // The "difference" blend inverts whatever colour is underneath the cursor —
+  // dark text becomes light, light bg becomes dark. Zero extra logic needed,
+  // pure CSS does the inversion automatically.
+  // Best on: large display headings with high contrast text.
+  blob: {
+    dotSize:      0,
+    ringSize:     110,
+    dotColor:     "transparent",
+    // White is required for mix-blend-mode:difference to produce true inversion.
+    // Any other colour produces a tinted inversion instead.
+    ringColor:    "rgba(181, 114, 74, 0.35)",
+    ringOpacity:  1,
+    ringBlur:     0,
+    label:        undefined,
+    labelSize:    0,
+    dotScale:     0,
+    ringScale:    1,
+    mixBlendMode: "normal",
   },
 };
 
@@ -155,6 +179,9 @@ const CursorDot = () => {
           y:             ringY,
           translateX:    "-50%",
           translateY:    "-50%",
+          // ADDED: mixBlendMode from mode config — "difference" for blob,
+          // undefined (normal) for all other modes. This is the inversion trick.
+          mixBlendMode:  (style.mixBlendMode as React.CSSProperties["mixBlendMode"]) ?? "normal",
         }}
         animate={{
           width:        style.ringSize,
@@ -162,7 +189,7 @@ const CursorDot = () => {
           background:   style.ringColor,
           opacity:      style.ringOpacity,
           filter:       `blur(${style.ringBlur}px)`,
-          borderRadius: style.label ? "50%" : "50%",
+          borderRadius: "50%",
           scale:        style.ringScale,
         }}
         transition={{ duration: 0.2, ease: "easeOut" }}

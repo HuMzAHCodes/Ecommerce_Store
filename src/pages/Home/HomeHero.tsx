@@ -12,6 +12,8 @@ import {
   floatDownVariant,
 } from "./animations";
 import { AVATAR_COLORS } from "./constants";
+// ADDED: blob cursor for hero headline
+import useCursor from "../../components/cursor/useCursor";
 
 /** Parallax blobs rendered behind the hero content */
 const HeroBackground = ({ y }: { y: MotionValue<string> }) => {
@@ -64,6 +66,11 @@ const SocialProof = () => {
 /** Left column — badge, headline, body copy, CTA buttons, social proof */
 const HeroCopy = () => {
   const { colors, typography, radius, shadows, transitions } = useTheme();
+
+  // ADDED: blob cursor — expands to a large white circle with mix-blend-mode:difference
+  // on the headline, inverting the text colour underneath for a premium editorial feel.
+  // Only applied to the h1 — badge and buttons will get their own cursor modes later.
+  const blobCursor = useCursor("blob");
   return (
     <motion.div variants={staggerContainerVariant} initial="hidden" animate="visible">
 
@@ -75,12 +82,24 @@ const HeroCopy = () => {
       </motion.div>
 
       {/* Headline */}
+      {/* ADDED: blobCursor.handlers spread here — onMouseEnter triggers blob mode,
+          onMouseLeave returns to default. cursor:"none" lets CursorDot take over. */}
       <motion.h1
         variants={fadeUpVariant}
-        style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, lineHeight: 1.1, marginBottom: "1.25rem", fontWeight: typography.weightBold, fontStyle: "italic", letterSpacing: "-0.01em" }}
+        {...blobCursor.handlers}
+        style={{ fontFamily: typography.fontDisplay,
+           color: colors.textPrimary,
+            lineHeight: 1.1,
+             marginBottom: "1.25rem",
+              fontWeight: typography.weightBold,
+               fontStyle: "italic",
+                letterSpacing: "-0.01em",
+                 cursor: "none",
+                 display: "inline-block"
+                 }}
       >
-        Simple.<br />
-        <span style={{ fontStyle: "normal", fontWeight: typography.weightBold }}>Clean.</span><br />
+        Simple,<br />
+        <span style={{ fontStyle: "normal", fontWeight: typography.weightBold }}>Clean,</span><br />
         Beautiful.
       </motion.h1>
 
@@ -124,13 +143,13 @@ const HeroVisual = () => {
       {/* Main product card */}
       <div style={{ width: 340, height: 420, borderRadius: radius?.xl, background: `linear-gradient(145deg, ${colors.accentLight}, ${colors.bgSecondary})`, boxShadow: shadows?.xl, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
         <img 
-          src="/images/products/rose-toner/rose-toner.jpeg" 
-          alt="rose-toner" 
+          src="/images/products/radiance-serum/radiance-serum.jpeg" 
+          alt="Radiance Serum" 
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "1.25rem", background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))", textAlign: "center" }}>
-          <p style={{ fontFamily: typography.fontDisplay, fontSize: typography["xl"], color: "#fff", fontStyle: "italic", margin: 0 }}>Rose Toner</p>
-          <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: "rgba(255,255,255,0.8)", marginTop: 4, marginBottom: 0 }}>250ml · Clean formula</p>
+          <p style={{ fontFamily: typography.fontDisplay, fontSize: typography["xl"], color: "#fff", fontStyle: "italic", margin: 0 }}>Radiance Serum</p>
+          <p style={{ fontFamily: typography.fontBody, fontSize: typography.xs, color: "rgba(255,255,255,0.8)", marginTop: 4, marginBottom: 0 }}>30ml · Clean formula</p>
         </div>
       </div>
 
@@ -173,9 +192,7 @@ const HomeHero = () => {
     >
       <HeroBackground y={heroY} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", 
-        padding: isMobile ? "2rem 1.25rem" : "2.3rem 3.2rem",
-        display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems: "center", width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: isMobile ? "2rem 1.25rem" : "3rem 1.5rem", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2rem" : "4rem", alignItems: "center", width: "100%" }}>
         <HeroCopy />
         <HeroVisual />
       </div>
