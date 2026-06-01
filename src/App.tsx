@@ -17,21 +17,21 @@ import CartDrawer from "./components/cart/CartDrawer";
 
 
 
-const Home         = lazy(() => import("./pages/Home/Home"));
-const Shop         = lazy(() => import("./pages/Shop/Shop"));
-const ProductPage  = lazy(() => import("./pages/ProductPage/ProductPage"));
-const Cart         = lazy(() => import("./pages/Cart/Cart"));
-const Checkout     = lazy(() => import("./pages/Checkout/Checkout"));
-const OrderSuccess = lazy(() => import("./pages/OrderSuccess/OrderSuccess"));
-const Login        = lazy(() => import("./pages/Login/Login"));
-const Register     = lazy(() => import("./pages/Register/Register"));
-const Profile      = lazy(() => import("./pages/Profile/Profile"));
-const AccountProfile = lazy(() => import("./pages/AccountProfile"));
-const Orders       = lazy(() => import("./pages/Orders/Orders"));
-const Wishlist     = lazy(() => import("./pages/Wishlist/Wishlist"));
-const About        = lazy(() => import("./pages/About/About"));
-const Collections  = lazy(() => import("./pages/Collections/Collections"));
-const NotFound     = lazy(() => import("./pages/NotFound/NotFound"));
+import Home            from "./pages/Home/Home";
+import Shop            from "./pages/Shop/Shop";
+import ProductPage     from "./pages/ProductPage/ProductPage";
+import Cart            from "./pages/Cart/Cart";
+import Checkout        from "./pages/Checkout/Checkout";
+import OrderSuccess    from "./pages/OrderSuccess/OrderSuccess";
+import Login           from "./pages/Login/Login";
+import Register        from "./pages/Register/Register";
+import Profile         from "./pages/Profile/Profile";
+import AccountProfile  from "./pages/AccountProfile";
+import Orders          from "./pages/Orders/Orders";
+import Wishlist        from "./pages/Wishlist/Wishlist";
+import About           from "./pages/About/About";
+import Collections     from "./pages/Collections/Collections";
+import NotFound        from "./pages/NotFound/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
