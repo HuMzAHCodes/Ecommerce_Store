@@ -46,9 +46,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Apply 3–4 drops to cleansed skin morning and evening. Gently pat into face and neck. Follow with moisturiser. Use SPF in the morning.",
     images: [
-      { bg: "/images/products/radiance-serum/radiance-serum.jpeg", label: "Front"  },
-      { bg: "/images/products/radiance-serum/radiance-serum-top.jpeg", label: "Texture" },
-      { bg: "/images/products/radiance-serum/radiance-serum-side.jpeg", label: "Detail" },
+      { bg: "/images/products/radiance-serum/radiance-serum.webp", label: "Front"  },
+      { bg: "/images/products/radiance-serum/radiance-serum-top.webp", label: "Texture" },
+      { bg: "/images/products/radiance-serum/radiance-serum-side.webp", label: "Detail" },
     ],
     reviews: [
       { id: "r1", name: "Amara K.",  rating: 5, date: "May 2025", body: "Genuinely the best serum I've ever used. My skin is glowing after just two weeks." },
@@ -75,9 +75,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Mist onto face before skincare, after makeup application, or anytime throughout the day for an instant pick-me-up.",
     images: [
-      { bg: "/images/products/glow-face-mist/glow-face-mist.jpeg", label: "Front" },
-      { bg: "/images/products/glow-face-mist/glow-face-mist-top.jpeg", label: "top" },
-       { bg: "/images/products/glow-face-mist/glow-face-mist-close.jpeg", label: "close" },
+      { bg: "/images/products/glow-face-mist/glow-face-mist.webp", label: "Front" },
+      { bg: "/images/products/glow-face-mist/glow-face-mist-top.webp", label: "top" },
+       { bg: "/images/products/glow-face-mist/glow-face-mist-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r4", name: "Emma T.", rating: 5, date: "May 2025", body: "Keep this on my desk and spray it all day long. Incredibly hydrating!" },
@@ -103,9 +103,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Massage generously into clean skin all over the body, paying extra attention to dry areas like elbows and knees.",
     images: [
-      { bg: "/images/products/velvet-body-butter/velvet-body-butter.jpeg", label: "Front" },
-      { bg: "/images/products/velvet-body-butter/velvet-body-butter-top.jpeg", label: "top" },
-      { bg: "/images/products/velvet-body-butter/velvet-body-butter-close.jpeg", label: "close" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter.webp", label: "Front" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter-top.webp", label: "top" },
+      { bg: "/images/products/velvet-body-butter/velvet-body-butter-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r6", name: "Sarah L.", rating: 5, date: "May 2025", body: "Honestly feels like velvet. Smells incredible too!" },
@@ -129,9 +129,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "After cleansing, sweep over face and neck using a cotton pad, or pat directly into the skin using clean hands.",
     images: [
-      { bg: "/images/products/rose-toner/rose-toner.jpeg", label: "Front" },
-      { bg: "/images/products/rose-toner/rose-toner-top.jpeg", label: "top" },
-      { bg: "/images/products/rose-toner/rose-toner-close.jpeg", label: "close" },
+      { bg: "/images/products/rose-toner/rose-toner.webp", label: "Front" },
+      { bg: "/images/products/rose-toner/rose-toner-top.webp", label: "top" },
+      { bg: "/images/products/rose-toner/rose-toner-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r7", name: "Diana B.", rating: 5, date: "Mar 2025", body: "Super gentle and smells like real roses. My skin loves this." },
@@ -155,9 +155,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Apply generously to face and neck 15 minutes before sun exposure as the final step of your morning skincare routine.",
     images: [
-      { bg: "/images/products/could-cream-spf/cloud-cream-spf.jpeg", label: "Front" },
-      { bg: "/images/products/could-cream-spf/cloud-cream-spf-top.jpeg", label: "top" },
-       { bg: "/images/products/could-cream-spf/cloud-cream-spf-close.jpeg", label: "close" },
+      { bg: "/images/products/could-cream-spf/cloud-cream-spf.webp", label: "Front" },
+      { bg: "/images/products/could-cream-spf/cloud-cream-spf-top.webp", label: "top" },
+       { bg: "/images/products/could-cream-spf/cloud-cream-spf-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r8", name: "Jessica K.", rating: 5, date: "May 2025", body: "Finally an SPF that doesn't break me out! Lightweight and invisible." },
@@ -181,9 +181,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Use the day balm throughout the day as needed. Apply a generous layer of the night mask before bed to wake up to soft, plump lips.",
     images: [
-      { bg: "/images/products/lip-treatment-set/lip-treatment-set.jpeg", label: "Front" },
-        { bg: "/images/products/lip-treatment-set/lip-treatment-set-top.jpeg", label: "top" },
-          { bg: "/images/products/lip-treatment-set/lip-treatment-set-close.jpeg", label: "close" },
+      { bg: "/images/products/lip-treatment-set/lip-treatment-set.webp", label: "Front" },
+        { bg: "/images/products/lip-treatment-set/lip-treatment-set-top.webp", label: "top" },
+          { bg: "/images/products/lip-treatment-set/lip-treatment-set-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r9", name: "Celine W.", rating: 5, date: "Apr 2025", body: "My dry lips were healed in one night. This set is a absolute must-have." },
@@ -207,9 +207,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Apply an even layer to clean skin, avoiding the eye area. Leave on for 10 minutes until dry. Rinse thoroughly with warm water.",
     images: [
-      { bg: "/images/products/deep-clean-mask/deep-clean-mask.jpeg", label: "Front" },
-      { bg: "/images/products/deep-clean-mask/deep-clean-mask-top.jpeg", label: "top" },
-      { bg: "/images/products/deep-clean-mask/deep-clean-mask-close.jpeg", label: "close" },
+      { bg: "/images/products/deep-clean-mask/deep-clean-mask.webp", label: "Front" },
+      { bg: "/images/products/deep-clean-mask/deep-clean-mask-top.webp", label: "top" },
+      { bg: "/images/products/deep-clean-mask/deep-clean-mask-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r10", name: "Nathan S.", rating: 5, date: "May 2025", body: "My skin feels so clean and smooth after using this. Doesn't feel tight at all." },
@@ -233,9 +233,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Mix 1–2 drops into your serum or moisturizer, or apply directly to clean skin before heavier creams.",
     images: [
-      { bg: "/images/products/vitamin-c-booster/vitamin-c-booster.jpeg", label: "Front" },
-        { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-top.jpeg", label: "top" },
-         { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-close.jpeg", label: "close" },
+      { bg: "/images/products/vitamin-c-booster/vitamin-c-booster.webp", label: "Front" },
+        { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-top.webp", label: "top" },
+         { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r11", name: "Rachel F.", rating: 5, date: "May 2025", body: "This is a miracle worker. My acne scars faded so fast." },
@@ -259,9 +259,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Apply 2–3 drops to face and neck as the final step of your nighttime routine. Press gently into the skin.",
     images: [
-       { bg: "/images/products/overnight-recovery/overnight-recovery.jpeg", label: "Front" },
-       { bg: "/images/products/overnight-recovery/overnight-recovery-top.jpeg", label: "top" },
-       { bg: "/images/products/overnight-recovery/overnight-recovery-close.jpeg", label: "close" },
+       { bg: "/images/products/overnight-recovery/overnight-recovery.webp", label: "Front" },
+       { bg: "/images/products/overnight-recovery/overnight-recovery-top.webp", label: "top" },
+       { bg: "/images/products/overnight-recovery/overnight-recovery-close.webp", label: "close" },
 
     ],
     reviews: [
@@ -286,9 +286,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Gently pat a small amount around the orbital bone using your ring finger, morning and night.",
     images: [
-     { bg: "/images/products/calming-eye-cream/calming-eye-cream.jpeg", label: "Front" },
-      { bg: "/images/products/calming-eye-cream/calming-eye-cream-side.jpeg", label: "side" },
-       { bg: "/images/products/calming-eye-cream/calming-eye-cream-top.jpeg", label: "top" },
+     { bg: "/images/products/calming-eye-cream/calming-eye-cream.webp", label: "Front" },
+      { bg: "/images/products/calming-eye-cream/calming-eye-cream-side.webp", label: "side" },
+       { bg: "/images/products/calming-eye-cream/calming-eye-cream-top.webp", label: "top" },
     ],
     reviews: [
       { id: "r13", name: "Lily H.", rating: 4, date: "Apr 2025", body: "Really soothing and works wonders on morning puffiness." },
@@ -312,9 +312,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Pour a few drops into palms and gently press onto face and neck immediately after cleansing, before serums.",
     images: [
-      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence.jpeg", label: "Front" },
-      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-top.jpeg", label: "top" },
-      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-close.jpeg", label: "close" },
+      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence.webp", label: "Front" },
+      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-top.webp", label: "top" },
+      { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r14", name: "Hannah P.", rating: 5, date: "May 2025", body: "My skin is so hydrated now. Plumps up fine lines beautifully." },
@@ -338,9 +338,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Light the botanical candle, mist your face, and indulge in our body butter for a complete sensory wellness ritual.",
     images: [
-      { bg: "/images/products/wellness-bundle/wellness-bundle.jpeg", label: "Front" },
-       { bg: "/images/products/wellness-bundle/wellness-bundle-top.jpeg", label: "top" },
-        { bg: "/images/products/wellness-bundle/wellness-bundle-close.jpeg", label: "close" },
+      { bg: "/images/products/wellness-bundle/wellness-bundle.webp", label: "Front" },
+       { bg: "/images/products/wellness-bundle/wellness-bundle-top.webp", label: "top" },
+        { bg: "/images/products/wellness-bundle/wellness-bundle-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r15", name: "Sophia K.", rating: 5, date: "May 2025", body: "Bought this for myself and it's the absolute best. Beautiful packaging too!" },
@@ -364,9 +364,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Use Rose Toner after cleansing, follow with Radiance Serum, and gently exfoliate with the muslin cloth.",
     images: [
-      { bg: "/images/products/glow-gift-set/glow-gift-set.jpeg", label: "Front" },
-      { bg: "/images/products/glow-gift-set/glow-gift-set-top.jpeg", label: "top" },
-      { bg: "/images/products/glow-gift-set/glow-gift-set-close.jpeg", label: "close" },
+      { bg: "/images/products/glow-gift-set/glow-gift-set.webp", label: "Front" },
+      { bg: "/images/products/glow-gift-set/glow-gift-set-top.webp", label: "top" },
+      { bg: "/images/products/glow-gift-set/glow-gift-set-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r16", name: "Amelie G.", rating: 5, date: "May 2025", body: "Gifted this to my mom and she loved it. The presentation is so premium." },
@@ -390,9 +390,9 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     howToUse: "Follow the mini routines inside the pouch: Cleanse, Tone, Mist, and Glow on the go.",
     images: [
-      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit.jpeg", label: "Front" },
-      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-top.jpeg", label: "top" },
-      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-close.jpeg", label: "close" },
+      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit.webp", label: "Front" },
+      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-top.webp", label: "top" },
+      { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-close.webp", label: "close" },
     ],
     reviews: [
       { id: "r17", name: "Nico L.", rating: 5, date: "May 2025", body: "Fantastic value. Great way to sample everything before committing to full sizes." },

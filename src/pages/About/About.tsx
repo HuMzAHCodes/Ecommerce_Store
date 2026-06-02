@@ -7,11 +7,11 @@ import { useIsMobile } from "../../hooks/useMediaQuery";
 // ── Image placeholders — replace with your generated images ───
 const IMAGES = {
   heroBanner:   "/images/products/about/hero-banner.webp",
-  mission:      "/images/products/about/mission.jpeg",
-  valueClean:   "/images/products/about/value-clean-ingredients.jpeg",
-  valueDerm:    "/images/products/about/value-dermatologist.jpeg",
-  valueCruelty: "/images/products/about/value-cruelty-free.jpeg",
-  valueSustain: "/images/products/about/value-sustainable.jpeg",
+  mission:      "/images/products/about/mission.webp",
+  valueClean:   "/images/products/about/value-clean-ingredients.webp",
+  valueDerm:    "/images/products/about/value-dermatologist.webp",
+  valueCruelty: "/images/products/about/value-cruelty-free.webp",
+  valueSustain: "/images/products/about/value-sustainable.webp",
 };
 
 // ── Data ──────────────────────────────────────────────────────
