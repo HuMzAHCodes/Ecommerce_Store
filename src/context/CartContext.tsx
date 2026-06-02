@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
+import { useAuth } from "./AuthContext";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -19,6 +20,7 @@ export interface CartItem {
 interface CartState {
   items:    CartItem[];
   isOpen:   boolean;
+  userId?:  string | null;
 }
 
 type CartAction =
@@ -29,7 +31,7 @@ type CartAction =
   | { type: "TOGGLE_DRAWER" }
   | { type: "OPEN_DRAWER" }
   | { type: "CLOSE_DRAWER" }
-  | { type: "HYDRATE";       payload: CartItem[] };
+  | { type: "HYDRATE";       payload: { items: CartItem[]; userId: string | null } };
 
 interface CartContextValue extends CartState {
   addItem:       (product: CartProduct) => void;
@@ -93,7 +95,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return { ...state, isOpen: false };
 
     case "HYDRATE":
-      return { ...state, items: action.payload };
+      return { ...state, items: action.payload.items, userId: action.payload.userId };
 
     default:
       return state;
@@ -112,23 +114,30 @@ export const useCart = (): CartContextValue => {
 
 // ── Provider ──────────────────────────────────────────────────
 
-const STORAGE_KEY = "blum_cart";
-
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
+  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false, userId: undefined });
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount/user change
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) dispatch({ type: "HYDRATE", payload: JSON.parse(saved) });
-    } catch { /* ignore */ }
-  }, []);
+      const storageKey = userId ? `blum_cart_${userId}` : "blum_cart_guest";
+      const saved = localStorage.getItem(storageKey);
+      const items = saved ? JSON.parse(saved) : [];
+      dispatch({ type: "HYDRATE", payload: { items, userId } });
+    } catch {
+      dispatch({ type: "HYDRATE", payload: { items: [], userId } });
+    }
+  }, [userId]);
 
-  // Persist to localStorage on every change
+  // Persist to localStorage on every change (only if matching the currently hydrated user)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-  }, [state.items]);
+    if (state.userId === userId) {
+      const storageKey = userId ? `blum_cart_${userId}` : "blum_cart_guest";
+      localStorage.setItem(storageKey, JSON.stringify(state.items));
+    }
+  }, [state.items, state.userId, userId]);
 
   // ── Derived values ────────────────────────────────────────
   const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0);

@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { useTheme } from "../../theme/ThemeContext";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../components/ui/Toast";
+import { useAuth } from "../../context/AuthContext";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { INITIAL_SHIPPING, INITIAL_PAYMENT, type Step, type ShippingForm, type PaymentForm } from "./types";
 import { validateShipping, validatePayment, isValid, type FormErrors } from "./validation";
@@ -31,6 +32,8 @@ const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
   const toast    = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
   const [currentStep, setCurrentStep] = useState<Step>("shipping");
   const [isPlacing,   setIsPlacing]   = useState(false);
@@ -77,7 +80,8 @@ const Checkout = () => {
 
     // Save to localStorage under blum_orders using the Order shape expected by OrderCard
     try {
-      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const storageKey = userId ? `blum_orders_${userId}` : "blum_orders_guest";
+      const existingOrdersStr = localStorage.getItem(storageKey);
       const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
       const ordersItemForLocalStorage = {
         id: newOrder.id,
@@ -90,7 +94,7 @@ const Checkout = () => {
           price: item.product.salePrice ?? item.product.price
         }))
       };
-      localStorage.setItem("blum_orders", JSON.stringify([ordersItemForLocalStorage, ...existingOrders]));
+      localStorage.setItem(storageKey, JSON.stringify([ordersItemForLocalStorage, ...existingOrders]));
     } catch (e) {
       console.error("Failed to save order to localStorage", e);
     }

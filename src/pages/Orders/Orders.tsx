@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme }    from "../../theme/ThemeContext";
+import { useAuth }     from "../../context/AuthContext";
 import OrdersHeader    from "./OrdersHeader";
 import OrderCard       from "./OrderCard";
 import OrdersEmpty     from "./OrdersEmpty";
@@ -11,16 +12,19 @@ import { MOCK_ORDERS, type Order } from "./ordersData";
 const Orders = () => {
   const { colors } = useTheme();
   const [orders, setOrders] = useState<Order[]>([]);
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
   useEffect(() => {
     try {
-      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const storageKey = userId ? `blum_orders_${userId}` : "blum_orders_guest";
+      const existingOrdersStr = localStorage.getItem(storageKey);
       const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
       setOrders([...existingOrders, ...MOCK_ORDERS]);
     } catch {
       setOrders(MOCK_ORDERS);
     }
-  }, []);
+  }, [userId]);
 
   const hasOrders  = orders.length > 0;
 

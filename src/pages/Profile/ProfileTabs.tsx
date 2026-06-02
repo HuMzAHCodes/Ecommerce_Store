@@ -9,6 +9,7 @@ import { MOCK_ORDERS, type Order } from "../Orders/ordersData";
 import { useWishlist } from "../../context/WishlistContext";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../components/ui/Toast";
+import { useAuth } from "../../context/AuthContext";
 import WishlistGrid from "../Wishlist/WishlistGrid";
 
 interface AccountTabProps {
@@ -65,16 +66,19 @@ export const AccountTab = ({ userName, userEmail }: AccountTabProps) => {
 export const OrdersTab = () => {
   const { colors, typography } = useTheme();
   const [orders, setOrders] = useState<Order[]>([]);
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
   useEffect(() => {
     try {
-      const existingOrdersStr = localStorage.getItem("blum_orders");
+      const storageKey = userId ? `blum_orders_${userId}` : "blum_orders_guest";
+      const existingOrdersStr = localStorage.getItem(storageKey);
       const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
       setOrders([...existingOrders, ...MOCK_ORDERS]);
     } catch {
       setOrders(MOCK_ORDERS);
     }
-  }, []);
+  }, [userId]);
 
   return (
     <div>
