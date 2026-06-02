@@ -21,19 +21,16 @@ const FooterLinkColumn = ({ heading, links }: FooterLinkColumnProps) => {
         {heading}
       </h4>
 
-      <nav style={columnNavStyles}>
-        {links.map((link) => (
-          <Link
-            key={link.label}
-            to={link.href}
-            style={columnLinkStyles(typography, butterSoft, transitions)}
-            onMouseEnter={(e) => { e.currentTarget.style.color = butter;     }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = butterSoft; }}
-          >
-            {link.label}
-          </Link>
-        ))}
-      </nav>
+    <nav style={columnNavStyles}>
+  {links.map((link) => (
+    <div
+      key={link.label}
+      style={columnLinkStyles(typography, butterSoft, transitions)}
+    >
+      {link.label}
+    </div>
+  ))}
+</nav>
     </div>
   );
 };
