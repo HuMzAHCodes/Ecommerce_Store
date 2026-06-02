@@ -8,12 +8,6 @@ export const NAV_LINKS: NavLink[] = [
   {
     label: "Shop",
     href:  "/shop",
-    children: [
-      { label: "All Products", href: "/shop" },
-      { label: "New Arrivals", href: "/shop?filter=new" },
-      { label: "Sale",         href: "/shop?filter=sale" },
-      { label: "Best Sellers", href: "/shop?filter=bestsellers" },
-    ],
   },
   {
     label: "Collections",
