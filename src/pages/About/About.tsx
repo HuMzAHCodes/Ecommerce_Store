@@ -6,12 +6,12 @@ import { useIsMobile } from "../../hooks/useMediaQuery";
 
 // ── Image placeholders — replace with your generated images ───
 const IMAGES = {
-  heroBanner:   "/images/about/hero-banner.jpg",
-  mission:      "/images/about/mission.jpg",
-  valueClean:   "/images/about/value-clean-ingredients.jpg",
-  valueDerm:    "/images/about/value-dermatologist.jpg",
-  valueCruelty: "/images/about/value-cruelty-free.jpg",
-  valueSustain: "/images/about/value-sustainable.jpg",
+  heroBanner:   "/images/about/hero-banner.jpeg",
+  mission:      "/images/about/mission.jpeg",
+  valueClean:   "/images/about/value-clean-ingredients.jpeg",
+  valueDerm:    "/images/about/value-dermatologist.jpeg",
+  valueCruelty: "/images/about/value-cruelty-free.jpeg",
+  valueSustain: "/images/about/value-sustainable.jpeg",
 };
 
 // ── Data ──────────────────────────────────────────────────────
