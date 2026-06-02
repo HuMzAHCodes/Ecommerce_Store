@@ -4,9 +4,9 @@ import { motion }   from "framer-motion";
 import { useTheme } from "../../theme/ThemeContext";
 import useRegister  from "./useRegister";
 import {
-  pageStyles,       brandLogoStyles,
+  pageStyles,          brandLogoStyles,
   brandSubtitleStyles, footerTextStyles,
-  footerLinkStyles, buildClerkAppearance,
+  footerLinkStyles,    buildClerkAppearance,
 } from "./registerStyles";
 
 // ── Component ─────────────────────────────────────────────────
@@ -34,16 +34,20 @@ const Register = () => {
         </p>
       </motion.div>
 
-      {/* Clerk SignUp — handles Google OAuth + email/password */}
+      {/* Clerk SignUp — handles Google OAuth + email/password
+          FIX: Changed routing="hash" → routing="path" + added path="/register"
+          Hash routing breaks OAuth callbacks; path routing keeps full URL intact.
+          FIX: Replaced deprecated afterSignUpUrl → fallbackRedirectUrl */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0  }}
         transition={{ duration: 0.45, delay: 0.1 }}
       >
         <SignUp
-          routing="hash"
-          signInUrl="/login"
-          afterSignUpUrl="/"
+          routing="path"          
+          path="/register"       
+          signInUrl="/login"      
+          fallbackRedirectUrl="/" 
           appearance={buildClerkAppearance(colors, typography, radius)}
         />
       </motion.div>

@@ -9,6 +9,15 @@ interface LoginSignInWidgetProps {
 /**
  * Wraps Clerk's SignIn component with the app's theme variables.
  * Handles Google OAuth and all auth flows internally.
+ *
+ * FIX: Changed routing="hash" → routing="path" + added path="/login"
+ * Hash routing strips the URL fragment during Google OAuth redirect,
+ * breaking the callback. Path routing keeps the full URL intact.
+ *
+ * FIX: Replaced deprecated afterSignInUrl → fallbackRedirectUrl
+ * fallbackRedirectUrl respects any pre-login intended destination
+ * (e.g. user tried to visit /checkout → got redirected to /login →
+ * after sign-in, Clerk sends them back to /checkout automatically)
  */
 const LoginSignInWidget = ({ redirectTo }: LoginSignInWidgetProps) => {
   const { colors, typography, radius } = useTheme();
@@ -20,9 +29,10 @@ const LoginSignInWidget = ({ redirectTo }: LoginSignInWidgetProps) => {
       transition={{ duration: 0.45, delay: 0.1 }}
     >
       <SignIn
-        routing="hash"
-        signUpUrl="/register"
-        afterSignInUrl={redirectTo}
+        routing="path"            
+        path="/login"             
+        signUpUrl="/register"     
+        fallbackRedirectUrl={redirectTo}
         appearance={{
           variables: {
             colorPrimary:         colors.accentPrimary,
