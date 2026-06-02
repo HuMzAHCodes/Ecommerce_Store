@@ -73,6 +73,8 @@ const AppInner = () => {
           <Route path="/about"                  element={<About />}        />
           <Route path="/collections"            element={<Collections />}  />
           <Route path="/collections/:category"  element={<Collections />}  />
+          <Route path="/login/*"    element={<Login />}    />
+          <Route path="/register/*" element={<Register />} />
           <Route path="/account/profile" element={<ProtectedRoute> <AccountProfile /></ProtectedRoute>
 }/>
 
