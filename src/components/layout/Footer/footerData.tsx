@@ -4,7 +4,7 @@ import type { ComponentType } from "react";
 
 export interface FooterLink {
   label: string;
-  href:  string;
+  href?:  string;
 }
 
 export interface SocialEntry {
@@ -46,22 +46,22 @@ const YoutubeIcon = () => (
 
 export const FOOTER_LINKS: Record<string, FooterLink[]> = {
   Shop: [
-    { label: "New Arrivals",  href: "/shop?filter=new"         },
-    { label: "Best Sellers",  href: "/shop?filter=bestsellers" },
-    { label: "Sale",          href: "/shop?filter=sale"        },
-    { label: "All Products",  href: "/shop"                    },
+    { label: "New Arrivals",           },
+    { label: "Best Sellers",  },
+    { label: "Sale",                 },
+    { label: "All Products",                      },
   ],
   Help: [
-    { label: "FAQs",          href: "/faqs"     },
-    { label: "Shipping Info", href: "/shipping" },
-    { label: "Returns",       href: "/returns"  },
-    { label: "Track Order",   href: "/track"    },
+    { label: "FAQs",           },
+    { label: "Shipping Info", },
+    { label: "Returns",        },
+    { label: "Track Order",      },
   ],
   Company: [
-    { label: "About Us",       href: "/about"          },
-    { label: "Sustainability", href: "/sustainability"  },
-    { label: "Careers",        href: "/careers"        },
-    { label: "Press",          href: "/press"          },
+    { label: "About Us",                },
+    { label: "Sustainability",   },
+    { label: "Careers",                },
+    { label: "Press",                  },
   ],
 };
 
