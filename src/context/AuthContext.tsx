@@ -4,10 +4,7 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import {
-  useAuth  as useClerkAuth,
-  useUser  as useClerkUser,
-} from "@clerk/clerk-react";
+import { useAuth as useFirebaseAuth } from "../components/auth/AuthContext"; // adjust path if needed
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -20,35 +17,11 @@ export interface AuthUser {
 }
 
 interface AuthContextValue {
-  user:          AuthUser | null;
-  isLoggedIn:    boolean;
-  isLoading:     boolean;
-  getToken:      () => Promise<string | null>;
+  user:       AuthUser | null;
+  isLoggedIn: boolean;
+  isLoading:  boolean;
+  getToken:   () => Promise<string | null>;
 }
-
-// ── Helpers ───────────────────────────────────────────────────
-
-/**
- * Maps a Clerk user object to our internal AuthUser shape.
- * Keeps Clerk implementation details out of the rest of the app.
- */
-const mapClerkUserToAuthUser = (
-  clerkUser: ReturnType<typeof useClerkUser>["user"]
-): AuthUser | null => {
-  if (!clerkUser) return null;
-
-  const primaryEmail = clerkUser.primaryEmailAddress?.emailAddress ?? "";
-  const fullName     = clerkUser.fullName ?? clerkUser.username ?? "User";
-  const avatarUrl    = clerkUser.imageUrl;
-
-  return {
-    id:     clerkUser.id,
-    name:   fullName,
-    email:  primaryEmail,
-    avatar: avatarUrl,
-    role:   "CUSTOMER",
-  };
-};
 
 // ── Context ───────────────────────────────────────────────────
 
@@ -56,48 +29,53 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used inside <AuthProvider>");
-  }
+  if (!context) throw new Error("useAuth must be used inside <AuthProvider>");
   return context;
 };
 
 // ── Provider ──────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { isSignedIn, isLoaded, getToken: clerkGetToken } = useClerkAuth();
-  const { user: clerkUser }                                = useClerkUser();
+  const { user: firebaseUser, isLoaded, isSignedIn } = useFirebaseAuth();
 
-  // Map Clerk user → our internal shape (memoized to avoid re-renders)
-  const mappedUser = useMemo(
-    () => mapClerkUserToAuthUser(clerkUser ?? null),
-    [clerkUser]
-  );
+  // Map Firebase user → our internal AuthUser shape
+  const mappedUser = useMemo((): AuthUser | null => {
+    if (!firebaseUser) return null;
+    return {
+      id:     firebaseUser.uid,
+      name:   firebaseUser.displayName ?? firebaseUser.email ?? "User",
+      email:  firebaseUser.email ?? "",
+      avatar: firebaseUser.photoURL ?? undefined,
+      role:   "CUSTOMER",
+    };
+  }, [firebaseUser]);
 
-  // Exposes Clerk session token for future authenticated API calls
+  // Firebase doesn't use session tokens the same way —
+  // returns the Firebase ID token for authenticated API calls
   const getToken = async (): Promise<string | null> => {
     try {
-      return await clerkGetToken();
+      return firebaseUser ? await firebaseUser.getIdToken() : null;
     } catch {
       return null;
     }
   };
 
-  const contextValue: AuthContextValue = {
-    user:       mappedUser,
-    isLoggedIn: isSignedIn ?? false,
-    isLoading:  !isLoaded,
-    getToken,
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider
+      value={{
+        user:       mappedUser,
+        isLoggedIn: isSignedIn,
+        isLoading:  !isLoaded,
+        getToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export default AuthContext;
+
 
 
 

@@ -1,44 +1,33 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useClerk, useUser } from "@clerk/clerk-react";
-import { useTheme } from "../../theme/ThemeContext";
-import { useToast } from "../../components/ui/Toast";
-import { useIsMobile } from "../../hooks/useMediaQuery";
+import { useState }       from "react";
+import { useNavigate }    from "react-router-dom";
+import { motion }         from "framer-motion";
+import { useTheme }       from "../../theme/ThemeContext";
+import { useToast }       from "../../components/ui/Toast";
+import { useIsMobile }    from "../../hooks/useMediaQuery";
+import { useAuth }        from "../../components/auth/AuthContext";       // Firebase auth
 import { TABS, type TabId } from "./types";
 import { AccountTab, OrdersTab, WishlistTab, SecurityTab } from "./ProfileTabs";
 import ProfileSidebar        from "./ProfileSidebar";
 import ProfileMobileDropdown from "./ProfileMobileDropdown";
 
-/**
- * Profile page — thin orchestrator.
- *
- *  ProfileSidebar        → sticky desktop nav with user info + tab buttons
- *  ProfileMobileDropdown → mobile tab selector dropdown
- *  AccountTab            → name, email, edit profile CTA
- *  OrdersTab             → order history (empty state for now)
- *  WishlistTab           → saved items (empty state for now)
- *  SecurityTab           → OAuth info + security settings link
- */
 const Profile = () => {
   const { colors, typography, radius, shadows } = useTheme();
   const isMobile = useIsMobile();
   const toast    = useToast();
   const navigate = useNavigate();
 
-  const { signOut }         = useClerk();
-  const { user: clerkUser } = useUser();
+  const { user, logout } = useAuth();
 
   const [activeTab,     setActiveTab]     = useState<TabId>("account");
   const [mobileTabOpen, setMobileTabOpen] = useState(false);
 
-  // Derive display values from Clerk user object
-  const userName  = clerkUser?.fullName ?? clerkUser?.username ?? "User";
-  const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? "";
-  const userImage = clerkUser?.imageUrl;
+  // Derive display values from Firebase user
+  const userName  = user?.displayName ?? user?.email ?? "User";
+  const userEmail = user?.email ?? "";
+  const userImage = user?.photoURL ?? undefined;
 
   const handleSignOut = async () => {
-    await signOut();
+    await logout();
     toast.info("Signed out successfully.");
     navigate("/");
   };
@@ -48,7 +37,6 @@ const Profile = () => {
     setMobileTabOpen(false);
   };
 
-  /** Renders the content panel for the currently active tab */
   const renderActiveTab = () => {
     switch (activeTab) {
       case "account":  return <AccountTab userName={userName} userEmail={userEmail} />;
@@ -73,16 +61,15 @@ const Profile = () => {
       {/* Main content */}
       <div
         style={{
-          maxWidth:             1280,
-          margin:               "0 auto",
-          padding:              isMobile ? "1.25rem" : "2.5rem 1.5rem",
-          display:              "grid",
-          gridTemplateColumns:  isMobile ? "1fr" : "220px 1fr",
-          gap:                  isMobile ? "1.25rem" : "2rem",
-          alignItems:           "start",
+          maxWidth:            1280,
+          margin:              "0 auto",
+          padding:             isMobile ? "1.25rem" : "2.5rem 1.5rem",
+          display:             "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "220px 1fr",
+          gap:                 isMobile ? "1.25rem" : "2rem",
+          alignItems:          "start",
         }}
       >
-        {/* Nav — dropdown on mobile, sidebar on desktop */}
         {isMobile ? (
           <ProfileMobileDropdown
             activeTab={activeTab}
@@ -102,7 +89,6 @@ const Profile = () => {
           />
         )}
 
-        {/* Tab content panel — animates on tab switch */}
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 10 }}
@@ -118,6 +104,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 
