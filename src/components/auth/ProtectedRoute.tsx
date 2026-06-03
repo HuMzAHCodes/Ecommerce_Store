@@ -1,7 +1,35 @@
-import { type ReactNode }    from "react";
-import { Navigate }          from "react-router-dom";
-import LoadingSpinner        from "./LoadingSpinner";
-import useProtectedRoute     from "./useProtectedRoute";
+// import { type ReactNode }    from "react";
+// import { Navigate }          from "react-router-dom";
+// import LoadingSpinner        from "./LoadingSpinner";
+// import useProtectedRoute     from "./useProtectedRoute";
+
+// // ── Types ────────────────────────────────────────────────────
+
+// interface ProtectedRouteProps {
+//   children: ReactNode;
+// }
+
+// // ── Component ────────────────────────────────────────────────
+
+// const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+//   const { isHydrating, isUnauthenticated, intendedPath } = useProtectedRoute();
+
+//   if (isHydrating)       return <LoadingSpinner />;
+//   if (isUnauthenticated) return <Navigate to="/login" state={{ from: intendedPath }} replace />;
+
+//   return <>{children}</>;
+// };
+
+// export default ProtectedRoute;
+
+
+
+
+
+import { type ReactNode } from "react";
+import { Navigate }       from "react-router-dom";
+import LoadingSpinner     from "./LoadingSpinner";
+import useProtectedRoute  from "./useProtectedRoute";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -21,6 +49,21 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 };
 
 export default ProtectedRoute;
+
+/*
+ * ── ProtectedRoute ───────────────────────────────────────────────────────────
+ *
+ * Identical flow to the Clerk version — only the auth source changed:
+ *
+ *   1. Firebase is still resolving the session  →  show LoadingSpinner
+ *      (isLoaded comes from onAuthStateChanged in AuthContext)
+ *
+ *   2. Session resolved, user is NOT signed in  →  redirect to /login
+ *      Current pathname passed as { from } so login can bounce them back.
+ *
+ *   3. Session resolved, user IS signed in  →  render protected children
+ */
+
 
 /*
  * ── ProtectedRoute — What this folder does ──────────────────────────────────
