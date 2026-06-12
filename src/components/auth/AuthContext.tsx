@@ -15,33 +15,69 @@ import {
   type User,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import api from "../../lib/api";
 
 // ── Types ────────────────────────────────────────────────────
 
+export interface DbUser {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  role: "CUSTOMER" | "ADMIN";
+  createdAt: string;
+}
+
 interface AuthContextValue {
-  user:        User | null;
-  isLoaded:    boolean;        // true once Firebase has resolved the initial session
-  isSignedIn:  boolean;
-  login:       (email: string, password: string) => Promise<void>;
-  register:    (email: string, password: string) => Promise<void>;
+  user: User | null;
+  dbUser: DbUser | null; // MySQL user record (available after sync)
+  isLoaded: boolean;
+  isSignedIn: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   loginGoogle: () => Promise<void>;
-  logout:      () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 // ── Context ──────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// ── Sync helper ──────────────────────────────────────────────
+
+async function syncWithBackend(firebaseUser: User): Promise<DbUser | null> {
+  try {
+    const token = await firebaseUser.getIdToken();
+    const res = await api.post(
+      "/api/auth/sync",
+      {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return res.data.data as DbUser;
+  } catch (err) {
+    console.error("[AuthContext] Backend sync failed:", err);
+    return null;
+  }
+}
+
 // ── Provider ─────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user,     setUser]     = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [dbUser, setDbUser] = useState<DbUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Listen for Firebase auth state changes (replaces Clerk hydration)
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+
+      if (firebaseUser) {
+        const synced = await syncWithBackend(firebaseUser);
+        setDbUser(synced);
+      } else {
+        setDbUser(null);
+      }
+
       setIsLoaded(true);
     });
     return unsubscribe;
@@ -62,12 +98,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     await signOut(auth);
+    setDbUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        dbUser,
         isLoaded,
         isSignedIn: !!user,
         login,
