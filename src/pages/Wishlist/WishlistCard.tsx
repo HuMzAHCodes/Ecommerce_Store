@@ -14,7 +14,7 @@ interface WishlistCardProps {
     id:        string;
     name:      string;
     price:     number;
-    salePrice?: number | null;
+    salePrice?: number | null ;
     image:     string;
     slug:      string;
   };
@@ -43,16 +43,8 @@ const WishlistCard = ({
         style={cardStyles(colors, radius, shadows)}
       >
         {/* Image */}
-        <div style={{ ...cardImageAreaStyles(item.image, isMobile), overflow: "hidden" }}>
-          {(item.image.startsWith("http") || item.image.startsWith("/")) ? (
-            <img 
-              src={item.image} 
-              alt={item.name} 
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            "✨"
-          )}
+        <div style={cardImageAreaStyles(item.image, isMobile)}>
+          ✨
           <button
             onClick={() => onRemove(item.id)}
             style={removeButtonStyles(colors, radius, shadows)}

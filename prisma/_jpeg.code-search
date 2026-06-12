@@ -1,0 +1,183 @@
+# Query: .jpeg
+# ContextLines: 1
+
+92 results - 6 files
+
+src\pages\About\About.tsx:
+   8  const IMAGES = {
+   9:   heroBanner:   "/images/products/about/hero-banner.jpe",
+  10:   mission:      "/images/products/about/mission.jpeg",
+  11:   valueClean:   "/images/products/about/value-clean-ingredients.jpeg",
+  12:   valueDerm:    "/images/products/about/value-dermatologist.jpeg",
+  13:   valueCruelty: "/images/products/about/value-cruelty-free.jpeg",
+  14:   valueSustain: "/images/products/about/value-sustainable.jpeg",
+  15  };
+
+src\pages\Collections\collectionsData.ts:
+  27      banner:      "#F5DDD0",
+  28:     image:       "/images/products/skincare/skincare-banner.jpeg",
+  29    },
+
+  34      banner:      "#F5D0E8",
+  35:     image:       "/images/products/beauty/beauty-banner.jpeg",
+  36    },
+
+  41      banner:      "#D5EDD5",
+  42:     image:       "/images/products/wellness/wellness-banner.jpeg",
+  43    },
+
+  48      banner:      "#EDE0F5",
+  49:     image:       "/images/products/gift-sets/gift-sets-banner.jpeg",
+  50    },
+
+  55  export const ALL_COLLECTION_PRODUCTS: CollectionProduct[] = [
+  56:   { id:"1",  name:"Radiance Serum",       price:68,  salePrice:null, collection:"skincare", badge:"Best Seller", bg:"#F5DDD0", image:"/images/products/radiance-serum/radiance-serum.jpeg",      slug:"radiance-serum"       },
+  57:   { id:"2",  name:"Glow Face Mist",       price:42,  salePrice:35,   collection:"skincare", badge:"Sale",        bg:"#D0E8F5", image:"/images/products/glow-face-mist/glow-face-mist.jpeg",      slug:"glow-face-mist"        },
+  58:   { id:"4",  name:"Rose Toner",           price:38,  salePrice:null, collection:"skincare", badge:null,          bg:"#F5D0E8", image:"/images/products/rose-toner/rose-toner.jpeg",           slug:"rose-toner"            },
+  59:   { id:"5",  name:"Cloud Cream SPF 30",   price:72,  salePrice:null, collection:"skincare", badge:"New",         bg:"#EDE0F5", image:"/images/products/could-cream-spf/cloud-cream-spf.jpeg",      slug:"cloud-cream-spf"       },
+  60:   { id:"7",  name:"Deep Clean Mask",      price:48,  salePrice:null, collection:"skincare", badge:null,          bg:"#D0F5E8", image:"/images/products/deep-clean-mask/deep-clean-mask.jpeg",      slug:"deep-clean-mask"       },
+  61:   { id:"8",  name:"Vitamin C Booster",    price:85,  salePrice:null, collection:"skincare", badge:"Best Seller", bg:"#F5F0D0", image:"/images/products/vitamin-c-booster/vitamin-c-booster.jpeg", slug:"vitamin-c-booster"     },
+  62:   { id:"9",  name:"Overnight Recovery",   price:92,  salePrice:75,   collection:"skincare", badge:"Sale",        bg:"#E8D0F5", image:"/images/products/overnight-recovery/overnight-recovery.jpeg", slug:"overnight-recovery"    },
+  63:   { id:"11", name:"Hydra Boost Essence",  price:65,  salePrice:null, collection:"skincare", badge:null,          bg:"#F5D8D0", image:"/images/products/hydra-boost-essence/hydra-boost-essence.jpeg", slug:"hydra-boost-essence"   },
+  64:   { id:"6",  name:"Lip Treatment Set",    price:34,  salePrice:28,   collection:"beauty",   badge:"Sale",        bg:"#F5EDD0", image:"/images/products/lip-treatment-set/lip-treatment-set.jpeg",    slug:"lip-treatment-set"     },
+  65:   { id:"10", name:"Calming Eye Cream",    price:58,  salePrice:null, collection:"beauty",   badge:"New",         bg:"#D0EAF5", image:"/images/products/calming-eye-cream/calming-eye-cream.jpeg", slug:"calming-eye-cream"     },
+  66:   { id:"3",  name:"Velvet Body Butter",   price:55,  salePrice:null, collection:"wellness", badge:"New",         bg:"#D5EDD5", image:"/images/products/velvet-body-butter/velvet-body-butter.jpeg",   slug:"velvet-body-butter"    },
+  67:   { id:"12", name:"Wellness Bundle",      price:120, salePrice:99,   collection:"wellness", badge:"Sale",        bg:"#D0F5D0", image:"/images/products/wellness-bundle/wellness-bundle.jpeg", slug:"wellness-bundle"       },
+  68:   { id:"13", name:"Glow Gift Set",        price:95,  salePrice:null, collection:"gifts",    badge:"New",         bg:"#EDE0F5", image:"/images/products/glow-gift-set/glow-gift-set.jpeg", slug:"glow-gift-set"         },
+  69:   { id:"14", name:"Skincare Starter Kit", price:75,  salePrice:null, collection:"gifts",    badge:null,          bg:"#F5DDD0", image:"/images/products/skincare-starter-kit/skincare-starter-kit.jpeg", slug:"skincare-starter-kit"  },
+  70  ];
+
+src\pages\Home\constants.ts:
+  31      href: "/collections/skincare",
+  32:     image: "/images/products/skincare/skincare.jpeg",
+  33      desc: "Clean formulas",
+
+  37      href: "/collections/beauty",
+  38:     image: "/images/products/beauty/beauty.jpeg",
+  39      desc: "Effortless glow",
+
+  43      href: "/collections/wellness",
+  44:     image: "/images/products/wellness/wellness.jpeg",
+  45      desc: "Feel-good rituals",
+
+  49      href: "/collections/gifts",
+  50:     image:  "/images/products/gift-sets/gift-sets.jpeg",
+  51      desc: "Beautifully curated",
+
+  55  export const FEATURED: FeaturedProduct[] = [
+  56:   { id: "1", name: "Radiance Serum",     price: 68, salePrice: null, badge: "Best Seller", bg: "#FFEFB3", image: "/images/products/radiance-serum/radiance-serum.jpeg", slug: "radiance-serum" },
+  57:   { id: "2", name: "Glow Face Mist",     price: 42, salePrice: 35,  badge: "Sale",        bg: "#C5E8E3", image: "/images/products/glow-face-mist/glow-face-mist.jpeg", slug: "glow-face-mist" },
+  58:   { id: "3", name: "Velvet Body Butter", price: 55, salePrice: null, badge: "New",         bg: "#FFF5D0", image: "/images/products/velvet-body-butter/velvet-body-butter.jpeg", slug: "velvet-body-butter" },
+  59:   { id: "4", name: "Rose Toner",         price: 38, salePrice: null, badge: null,          bg: "#A8D9D2", image: "/images/products/rose-toner/rose-toner.jpeg", slug: "rose-toner" },
+  60:   { id: "5", name: "Cloud Cream SPF 30", price: 72, salePrice: null, badge: "New",         bg: "#FFF9E8", image: "/images/products/could-cream-spf/cloud-cream-spf.jpeg", slug: "cloud-cream-spf" },
+  61:   { id: "6", name: "Lip Treatment Set",  price: 34, salePrice: 28,  badge: "Sale",        bg: "#E6F4F2", image: "/images/products/lip-treatment-set/lip-treatment-set.jpeg", slug: "lip-treatment-set" },
+  62:   { id: "7", name: "Deep Clean Mask",    price: 48, salePrice: null, badge: null,          bg: "#B8E8E3", image: "/images/products/deep-clean-mask/deep-clean-mask.jpeg",         slug: "deep-clean-mask",    },
+  63: { id: "8", name: "Vitamin C Booster",  price: 85, salePrice: null, badge: "Best Seller", bg: "#FFF0B8", image: "/images/products/vitamin-c-booster/vitamin-c-booster.jpeg",     slug: "vitamin-c-booster",  },
+  64: { id: "9", name: "Overnight Recovery", price: 92, salePrice: 75,  badge: "Sale",        bg: "#9ECFC6", image: "/images/products/overnight-recovery/overnight-recovery.jpeg",   slug: "overnight-recovery", },
+  65  ];
+
+src\pages\Home\HomeHero.tsx:
+  145          <img 
+  146:           src="/images/products/rose-toner/rose-toner.jpeg" 
+  147            alt="rose-toner" 
+
+src\pages\ProductPage\productData.ts:
+   48      images: [
+   49:       { bg: "/images/products/radiance-serum/radiance-serum.jpeg", label: "Front"  },
+   50:       { bg: "/images/products/radiance-serum/radiance-serum-top.jpeg", label: "Texture" },
+   51:       { bg: "/images/products/radiance-serum/radiance-serum-side.jpeg", label: "Detail" },
+   52      ],
+
+   77      images: [
+   78:       { bg: "/images/products/glow-face-mist/glow-face-mist.jpeg", label: "Front" },
+   79:       { bg: "/images/products/glow-face-mist/glow-face-mist-top.jpeg", label: "top" },
+   80:        { bg: "/images/products/glow-face-mist/glow-face-mist-close.jpeg", label: "close" },
+   81      ],
+
+  105      images: [
+  106:       { bg: "/images/products/velvet-body-butter/velvet-body-butter.jpeg", label: "Front" },
+  107:       { bg: "/images/products/velvet-body-butter/velvet-body-butter-top.jpeg", label: "top" },
+  108:       { bg: "/images/products/velvet-body-butter/velvet-body-butter-close.jpeg", label: "close" },
+  109      ],
+
+  131      images: [
+  132:       { bg: "/images/products/rose-toner/rose-toner.jpeg", label: "Front" },
+  133:       { bg: "/images/products/rose-toner/rose-toner-top.jpeg", label: "top" },
+  134:       { bg: "/images/products/rose-toner/rose-toner-close.jpeg", label: "close" },
+  135      ],
+
+  157      images: [
+  158:       { bg: "/images/products/could-cream-spf/cloud-cream-spf.jpeg", label: "Front" },
+  159:       { bg: "/images/products/could-cream-spf/cloud-cream-spf-top.jpeg", label: "top" },
+  160:        { bg: "/images/products/could-cream-spf/cloud-cream-spf-close.jpeg", label: "close" },
+  161      ],
+
+  183      images: [
+  184:       { bg: "/images/products/lip-treatment-set/lip-treatment-set.jpeg", label: "Front" },
+  185:         { bg: "/images/products/lip-treatment-set/lip-treatment-set-top.jpeg", label: "top" },
+  186:           { bg: "/images/products/lip-treatment-set/lip-treatment-set-close.jpeg", label: "close" },
+  187      ],
+
+  209      images: [
+  210:       { bg: "/images/products/deep-clean-mask/deep-clean-mask.jpeg", label: "Front" },
+  211:       { bg: "/images/products/deep-clean-mask/deep-clean-mask-top.jpeg", label: "top" },
+  212:       { bg: "/images/products/deep-clean-mask/deep-clean-mask-close.jpeg", label: "close" },
+  213      ],
+
+  235      images: [
+  236:       { bg: "/images/products/vitamin-c-booster/vitamin-c-booster.jpeg", label: "Front" },
+  237:         { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-top.jpeg", label: "top" },
+  238:          { bg: "/images/products/vitamin-c-booster/vitamin-c-booster-close.jpeg", label: "close" },
+  239      ],
+
+  261      images: [
+  262:        { bg: "/images/products/overnight-recovery/overnight-recovery.jpeg", label: "Front" },
+  263:        { bg: "/images/products/overnight-recovery/overnight-recovery-top.jpeg", label: "top" },
+  264:        { bg: "/images/products/overnight-recovery/overnight-recovery-close.jpeg", label: "close" },
+  265  
+
+  288      images: [
+  289:      { bg: "/images/products/calming-eye-cream/calming-eye-cream.jpeg", label: "Front" },
+  290:       { bg: "/images/products/calming-eye-cream/calming-eye-cream-side.jpeg", label: "side" },
+  291:        { bg: "/images/products/calming-eye-cream/calming-eye-cream-top.jpeg", label: "top" },
+  292      ],
+
+  314      images: [
+  315:       { bg: "/images/products/hydra-boost-essence/hydra-boost-essence.jpeg", label: "Front" },
+  316:       { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-top.jpeg", label: "top" },
+  317:       { bg: "/images/products/hydra-boost-essence/hydra-boost-essence-close.jpeg", label: "close" },
+  318      ],
+
+  340      images: [
+  341:       { bg: "/images/products/wellness-bundle/wellness-bundle.jpeg", label: "Front" },
+  342:        { bg: "/images/products/wellness-bundle/wellness-bundle-top.jpeg", label: "top" },
+  343:         { bg: "/images/products/wellness-bundle/wellness-bundle-close.jpeg", label: "close" },
+  344      ],
+
+  366      images: [
+  367:       { bg: "/images/products/glow-gift-set/glow-gift-set.jpeg", label: "Front" },
+  368:       { bg: "/images/products/glow-gift-set/glow-gift-set-top.jpeg", label: "top" },
+  369:       { bg: "/images/products/glow-gift-set/glow-gift-set-close.jpeg", label: "close" },
+  370      ],
+
+  392      images: [
+  393:       { bg: "/images/products/skincare-starter-kit/skincare-starter-kit.jpeg", label: "Front" },
+  394:       { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-top.jpeg", label: "top" },
+  395:       { bg: "/images/products/skincare-starter-kit/skincare-starter-kit-close.jpeg", label: "close" },
+  396      ],
+
+src\pages\Shop\shopData.ts:
+  18  export const ALL_PRODUCTS: Product[] = [
+  19:   { id:"1",  name:"Radiance Serum",      price:68,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#FFEFB3", image:"/images/products/radiance-serum/radiance-serum.jpeg", slug:"radiance-serum",      tags:["serum","glow"],        rating:4.9, reviews:312 },
+  20:   { id:"2",  name:"Glow Face Mist",      price:42,  salePrice:35,   category:"Skincare", badge:"Sale",        bg:"#C5E8E3", image:"/images/products/glow-face-mist/glow-face-mist.jpeg", slug:"glow-face-mist",       tags:["mist","hydration"],    rating:4.7, reviews:198 },
+  21:   { id:"3",  name:"Velvet Body Butter",  price:55,  salePrice:null, category:"Wellness", badge:"New",         bg:"#FFF5D0", image:"/images/products/velvet-body-butter/velvet-body-butter.jpeg", slug:"velvet-body-butter",   tags:["body","moisturizer"],  rating:4.8, reviews:145 },
+  22:   { id:"4",  name:"Rose Toner",          price:38,  salePrice:null, category:"Skincare", badge:null,          bg:"#A8D9D2", image:"/images/products/rose-toner/rose-toner.jpeg", slug:"rose-toner",           tags:["toner","rose"],        rating:4.6, reviews:89  },
+  23:   { id:"5",  name:"Cloud Cream SPF 30",  price:72,  salePrice:null, category:"Skincare", badge:"New",         bg:"#FFF9E8", image:"/images/products/could-cream-spf/cloud-cream-spf.jpeg", slug:"cloud-cream-spf",      tags:["spf","moisturizer"],   rating:4.9, reviews:267 },
+  24:   { id:"6",  name:"Lip Treatment Set",   price:34,  salePrice:28,   category:"Beauty",   badge:"Sale",        bg:"#E6F4F2", image:"/images/products/lip-treatment-set/lip-treatment-set.jpeg", slug:"lip-treatment-set",    tags:["lips","set"],          rating:4.5, reviews:73  },
+  25:   { id:"7",  name:"Deep Clean Mask",     price:48,  salePrice:null, category:"Skincare", badge:null,          bg:"#B8E8E3", image:"/images/products/deep-clean-mask/deep-clean-mask.jpeg", slug:"deep-clean-mask",      tags:["mask","cleansing"],    rating:4.7, reviews:156 },
+  26:   { id:"8",  name:"Vitamin C Booster",   price:85,  salePrice:null, category:"Skincare", badge:"Best Seller", bg:"#FFF0B8", image:"/images/products/vitamin-c-booster/vitamin-c-booster.jpeg", slug:"vitamin-c-booster",    tags:["vitamin-c","serum"],   rating:4.8, reviews:421 },
+  27:   { id:"9",  name:"Overnight Recovery",  price:92,  salePrice:75,   category:"Skincare", badge:"Sale",        bg:"#9ECFC6", image:"/images/products/overnight-recovery/overnight-recovery.jpeg", slug:"overnight-recovery",   tags:["night","repair"],      rating:4.9, reviews:203 },
+  28:   { id:"10", name:"Calming Eye Cream",   price:58,  salePrice:null, category:"Beauty",   badge:"New",         bg:"#D4EDE8", image:"/images/products/calming-eye-cream/calming-eye-cream.jpeg", slug:"calming-eye-cream",    tags:["eyes","sensitive"],    rating:4.6, reviews:88  },
+  29:   { id:"11", name:"Hydra Boost Essence", price:65,  salePrice:null, category:"Skincare", badge:null,          bg:"#F5F8C0", image:"/images/products/hydra-boost-essence/hydra-boost-essence.jpeg", slug:"hydra-boost-essence",  tags:["essence","hydration"], rating:4.7, reviews:134 },
+  30:   { id:"12", name:"Wellness Bundle",     price:120, salePrice:99,   category:"Wellness", badge:"Sale",        bg:"#8BC4BC", image:"/images/products/wellness-bundle/wellness-bundle.jpeg", slug:"wellness-bundle",      tags:["bundle","set"],        rating:4.9, reviews:67  },
+  31  ];
