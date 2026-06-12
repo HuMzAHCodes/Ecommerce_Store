@@ -1,6 +1,13 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  type ReactNode,
+} from "react";
 import type { CartProduct } from "./CartContext";
 import { useAuth } from "./AuthContext";
+import api from "../lib/api";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -12,30 +19,39 @@ interface WishlistState {
 }
 
 type WishlistAction =
-  | { type: "ADD_ITEM";    payload: WishlistItem }
+  | { type: "ADD_ITEM"; payload: WishlistItem }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "CLEAR" }
-  | { type: "HYDRATE";     payload: { items: WishlistItem[]; userId: string | null } };
+  | {
+      type: "HYDRATE";
+      payload: { items: WishlistItem[]; userId: string | null };
+    };
 
 interface WishlistContextValue extends WishlistState {
-  addItem:    (item: WishlistItem) => void;
+  addItem: (item: WishlistItem) => void;
   removeItem: (id: string) => void;
-  toggle:     (item: WishlistItem) => void;
-  clear:      () => void;
+  toggle: (item: WishlistItem) => void;
+  clear: () => void;
   isWishlisted: (id: string) => boolean;
-  totalItems:   number;
+  totalItems: number;
 }
 
 // ── Reducer ───────────────────────────────────────────────────
 
-const wishlistReducer = (state: WishlistState, action: WishlistAction): WishlistState => {
+const wishlistReducer = (
+  state: WishlistState,
+  action: WishlistAction,
+): WishlistState => {
   switch (action.type) {
     case "ADD_ITEM":
       if (state.items.find((i) => i.id === action.payload.id)) return state;
       return { ...state, items: [...state.items, action.payload] };
 
     case "REMOVE_ITEM":
-      return { ...state, items: state.items.filter((i) => i.id !== action.payload) };
+      return {
+        ...state,
+        items: state.items.filter((i) => i.id !== action.payload),
+      };
 
     case "CLEAR":
       return { ...state, items: [] };
@@ -54,62 +70,116 @@ const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 export const useWishlist = (): WishlistContextValue => {
   const ctx = useContext(WishlistContext);
-  if (!ctx) throw new Error("useWishlist must be used inside <WishlistProvider>");
+  if (!ctx)
+    throw new Error("useWishlist must be used inside <WishlistProvider>");
   return ctx;
 };
+
+// ── Helpers ───────────────────────────────────────────────────
+
+function mapServerItem(item: any): WishlistItem {
+  return {
+    id: item.product.id,
+    name: item.product.name,
+    price: item.product.price,
+    salePrice: item.product.salePrice ?? null,
+    image: Array.isArray(item.product.images)
+      ? (item.product.images[0] ?? "")
+      : "",
+    slug: item.product.slug,
+  };
+}
 
 // ── Provider ──────────────────────────────────────────────────
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(wishlistReducer, { items: [], userId: undefined });
-  const { user } = useAuth();
-  const userId = user?.id || null;
+  const [state, dispatch] = useReducer(wishlistReducer, {
+    items: [],
+    userId: undefined,
+  });
 
-  // Hydrate from localStorage on mount/user change
-  useEffect(() => {
-    try {
-      const storageKey = userId ? `blum_wishlist_${userId}` : "blum_wishlist_guest";
-      const saved = localStorage.getItem(storageKey);
-      const items = saved ? JSON.parse(saved) : [];
-      dispatch({ type: "HYDRATE", payload: { items, userId } });
-    } catch {
-      dispatch({ type: "HYDRATE", payload: { items: [], userId } });
-    }
-  }, [userId]);
+  const { user, isLoggedIn } = useAuth();
+  const userId = user?.id ?? null;
 
-  // Persist on change (only if matching the currently hydrated user)
+  // ── Hydration ─────────────────────────────────────────────
   useEffect(() => {
-    if (state.userId === userId) {
-      const storageKey = userId ? `blum_wishlist_${userId}` : "blum_wishlist_guest";
-      localStorage.setItem(storageKey, JSON.stringify(state.items));
+    if (!isLoggedIn) {
+      try {
+        const saved = localStorage.getItem("blum_wishlist_guest");
+        const items = saved ? JSON.parse(saved) : [];
+        dispatch({ type: "HYDRATE", payload: { items, userId: null } });
+      } catch {
+        dispatch({ type: "HYDRATE", payload: { items: [], userId: null } });
+      }
+      return;
     }
-  }, [state.items, state.userId, userId]);
+
+    // Logged in: load from server
+    api
+      .get("/api/wishlist")
+      .then((res) => {
+        const serverItems: WishlistItem[] = (res.data.data ?? []).map(
+          mapServerItem,
+        );
+        dispatch({ type: "HYDRATE", payload: { items: serverItems, userId } });
+      })
+      .catch(() => {
+        dispatch({ type: "HYDRATE", payload: { items: [], userId } });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, userId]);
+
+  // ── Guest localStorage persistence ────────────────────────
+  useEffect(() => {
+    if (!isLoggedIn && state.userId === null) {
+      localStorage.setItem("blum_wishlist_guest", JSON.stringify(state.items));
+    }
+  }, [state.items, state.userId, isLoggedIn]);
+
+  // ── Actions ───────────────────────────────────────────────
 
   const isWishlisted = (id: string) => state.items.some((i) => i.id === id);
 
+  const addItem = (item: WishlistItem) => {
+    dispatch({ type: "ADD_ITEM", payload: item }); // optimistic
+    if (isLoggedIn) {
+      api.post("/api/wishlist", { productId: item.id }).catch(console.error);
+    }
+  };
+
+  const removeItem = (id: string) => {
+    dispatch({ type: "REMOVE_ITEM", payload: id }); // optimistic
+    if (isLoggedIn) {
+      api.delete(`/api/wishlist/${id}`).catch(console.error);
+    }
+  };
+
   const toggle = (item: WishlistItem) => {
     if (isWishlisted(item.id)) {
-      dispatch({ type: "REMOVE_ITEM", payload: item.id });
+      removeItem(item.id);
     } else {
-      dispatch({ type: "ADD_ITEM",    payload: item });
+      addItem(item);
     }
   };
 
   const value: WishlistContextValue = {
     ...state,
-    addItem:    (item) => dispatch({ type: "ADD_ITEM",    payload: item }),
-    removeItem: (id)   => dispatch({ type: "REMOVE_ITEM", payload: id }),
+    addItem,
+    removeItem,
     toggle,
-    clear:      ()     => dispatch({ type: "CLEAR" }),
+    clear: () => dispatch({ type: "CLEAR" }),
     isWishlisted,
     totalItems: state.items.length,
   };
 
-  return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
+  return (
+    <WishlistContext.Provider value={value}>
+      {children}
+    </WishlistContext.Provider>
+  );
 };
 
 export default WishlistContext;
-
 
 // ──────────────────────────────────────────────────────────────────────────────
 // FILE OVERVIEW: WishlistContext.tsx
