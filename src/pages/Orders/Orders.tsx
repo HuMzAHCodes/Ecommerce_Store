@@ -1,51 +1,72 @@
-import { useState, useEffect } from "react";
-import { useTheme }    from "../../theme/ThemeContext";
-import { useAuth }     from "../../context/AuthContext";
-import OrdersHeader    from "./OrdersHeader";
-import OrderCard       from "./OrderCard";
-import OrdersEmpty     from "./OrdersEmpty";
+import { useTheme } from "../../theme/ThemeContext";
+import { useQuery } from "@tanstack/react-query";
+import OrdersHeader from "./OrdersHeader";
+import OrderCard from "./OrderCard";
+import OrdersEmpty from "./OrdersEmpty";
 import { pageStyles, ordersListStyles } from "./ordersStyles";
-import { MOCK_ORDERS, type Order } from "./ordersData";
+import type { Order } from "./ordersData";
+import api from "../../lib/api";
+
+// ── API → local Order shape mapper ────────────────────────────
+
+function mapApiOrder(o: any): Order {
+  return {
+    id: o.id,
+    date: new Date(o.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    status: o.status,
+    total: o.total,
+    items: (o.items ?? []).map((item: any) => ({
+      name: item.product?.name ?? "Product",
+      qty: item.quantity,
+      price: item.price,
+    })),
+  };
+}
 
 // ── Component ─────────────────────────────────────────────────
 
 const Orders = () => {
   const { colors } = useTheme();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const { user } = useAuth();
-  const userId = user?.id || null;
 
-  useEffect(() => {
-    try {
-      const storageKey = userId ? `blum_orders_${userId}` : "blum_orders_guest";
-      const existingOrdersStr = localStorage.getItem(storageKey);
-      const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
-      setOrders([...existingOrders, ...MOCK_ORDERS]);
-    } catch {
-      setOrders(MOCK_ORDERS);
-    }
-  }, [userId]);
-
-  const hasOrders  = orders.length > 0;
+  const { data: orders = [], isLoading } = useQuery<Order[]>({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      const { data } = await api.get("/api/orders");
+      return (data.data ?? []).map(mapApiOrder);
+    },
+  });
 
   return (
     <div style={pageStyles(colors)}>
-
       <OrdersHeader orderCount={orders.length} />
 
       <div style={ordersListStyles}>
-        {hasOrders
-          ? orders.map((order, index) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                animationDelay={index * 0.08}
-              />
-            ))
-          : <OrdersEmpty />
-        }
+        {isLoading ? (
+          <p
+            style={{
+              color: colors.textMuted,
+              textAlign: "center",
+              padding: "3rem 0",
+            }}
+          >
+            Loading orders…
+          </p>
+        ) : orders.length > 0 ? (
+          orders.map((order, index) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              animationDelay={index * 0.08}
+            />
+          ))
+        ) : (
+          <OrdersEmpty />
+        )}
       </div>
-
     </div>
   );
 };
