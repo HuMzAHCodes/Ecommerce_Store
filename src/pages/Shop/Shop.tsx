@@ -1,62 +1,91 @@
-import { useTheme }          from "../../theme/ThemeContext";
-import { useCart }           from "../../context/CartContext";
-import { useWishlist }       from "../../context/WishlistContext";
-import { useToast }          from "../../components/ui/Toast";
-import { useIsMobile }       from "../../hooks/useMediaQuery";
-import useShopFilters        from "./useShopFilters";
-import ShopHeader            from "./ShopHeader";
-import ShopSidebar           from "./ShopSidebar";
-import ShopMobileFilters     from "./ShopMobileFilters";
-import ShopToolbar           from "./ShopToolbar";
-import ShopProductGrid       from "./ShopProductGrid";
+import { useTheme } from "../../theme/ThemeContext";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { useToast } from "../../components/ui/Toast";
+import { useIsMobile } from "../../hooks/useMediaQuery";
+import useShopFilters from "./useShopFilters";
+import ShopHeader from "./ShopHeader";
+import ShopSidebar from "./ShopSidebar";
+import ShopMobileFilters from "./ShopMobileFilters";
+import ShopToolbar from "./ShopToolbar";
+import ShopProductGrid from "./ShopProductGrid";
 import { pageStyles, contentGridStyles } from "./shopStyles";
-import type { Product }      from "./shopData";
+import type { Product } from "./shopData";
 
 // ── Component ─────────────────────────────────────────────────
 
 const Shop = () => {
-  const { colors }                        = useTheme();
-  const isMobile                          = useIsMobile();
+  const { colors } = useTheme();
+  const isMobile = useIsMobile();
   const { addItem, isInCart, openDrawer } = useCart();
-  const { toggle, isWishlisted }          = useWishlist();
-  const toast                             = useToast();
+  const { toggle, isWishlisted } = useWishlist();
+  const toast = useToast();
 
   const {
-    search, category, sort, priceMax, saleOnly,
-    filtersOpen, filteredProducts, hasActiveFilters,
-    setSearch, setCategory, setSort, setPriceMax,
-    setSaleOnly, setFiltersOpen, clearAllFilters,
+    search,
+    category,
+    sort,
+    priceMax,
+    saleOnly,
+    filtersOpen,
+    filteredProducts,
+    hasActiveFilters,
+    setSearch,
+    setCategory,
+    setSort,
+    setPriceMax,
+    setSaleOnly,
+    setFiltersOpen,
+    clearAllFilters,
+    isLoading,
   } = useShopFilters();
 
   const handleAddToCart = (product: Product) => {
-    addItem({ id: product.id, name: product.name, price: product.price,
-       salePrice: product.salePrice, image: product.image, slug: product.slug });
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice,
+      image: product.image,
+      slug: product.slug,
+    });
     openDrawer();
     toast.success(`${product.name} added to cart!`);
   };
 
   const handleWishlist = (product: Product) => {
-    toggle({ id: product.id, name: product.name, price: product.price,
-       salePrice: product.salePrice, image: product.image, slug: product.slug });
-    toast.info(isWishlisted(product.id) ? "Removed from wishlist" : `${product.name} saved!`);
+    toggle({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice,
+      image: product.image,
+      slug: product.slug,
+    });
+    toast.info(
+      isWishlisted(product.id)
+        ? "Removed from wishlist"
+        : `${product.name} saved!`,
+    );
   };
 
   const sharedFilterProps = {
-    search, category, priceMax, saleOnly,
-    onSearchChange:   setSearch,
+    search,
+    category,
+    priceMax,
+    saleOnly,
+    onSearchChange: setSearch,
     onCategoryChange: setCategory,
-    onPriceChange:    setPriceMax,
-    onSaleToggle:     setSaleOnly,
-    onClearAll:       clearAllFilters,
+    onPriceChange: setPriceMax,
+    onSaleToggle: setSaleOnly,
+    onClearAll: clearAllFilters,
   };
 
   return (
     <div style={pageStyles(colors)}>
-
       <ShopHeader productCount={filteredProducts.length} />
 
       <div style={contentGridStyles(isMobile)}>
-
         {/* Desktop sidebar */}
         {!isMobile && <ShopSidebar {...sharedFilterProps} />}
 
@@ -89,7 +118,6 @@ const Shop = () => {
             onWishlist={handleWishlist}
           />
         </div>
-
       </div>
     </div>
   );
