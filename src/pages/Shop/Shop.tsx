@@ -30,6 +30,7 @@ const Shop = () => {
     filtersOpen,
     filteredProducts,
     hasActiveFilters,
+    isLoading,
     setSearch,
     setCategory,
     setSort,
@@ -37,7 +38,6 @@ const Shop = () => {
     setSaleOnly,
     setFiltersOpen,
     clearAllFilters,
-    isLoading,
   } = useShopFilters();
 
   const handleAddToCart = (product: Product) => {
@@ -112,6 +112,7 @@ const Shop = () => {
 
           <ShopProductGrid
             products={filteredProducts}
+            isLoading={isLoading}
             isInCart={isInCart}
             isWishlisted={isWishlisted}
             onAddToCart={handleAddToCart}
