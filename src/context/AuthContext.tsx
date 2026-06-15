@@ -1,21 +1,26 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { useAuth as useFirebaseAuth } from "../components/auth/AuthContext";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
+import { useAuth as useFirebaseAuth } from "../components/auth/AuthContext"; // adjust path if needed
 
 // ── Types ─────────────────────────────────────────────────────
 
 export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
+  id:      string;
+  name:    string;
+  email:   string;
   avatar?: string;
-  role: "CUSTOMER" | "ADMIN";
+  role:    "CUSTOMER" | "ADMIN";
 }
 
 interface AuthContextValue {
-  user: AuthUser | null;
+  user:       AuthUser | null;
   isLoggedIn: boolean;
-  isLoading: boolean;
-  getToken: () => Promise<string | null>;
+  isLoading:  boolean;
+  getToken:   () => Promise<string | null>;
 }
 
 // ── Context ───────────────────────────────────────────────────
@@ -31,41 +36,22 @@ export const useAuth = (): AuthContextValue => {
 // ── Provider ──────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const {
-    user: firebaseUser,
-    dbUser,
-    isLoaded,
-    isSignedIn,
-  } = useFirebaseAuth();
+  const { user: firebaseUser, isLoaded, isSignedIn } = useFirebaseAuth();
 
-  // Prefer dbUser (has real role from DB); fall back to Firebase user while syncing
+  // Map Firebase user → our internal AuthUser shape
   const mappedUser = useMemo((): AuthUser | null => {
     if (!firebaseUser) return null;
-
-    if (dbUser) {
-      return {
-        id: dbUser.id,
-        name:
-          dbUser.name ??
-          firebaseUser.displayName ??
-          firebaseUser.email ??
-          "User",
-        email: dbUser.email,
-        avatar: dbUser.avatar ?? firebaseUser.photoURL ?? undefined,
-        role: dbUser.role,
-      };
-    }
-
-    // dbUser not yet synced — use Firebase data with default role
     return {
-      id: firebaseUser.uid,
-      name: firebaseUser.displayName ?? firebaseUser.email ?? "User",
-      email: firebaseUser.email ?? "",
+      id:     firebaseUser.uid,
+      name:   firebaseUser.displayName ?? firebaseUser.email ?? "User",
+      email:  firebaseUser.email ?? "",
       avatar: firebaseUser.photoURL ?? undefined,
-      role: "CUSTOMER",
+      role:   "CUSTOMER",
     };
-  }, [firebaseUser, dbUser]);
+  }, [firebaseUser]);
 
+  // Firebase doesn't use session tokens the same way —
+  // returns the Firebase ID token for authenticated API calls
   const getToken = async (): Promise<string | null> => {
     try {
       return firebaseUser ? await firebaseUser.getIdToken() : null;
@@ -77,9 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        user: mappedUser,
+        user:       mappedUser,
         isLoggedIn: isSignedIn,
-        isLoading: !isLoaded,
+        isLoading:  !isLoaded,
         getToken,
       }}
     >
@@ -89,6 +75,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export default AuthContext;
+
+
+
+
+
+
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // FILE OVERVIEW: AuthContext.tsx

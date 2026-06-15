@@ -1,102 +1,84 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-  useEffect,
-  type ReactNode,
-} from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
 import { useAuth } from "./AuthContext";
-import api from "../lib/api";
 
 // ── Types ─────────────────────────────────────────────────────
 
 export interface CartProduct {
-  id: string;
-  name: string;
-  price: number;
+  id:       string;
+  name:     string;
+  price:    number;
   salePrice?: number | null;
-  image: string;
-  slug: string;
+  image:    string;
+  slug:     string;
 }
 
 export interface CartItem {
-  product: CartProduct;
+  product:  CartProduct;
   quantity: number;
 }
 
 interface CartState {
-  items: CartItem[];
-  isOpen: boolean;
-  userId?: string | null;
+  items:    CartItem[];
+  isOpen:   boolean;
+  userId?:  string | null;
 }
 
 type CartAction =
-  | { type: "ADD_ITEM"; payload: CartProduct }
-  | { type: "REMOVE_ITEM"; payload: string }
-  | { type: "UPDATE_QTY"; payload: { id: string; quantity: number } }
+  | { type: "ADD_ITEM";      payload: CartProduct }
+  | { type: "REMOVE_ITEM";   payload: string }
+  | { type: "UPDATE_QTY";    payload: { id: string; quantity: number } }
   | { type: "CLEAR_CART" }
   | { type: "TOGGLE_DRAWER" }
   | { type: "OPEN_DRAWER" }
   | { type: "CLOSE_DRAWER" }
-  | { type: "HYDRATE"; payload: { items: CartItem[]; userId: string | null } };
+  | { type: "HYDRATE";       payload: { items: CartItem[]; userId: string | null } };
 
 interface CartContextValue extends CartState {
-  addItem: (product: CartProduct) => void;
-  removeItem: (id: string) => void;
-  updateQty: (id: string, quantity: number) => void;
-  clearCart: () => void;
-  toggleDrawer: () => void;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-  totalItems: number;
-  totalPrice: number;
-  isInCart: (id: string) => boolean;
+  addItem:       (product: CartProduct) => void;
+  removeItem:    (id: string) => void;
+  updateQty:     (id: string, quantity: number) => void;
+  clearCart:     () => void;
+  toggleDrawer:  () => void;
+  openDrawer:    () => void;
+  closeDrawer:   () => void;
+  totalItems:    number;
+  totalPrice:    number;
+  isInCart:      (id: string) => boolean;
 }
 
 // ── Reducer ───────────────────────────────────────────────────
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
+
     case "ADD_ITEM": {
-      const exists = state.items.find(
-        (i) => i.product.id === action.payload.id,
-      );
+      const exists = state.items.find((i) => i.product.id === action.payload.id);
       if (exists) {
         return {
           ...state,
           items: state.items.map((i) =>
             i.product.id === action.payload.id
               ? { ...i, quantity: i.quantity + 1 }
-              : i,
+              : i
           ),
         };
       }
-      return {
-        ...state,
-        items: [...state.items, { product: action.payload, quantity: 1 }],
-      };
+      return { ...state, items: [...state.items, { product: action.payload, quantity: 1 }] };
     }
 
     case "REMOVE_ITEM":
-      return {
-        ...state,
-        items: state.items.filter((i) => i.product.id !== action.payload),
-      };
+      return { ...state, items: state.items.filter((i) => i.product.id !== action.payload) };
 
     case "UPDATE_QTY":
       if (action.payload.quantity <= 0) {
-        return {
-          ...state,
-          items: state.items.filter((i) => i.product.id !== action.payload.id),
-        };
+        return { ...state, items: state.items.filter((i) => i.product.id !== action.payload.id) };
       }
       return {
         ...state,
         items: state.items.map((i) =>
           i.product.id === action.payload.id
             ? { ...i, quantity: action.payload.quantity }
-            : i,
+            : i
         ),
       };
 
@@ -113,11 +95,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return { ...state, isOpen: false };
 
     case "HYDRATE":
-      return {
-        ...state,
-        items: action.payload.items,
-        userId: action.payload.userId,
-      };
+      return { ...state, items: action.payload.items, userId: action.payload.userId };
 
     default:
       return state;
@@ -134,133 +112,34 @@ export const useCart = (): CartContextValue => {
   return ctx;
 };
 
-// ── Helpers ───────────────────────────────────────────────────
-
-// Map a backend cart item → local CartItem shape
-function mapServerItem(item: any): CartItem {
-  return {
-    product: {
-      id: item.product.id,
-      name: item.product.name,
-      price: item.product.price,
-      salePrice: item.product.salePrice ?? null,
-      image: Array.isArray(item.product.images)
-        ? (item.product.images[0] ?? "")
-        : "",
-      slug: item.product.slug,
-    },
-    quantity: item.quantity,
-  };
-}
-
 // ── Provider ──────────────────────────────────────────────────
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, {
-    items: [],
-    isOpen: false,
-    userId: undefined,
-  });
+  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false, userId: undefined });
+  const { user } = useAuth();
+  const userId = user?.id || null;
 
-  const { user, isLoggedIn } = useAuth();
-  const userId = user?.id ?? null;
-  const qc = useQueryClient();
-
-  // ── Hydration ─────────────────────────────────────────────
+  // Hydrate from localStorage on mount/user change
   useEffect(() => {
-    if (!isLoggedIn) {
-      // Guest: load from localStorage
-      try {
-        const saved = localStorage.getItem("blum_cart_guest");
-        const items = saved ? JSON.parse(saved) : [];
-        dispatch({ type: "HYDRATE", payload: { items, userId: null } });
-      } catch {
-        dispatch({ type: "HYDRATE", payload: { items: [], userId: null } });
-      }
-      return;
+    try {
+      const storageKey = userId ? `blum_cart_${userId}` : "blum_cart_guest";
+      const saved = localStorage.getItem(storageKey);
+      const items = saved ? JSON.parse(saved) : [];
+      dispatch({ type: "HYDRATE", payload: { items, userId } });
+    } catch {
+      dispatch({ type: "HYDRATE", payload: { items: [], userId } });
     }
+  }, [userId]);
 
-    // Logged in: load from server
-    api
-      .get("/api/cart")
-      .then((res) => {
-        const serverItems: CartItem[] = (res.data.data.items ?? []).map(
-          mapServerItem,
-        );
-
-        // Merge guest cart into server cart
-        const guestRaw = localStorage.getItem("blum_cart_guest");
-        const guestItems: CartItem[] = guestRaw ? JSON.parse(guestRaw) : [];
-
-        if (guestItems.length > 0) {
-          const merges = guestItems.map(
-            (g) =>
-              api
-                .post("/api/cart", {
-                  productId: g.product.id,
-                  quantity: g.quantity,
-                })
-                .catch(() => null), // ignore failures for individual items
-          );
-          Promise.all(merges).then(() => {
-            localStorage.removeItem("blum_cart_guest");
-            qc.invalidateQueries({ queryKey: ["cart"] });
-          });
-        }
-
-        dispatch({ type: "HYDRATE", payload: { items: serverItems, userId } });
-      })
-      .catch(() => {
-        dispatch({ type: "HYDRATE", payload: { items: [], userId } });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, userId]);
-
-  // ── Guest localStorage persistence ────────────────────────
+  // Persist to localStorage on every change (only if matching the currently hydrated user)
   useEffect(() => {
-    if (!isLoggedIn && state.userId === null) {
-      localStorage.setItem("blum_cart_guest", JSON.stringify(state.items));
+    if (state.userId === userId) {
+      const storageKey = userId ? `blum_cart_${userId}` : "blum_cart_guest";
+      localStorage.setItem(storageKey, JSON.stringify(state.items));
     }
-  }, [state.items, state.userId, isLoggedIn]);
+  }, [state.items, state.userId, userId]);
 
-  // ── Actions ───────────────────────────────────────────────
-
-  const addItem = (product: CartProduct) => {
-    dispatch({ type: "ADD_ITEM", payload: product }); // optimistic
-    if (isLoggedIn) {
-      api
-        .post("/api/cart", { productId: product.id, quantity: 1 })
-        .catch(console.error);
-    }
-  };
-
-  const removeItem = (id: string) => {
-    dispatch({ type: "REMOVE_ITEM", payload: id }); // optimistic
-    if (isLoggedIn) {
-      api.delete(`/api/cart/${id}`).catch(console.error);
-    }
-  };
-
-  const updateQty = (id: string, quantity: number) => {
-    dispatch({ type: "UPDATE_QTY", payload: { id, quantity } }); // optimistic
-    if (isLoggedIn) {
-      if (quantity <= 0) {
-        api.delete(`/api/cart/${id}`).catch(console.error);
-      } else {
-        api.put(`/api/cart/${id}`, { quantity }).catch(console.error);
-      }
-    }
-  };
-
-  const clearCart = () => {
-    dispatch({ type: "CLEAR_CART" });
-    if (isLoggedIn) {
-      api.delete("/api/cart").catch(console.error);
-    }
-  };
-
-  // ── Derived ───────────────────────────────────────────────
-
+  // ── Derived values ────────────────────────────────────────
   const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0);
 
   const totalPrice = state.items.reduce((sum, i) => {
@@ -272,13 +151,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const value: CartContextValue = {
     ...state,
-    addItem,
-    removeItem,
-    updateQty,
-    clearCart,
-    toggleDrawer: () => dispatch({ type: "TOGGLE_DRAWER" }),
-    openDrawer: () => dispatch({ type: "OPEN_DRAWER" }),
-    closeDrawer: () => dispatch({ type: "CLOSE_DRAWER" }),
+    addItem:      (product)          => dispatch({ type: "ADD_ITEM",    payload: product }),
+    removeItem:   (id)               => dispatch({ type: "REMOVE_ITEM", payload: id }),
+    updateQty:    (id, quantity)     => dispatch({ type: "UPDATE_QTY",  payload: { id, quantity } }),
+    clearCart:    ()                 => dispatch({ type: "CLEAR_CART" }),
+    toggleDrawer: ()                 => dispatch({ type: "TOGGLE_DRAWER" }),
+    openDrawer:   ()                 => dispatch({ type: "OPEN_DRAWER" }),
+    closeDrawer:  ()                 => dispatch({ type: "CLOSE_DRAWER" }),
     totalItems,
     totalPrice,
     isInCart,

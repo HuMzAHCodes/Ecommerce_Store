@@ -6,25 +6,13 @@ import { useCart } from "../../context/CartContext";
 import { useToast } from "../../components/ui/Toast";
 import { useAuth } from "../../context/AuthContext";
 import { useIsMobile } from "../../hooks/useMediaQuery";
-import {
-  INITIAL_SHIPPING,
-  INITIAL_PAYMENT,
-  type Step,
-  type ShippingForm,
-  type PaymentForm,
-} from "./types";
-import {
-  validateShipping,
-  validatePayment,
-  isValid,
-  type FormErrors,
-} from "./validation";
-import CheckoutStepper from "./CheckoutStepper";
-import ShippingStep from "./ShippingStep";
-import PaymentStep from "./PaymentStep";
-import ReviewStep from "./ReviewStep";
+import { INITIAL_SHIPPING, INITIAL_PAYMENT, type Step, type ShippingForm, type PaymentForm } from "./types";
+import { validateShipping, validatePayment, isValid, type FormErrors } from "./validation";
+import CheckoutStepper      from "./CheckoutStepper";
+import ShippingStep         from "./ShippingStep";
+import PaymentStep          from "./PaymentStep";
+import ReviewStep           from "./ReviewStep";
 import CheckoutOrderSummary from "./CheckoutOrderSummary";
-import api from "../../lib/api";
 
 /**
  * Checkout page — thin orchestrator.
@@ -42,18 +30,19 @@ const Checkout = () => {
   const { colors, typography, radius } = useTheme();
   const isMobile = useIsMobile();
   const { items, totalPrice, clearCart } = useCart();
-  const toast = useToast();
+  const toast    = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const userId = user?.id || null;
 
   const [currentStep, setCurrentStep] = useState<Step>("shipping");
-  const [isPlacing, setIsPlacing] = useState(false);
-  const [shipping, setShipping] = useState<ShippingForm>(INITIAL_SHIPPING);
-  const [payment, setPayment] = useState<PaymentForm>(INITIAL_PAYMENT);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [isPlacing,   setIsPlacing]   = useState(false);
+  const [shipping,    setShipping]    = useState<ShippingForm>(INITIAL_SHIPPING);
+  const [payment,     setPayment]     = useState<PaymentForm>(INITIAL_PAYMENT);
+  const [errors,      setErrors]      = useState<FormErrors>({});
 
   const shippingFee = totalPrice >= 50 ? 0 : 5.99;
-  const orderTotal = totalPrice + shippingFee;
+  const orderTotal  = totalPrice + shippingFee;
 
   const handleShippingChange = (field: keyof ShippingForm, value: string) =>
     setShipping((prev) => ({ ...prev, [field]: value }));
@@ -64,94 +53,65 @@ const Checkout = () => {
   const handleNext = () => {
     if (currentStep === "shipping") {
       const errs = validateShipping(shipping);
-      if (!isValid(errs)) {
-        setErrors(errs);
-        return;
-      }
+      if (!isValid(errs)) { setErrors(errs); return; }
       setErrors({});
       setCurrentStep("payment");
     } else if (currentStep === "payment") {
       const errs = validatePayment(payment);
-      if (!isValid(errs)) {
-        setErrors(errs);
-        return;
-      }
+      if (!isValid(errs)) { setErrors(errs); return; }
       setErrors({});
       setCurrentStep("review");
     }
   };
 
   const handlePlaceOrder = async () => {
-    if (!user) {
-      toast.error("Please log in to place an order.");
-      return;
-    }
-
     setIsPlacing(true);
+    await new Promise((r) => setTimeout(r, 1500));
 
+    // Construct the new order object matching OrderData shape
+    const newOrder = {
+      id: "ORD-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+      items: items.reduce((sum, item) => sum + item.quantity, 0),
+      total: orderTotal,
+      shipping: "Standard · 3–5 business days",
+      email: shipping.email || "customer@email.com",
+    };
+
+    // Save to localStorage under blum_orders using the Order shape expected by OrderCard
     try {
-      const res = await api.post("/api/orders", {
-        address: {
-          label: "Home",
-          street: shipping.address,
-          city: shipping.city,
-          state: shipping.state,
-          zip: shipping.zip,
-          country: shipping.country,
-        },
-        paymentMethod: payment.cardNumber ? "card" : "cod",
-        notes: undefined,
-      });
-
-      const order = res.data.data;
-
-      clearCart();
-      toast.success("Order placed! Thank you 🎉");
-      navigate("/order-success", {
-        state: {
-          order: {
-            id: order.id,
-            date: new Date(order.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }),
-            items: items.reduce((sum, i) => sum + i.quantity, 0),
-            total: order.total,
-            shipping: "Standard · 3–5 business days",
-            email: shipping.email || user.email,
-          },
-        },
-      });
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message ?? "Order failed. Please try again.";
-      toast.error(message);
-    } finally {
-      setIsPlacing(false);
+      const storageKey = userId ? `blum_orders_${userId}` : "blum_orders_guest";
+      const existingOrdersStr = localStorage.getItem(storageKey);
+      const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+      const ordersItemForLocalStorage = {
+        id: newOrder.id,
+        date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+        status: "PROCESSING",
+        total: newOrder.total,
+        items: items.map(item => ({
+          name: item.product.name,
+          qty: item.quantity,
+          price: item.product.salePrice ?? item.product.price
+        }))
+      };
+      localStorage.setItem(storageKey, JSON.stringify([ordersItemForLocalStorage, ...existingOrders]));
+    } catch (e) {
+      console.error("Failed to save order to localStorage", e);
     }
+
+    clearCart();
+    toast.success("Order placed! Thank you 🎉");
+    navigate("/order-success", { state: { order: newOrder } });
+    setIsPlacing(false);
   };
 
   return (
     <div style={{ background: colors.bgPrimary, minHeight: "100vh" }}>
+
       {/* Page header + stepper */}
-      <div
-        style={{
-          background: colors.bgSecondary,
-          borderBottom: `1px solid ${colors.borderLight}`,
-          padding: isMobile ? "1.5rem 1.25rem" : "2rem 1.5rem",
-        }}
-      >
+      <div style={{ background: colors.bgSecondary, borderBottom: `1px solid ${colors.borderLight}`, padding: isMobile ? "1.5rem 1.25rem" : "2rem 1.5rem" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <h1
-            style={{
-              fontFamily: typography.fontDisplay,
-              color: colors.textPrimary,
-              fontStyle: "italic",
-              marginBottom: "1.25rem",
-              fontSize: isMobile ? typography["2xl"] : undefined,
-            }}
-          >
+          <h1 style={{ fontFamily: typography.fontDisplay, color: colors.textPrimary, fontStyle: "italic", marginBottom: "1.25rem", fontSize: isMobile ? typography["2xl"] : undefined }}>
             Checkout
           </h1>
           <CheckoutStepper currentStep={currentStep} />
@@ -161,13 +121,13 @@ const Checkout = () => {
       {/* Main content */}
       <div
         style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: isMobile ? "1.25rem" : "2.5rem 1.5rem",
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "1fr 320px",
-          gap: isMobile ? "1.5rem" : "2.5rem",
-          alignItems: "start",
+          maxWidth:             1280,
+          margin:               "0 auto",
+          padding:              isMobile ? "1.25rem" : "2.5rem 1.5rem",
+          display:              "grid",
+          gridTemplateColumns:  isMobile ? "1fr" : "1fr 320px",
+          gap:                  isMobile ? "1.5rem" : "2.5rem",
+          alignItems:           "start",
         }}
       >
         {/* Left — animated step forms */}
@@ -214,6 +174,35 @@ const Checkout = () => {
 };
 
 export default Checkout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ── File Overview ──────────────────────────────────────────────────────────────
 //
